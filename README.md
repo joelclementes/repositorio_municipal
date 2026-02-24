@@ -9,7 +9,7 @@
 
 ## Después de clonar el repositorio 
 
-Ejecuta los siguientes comandos
+Ubicado en la carpeta del proyecto, ejecuta los siguientes comandos
 
 ```
 composer update
@@ -23,7 +23,7 @@ npm install
 npm run build
 ```
 
-Obten el .env con el equipo de desarrollo
+### Obten el .env con el equipo de desarrollo
 
 Ejecuta migraciones y seeders
 
