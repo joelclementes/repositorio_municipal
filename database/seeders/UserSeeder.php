@@ -22,6 +22,14 @@ class UserSeeder extends Seeder
                 ],
                 'role' => 'SuperUsuario'
             ],
+            [
+                'user_data' => [
+                    'name' => 'Johan Francisco Morales',
+                    'email' => 'jmorales',
+                    'password' => bcrypt('123456789'),
+                ],
+                'role' => 'Administrador'
+            ],
         ];
 
         foreach ($usuarios as $usuario) {
