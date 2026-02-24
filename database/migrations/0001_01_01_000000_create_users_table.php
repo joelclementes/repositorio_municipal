@@ -20,6 +20,8 @@ return new class extends Migration
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();
+            $table->boolean('is_active')->default(true)->comment('Estado del usuario: 1=Activo, 0=Inactivo');
+            $table->integer('ente_id')->nullable()->comment('ID del ente al que pertenece el usuario');
             $table->timestamps();
         });
 
