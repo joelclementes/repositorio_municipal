@@ -28,3 +28,10 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+
+# Adicionales multiplataforma
+.DS_Store
+
+# Docker
+docker-compose.yml
+docker/
