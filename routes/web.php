@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('auth.login');
-});
+    return view('dashboard');
+})->middleware('auth');
 
 Route::middleware([
     'auth:sanctum',
