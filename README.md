@@ -56,6 +56,7 @@ Instalación
 ```
 composer require filament/filament:"^5.0"
 ```
+
 ```
 php artisan filament:install --panels
 ```
