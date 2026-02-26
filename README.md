@@ -50,3 +50,12 @@ php artisan serve
 Y accede a http://127.0.0.1:8000.
 
 ---
+
+## Filament
+Instalación
+```
+composer require filament/filament:"^5.0"
+```
+```
+php artisan filament:install --panels
+```
