@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="900"
+   height="900"
+   viewBox="0 0 238.12499 238.125"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="LogoTi.svg"
+   inkscape:export-xdpi="76.970001"
+   inkscape:export-ydpi="76.970001"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient6"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#705b00;stop-opacity:1;"
+         offset="0"
+         id="stop8" />
+      <stop
+         style="stop-color:#f5c500;stop-opacity:1;"
+         offset="0.66735822"
+         id="stop9" />
+      <stop
+         style="stop-color:#f5c400;stop-opacity:1;"
+         offset="1"
+         id="stop7" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6"
+       id="linearGradient8"
+       x1="39.129417"
+       y1="119.40829"
+       x2="149.94508"
+       y2="119.40829"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="opacity:1;fill:#333333;fill-opacity:1;fill-rule:evenodd;stroke-width:0.370417;paint-order:stroke fill markers"
+       id="rect1"
+       width="230.1476"
+       height="224.30258"
+       x="3.9887009"
+       y="6.9112091"
+       ry="9.8634682"
+       rx="9.8634682" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:229.432px;line-height:1;font-family:'Reem Kufi';-inkscape-font-specification:'Reem Kufi, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.146276px;word-spacing:0px;text-anchor:middle;opacity:1;fill:url(#linearGradient8);fill-opacity:1;fill-rule:evenodd;stroke-width:0.370417;paint-order:stroke fill markers"
+       x="94.422615"
+       y="203.49348"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:229.432px;font-family:'Reem Kufi';-inkscape-font-specification:'Reem Kufi, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:url(#linearGradient8);fill-opacity:1;stroke-width:0.370417"
+         x="94.34948"
+         y="203.49348">T</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:226.232px;line-height:1;font-family:'Reem Kufi';-inkscape-font-specification:'Reem Kufi, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.144236px;word-spacing:0px;text-anchor:middle;opacity:1;fill:#f5c500;fill-opacity:1;fill-rule:evenodd;stroke-width:0.370417;paint-order:stroke fill markers"
+       x="184.62866"
+       y="203.49348"
+       id="text3"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:226.232px;font-family:'Reem Kufi';-inkscape-font-specification:'Reem Kufi, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#f5c500;fill-opacity:1;stroke-width:0.370417"
+         x="184.55655"
+         y="203.49348">i</tspan></text>
+  </g>
+</svg>
