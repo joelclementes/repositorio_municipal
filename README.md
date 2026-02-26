@@ -60,3 +60,8 @@ composer require filament/filament:"^5.0"
 ```
 php artisan filament:install --panels
 ```
+
+Recursos
+```
+​php artisan make:filament-resource [nombre (de acuerdo al modelo)] --generate
+```
