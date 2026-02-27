@@ -9,7 +9,7 @@ class Ente extends Model
     //
     protected $fillable = [
         'nombre',
-        'tipo_de_ente',
+        'tipos_entes_id',
     ];
 
     public function users()
