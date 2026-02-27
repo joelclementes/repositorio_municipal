@@ -14,15 +14,19 @@ class CausaRechazoSeeder extends Seeder
     public function run(): void
     {
         $causas = [
-            [
-                'descripcion' => 'Documentación incompleta',
-            ],
-            [
-                'descripcion' => 'Datos incorrectos',
-            ],
-            [
-                'descripcion' => 'Fuera de plazo',
-            ],
+            ['descripcion' => 'Documento ilegible',],
+            ['descripcion' => 'Documento no corresponde al solicitado',],
+            ['descripcion' => 'Faltan firmas',],
+            ['descripcion' => 'Las firmas no corresponden a los titulares',],
+            ['descripcion' => 'Documento dañado y no se puede descargar',],
+            ['descripcion' => 'A solicitud del Ayuntamiento',],
+            ['descripcion' => 'Documento en blanco',],
+            ['descripcion' => 'Documento de otro periodo (mes y/o año)',],
+            ['descripcion' => 'Documento que no se debe presentar en este periodo',],
+            ['descripcion' => 'Documentaciòn no dirigida al funcionario actual',],
+            ['descripcion' => 'Documento incompleto',],
+            ['descripcion' => 'Documento no aprobado en sesión de cabildo',],
+            ['descripcion' => 'Este formato no forma parte de sus obligaciones a presentar',],
         ];
 
         foreach ($causas as $causa) {

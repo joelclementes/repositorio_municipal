@@ -14,15 +14,9 @@ class EstadoSeeder extends Seeder
     public function run(): void
     {
         $estados = [
-            [
-                'nombre' => 'Recibido',
-            ],
-            [
-                'nombre' => 'Aprobado',
-            ],
-            [
-                'nombre' => 'Rechazado',
-            ],
+            ['nombre' => 'Recibido',],
+            ['nombre' => 'Aprobado',],
+            ['nombre' => 'Rechazado',],
         ];
 
         foreach ($estados as $estado) {

@@ -13,23 +13,41 @@ class CategoriasDocumentoSeeder extends Seeder
      */
     public function run(): void
     {
-                $categorias = [
+        $categorias = [
             [
-                'user_data' => [
-                    'clave' => 'EF1',
-                    'nombre' => 'Estado de Actividades',
+                'categoria_Data' => [
+                    'clave' => 'IEFM',
+                    'nombre' => 'Integración del Estado Financiero Mensual',
                 ],
             ],
             [
-                'user_data' => [
-                    'clave' => 'EF2',
-                    'nombre' => 'Estado de Situación Financiera',
+                'categoria_Data' => [
+                    'clave' => 'IEFMOP',
+                    'nombre' => 'Integración del Estado Financiero Mensual de Obra Pública',
+                ],
+            ],
+            [
+                'categoria_Data' => [
+                    'clave' => 'OM',
+                    'nombre' => 'Obligaciones Municipales',
+                ],
+            ],
+            [
+                'categoria_Data' => [
+                    'clave' => 'CI',
+                    'nombre' => 'Contralores internos',
+                ],
+            ],
+            [
+                'categoria_Data' => [
+                    'clave' => 'IMM',
+                    'nombre' => 'Institutos Municipales de las Mujeres',
                 ],
             ],
         ];
 
         foreach ($categorias as $categoria) {
-            $categoriaModel = CategoriasDocumento::create($categoria['user_data']);
+            CategoriasDocumento::create($categoria['categoria_Data']);
         }
     }
 }

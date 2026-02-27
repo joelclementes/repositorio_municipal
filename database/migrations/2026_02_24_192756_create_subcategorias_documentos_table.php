@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('subcategorias_documentos', function (Blueprint $table) {
             $table->id();
             $table->string('clave')->unique();
-            $table->string('nombre')->unique();
+            $table->string('nombre', length:255)->unique();
             $table->unsignedBigInteger('categoria_id');
             $table->timestamps();
 
