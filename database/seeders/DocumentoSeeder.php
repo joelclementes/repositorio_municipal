@@ -794,6 +794,125 @@ class DocumentoSeeder extends Seeder
                     'subcategoria_id' => 12,
                 ],
             ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIPA01',
+                    'nombre' => 'Plan anual de Auditorías del Contralor Interno',
+                    'subcategoria_id' => 13,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIPA02',
+                    'nombre' => 'Primer informe trimestral sobre las Auditorías del Contralor Interno (Con corte al 31 de marzo)',
+                    'subcategoria_id' => 13,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIPA03',
+                    'nombre' => 'Segundo informe trimestral sobre las Auditorías del Contralor Interno (Con corte al 30 de junio)',
+                    'subcategoria_id' => 13,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIPA04',
+                    'nombre' => 'Tercer informe trimestral sobre las Auditorías del Contralor Interno (Con corte al 30 de septiembre)',
+                    'subcategoria_id' => 13,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIPA05',
+                    'nombre' => 'Cuarto informe trimestral sobre las Auditorías del Contralor Interno (Con corte al 31 de diciembre)',
+                    'subcategoria_id' => 13,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIIS01',
+                    'nombre' => 'Reporte de Estatus Inicial del Ejercicio sobre las Observaciones y/o Recomendaciones',
+                    'subcategoria_id' => 14,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIIS02',
+                    'nombre' => 'Primer informe trimestral sobre las Observaciones y/o Recomendaciones (Con corte al 31 de marzo)',
+                    'subcategoria_id' => 14,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIIS03',
+                    'nombre' => 'Segundo informe trimestral sobre las Observaciones y/o Recomendaciones (Con corte al 30 de junio)',
+                    'subcategoria_id' => 14,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIIS04',
+                    'nombre' => 'Tercer informe trimestral sobre las Observaciones y/o Recomendaciones (Con corte al 30 de septiembre)',
+                    'subcategoria_id' => 14,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIIS05',
+                    'nombre' => 'Cuarto informe trimestral sobre las Observaciones y/o Recomendaciones (Con corte al 31 de diciembre)',
+                    'subcategoria_id' => 14,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIER01',
+                    'nombre' => 'Dictamen de Entrega Recepción',
+                    'subcategoria_id' => 15,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIER02',
+                    'nombre' => 'Primer Informe Trimestral sobre el Seguimiento de las Observaciones de Entrega Recepción (Corte al 30 de Junio)',
+                    'subcategoria_id' => 15,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIER03',
+                    'nombre' => 'Segundo Informe Trimestral sobre el Seguimiento de las Observaciones de Entrega Recepción (Corte al 30 de Septiembre)',
+                    'subcategoria_id' => 15,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIER04',
+                    'nombre' => 'Tercer Informe Trimestral sobre el Seguimiento de las Observaciones de Entrega Recepción (Corte al 30 de Diciembre)',
+                    'subcategoria_id' => 15,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIPMD01',
+                    'nombre' => 'CIPMD01 Plan Municipal de Desarrollo',
+                    'subcategoria_id' => 16,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIPMD02',
+                    'nombre' => 'CIPMD02 Seguimiento al Plan Municipal de Desarrollo',
+                    'subcategoria_id' => 16,
+                ],
+            ],
+            [
+                'documento_data' => [
+                    'clave' => 'CIPMD03',
+                    'nombre' => 'CIPMD03 Actualizaciones al Plan Municipal de Desarrollo',
+                    'subcategoria_id' => 16,
+                ],
+            ],
         ];
 
         foreach ($documentos as $documento) {

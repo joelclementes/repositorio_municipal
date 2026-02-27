@@ -100,28 +100,28 @@ class SubcategoriasDocumentoSeeder extends Seeder
             ],
             [
                 'subcategoria_Data' => [
-                    'clave' => 'PANAUD',
+                    'clave' => 'CIPA',
                     'nombre' => 'Plan anual de auditoría',
                     'categoria_id' => 4,
                 ],
             ],
             [
                 'subcategoria_Data' => [
-                    'clave' => 'ISOANT',
+                    'clave' => 'CIIS',
                     'nombre' => 'Informes de seguimiento de Observaciones y/o recomendaciones de años anteriores de las cuentas públicas auditadas por el ORFIS',
                     'categoria_id' => 4,
                 ],
             ],
             [
                 'subcategoria_Data' => [
-                    'clave' => 'ISODER',
+                    'clave' => 'CIER',
                     'nombre' => 'Informes de Seguimiento de Observaciones del Dictamen de Entrega y Recepción',
                     'categoria_id' => 4,
                 ],
             ],
             [
                 'subcategoria_Data' => [
-                    'clave' => 'PMD',
+                    'clave' => 'CIPMD',
                     'nombre' => 'Plan Municipal de Desarrollo',
                     'categoria_id' => 4,
                 ],
