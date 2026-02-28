@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('tipo_aviso')->comment('Ejemplo: "Aviso", "Invitación", "Exhorto"');
             $table->text('texto');
             $table->boolean('activo')->default(true);
+            $table->string('url')->nullable();
             $table->string('archivo')->nullable();
             $table->timestamp('fecha_publicacion')->nullable(); // ¿Cuándo se publica?
             $table->timestamp('fecha_expiracion')->nullable(); // ¿Hasta cuándo es válido?

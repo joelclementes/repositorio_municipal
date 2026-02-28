@@ -28,7 +28,7 @@
 
         <!-- Círculo de notificación color #6C143B -->
         @if ($cantidadPendientes > 0)
-            <span class="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white"
+            <span class="absolute top-1 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white"
                 style="background-color: #6C143B;">
             </span>
         @endif
@@ -39,7 +39,7 @@
         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95" @click.away="open = false"
-        class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+        class="absolute mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 -right-2 sm:-right-6"
         style="display: none;">
 
         <!-- Cabecera -->
@@ -232,49 +232,63 @@
                         <!-- Contenido -->
                         <div class="prose max-w-none">
                             <h4 class="text-sm font-semibold text-gray-700 mb-2">Contenido del aviso:</h4>
-                            <div class="text-gray-700 whitespace-pre-line">
+                            <div class="text-gray-700 ">
                                 {{ $avisoSeleccionado->aviso->texto }}
+                                @if (!empty($avisoSeleccionado->aviso->url))
+                                    <div class="mt-0">
+                                        <a href="{{ $avisoSeleccionado->aviso->url }}" target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex items-center text-[#6C143B] hover:text-[#4a0e29] font-medium">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                            </svg>
+                                            Enlace relacionado
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
+
+                            <!-- Archivo adjunto -->
+                            @if ($avisoSeleccionado->aviso->archivo)
+                                <div class="mt-4 pt-4 border-t border-gray-200">
+                                    <a href="{{ Storage::url($avisoSeleccionado->aviso->archivo) }}" target="_blank"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                        </svg>
+                                        <span>Ver archivo adjunto</span>
+                                    </a>
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Archivo adjunto -->
-                        @if ($avisoSeleccionado->aviso->archivo)
-                            <div class="mt-4 pt-4 border-t border-gray-200">
-                                <a href="{{ Storage::url($avisoSeleccionado->aviso->archivo) }}" target="_blank"
-                                    class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                    </svg>
-                                    <span>Ver archivo adjunto</span>
-                                </a>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
-                        @if ($avisoSeleccionado->estado_envio !== 'leido')
-                            <button wire:click="marcarComoLeido({{ $avisoSeleccionado->id }})"
-                                wire:loading.attr="disabled"
-                                class="px-4 py-2 bg-[#6C143B] hover:bg-[#4a0e29] text-white rounded-lg transition-colors flex items-center">
-                                <span wire:loading.remove wire:target="marcarComoLeido({{ $avisoSeleccionado->id }})">
-                                    Marcar como leído
-                                </span>
-                                <span wire:loading wire:target="marcarComoLeido({{ $avisoSeleccionado->id }})">
-                                    Procesando...
-                                </span>
+                        <!-- Footer -->
+                        <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+                            @if ($avisoSeleccionado->estado_envio !== 'leido')
+                                <button wire:click="marcarComoLeido({{ $avisoSeleccionado->id }})"
+                                    wire:loading.attr="disabled"
+                                    class="px-4 py-2 bg-[#6C143B] hover:bg-[#4a0e29] text-white rounded-lg transition-colors flex items-center">
+                                    <span wire:loading.remove
+                                        wire:target="marcarComoLeido({{ $avisoSeleccionado->id }})">
+                                        Marcar como leído
+                                    </span>
+                                    <span wire:loading wire:target="marcarComoLeido({{ $avisoSeleccionado->id }})">
+                                        Procesando...
+                                    </span>
+                                </button>
+                            @endif
+                            <button @click="show = false"
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                                Cerrar
                             </button>
-                        @endif
-                        <button @click="show = false"
-                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
-                            Cerrar
-                        </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     @endif
 
     @script

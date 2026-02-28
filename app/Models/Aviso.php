@@ -18,6 +18,7 @@ class Aviso extends Model
         'tipo_aviso',
         'texto',
         'activo',
+        'url',
         'archivo',
         'fecha_publicacion',
         'fecha_expiracion',

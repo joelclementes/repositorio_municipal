@@ -97,6 +97,7 @@
                                         @elseif($avisoEnte->aviso->tipo_aviso === 'Invitación') bg-green-100 text-green-800
                                         @elseif($avisoEnte->aviso->tipo_aviso === 'Exhorto') bg-yellow-100 text-yellow-800
                                         @elseif($avisoEnte->aviso->tipo_aviso === 'Convocatoria') bg-purple-100 text-purple-800
+                                        @elseif($avisoEnte->aviso->tipo_aviso === 'Circular') bg-purple-100 text-orange-800
                                         @else bg-gray-100 text-gray-800 @endif">
                                         {{ $avisoEnte->aviso->tipo_aviso }}
                                     </span>
