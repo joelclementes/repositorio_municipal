@@ -183,7 +183,7 @@ new class extends Component {
     }
 };
 ?>
-{{-- 
-<div>
+
+{{-- <div>
     Aquí las notificaciones
 </div> --}}
