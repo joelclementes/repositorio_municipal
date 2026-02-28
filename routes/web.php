@@ -1,26 +1,6 @@
 <?php
 
-// use Illuminate\Support\Facades\Route;
-
-// Route::get('/', function () {
-//     return view('dashboard');
-// })->middleware('auth');
-
-// Route::middleware([
-//     'auth:sanctum',
-//     config('jetstream.auth_session'),
-//     'verified',
-// ])->group(function () {
-//     Route::get('/dashboard', function () {
-//         return view('dashboard');
-//     })->name('dashboard');
-// });
-
-
-
 use Illuminate\Support\Facades\Route;
-use App\Models\AvisoEnte;
-use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -37,71 +17,6 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    // ===== NUEVAS RUTAS PARA AVISOS =====
 
-    // Ruta para ver todos los avisos pendientes
-    Route::get('/avisos/pendientes', function (Request $request) {
-        $user = auth()->user();
-
-        // Verificar que el usuario es EnteObligado
-        if (!$user->hasRole('EnteObligado')) {
-            abort(403, 'No tienes permiso para ver esta página.');
-        }
-
-        $ente = $user->ente;
-
-        if (!$ente) {
-            abort(404, 'No se encontró el ente asociado.');
-        }
-
-        $avisosPendientes = AvisoEnte::with(['aviso.creador'])
-            ->where('ente_id', $ente->id)
-            ->where('estado_envio', '!=', 'leido')
-            ->whereHas('aviso', function ($query) {
-                $query->where('activo', true)
-                    ->where(function ($q) {
-                        $q->whereNull('fecha_expiracion')
-                            ->orWhere('fecha_expiracion', '>', now());
-                    });
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-
-        return view('avisos.pendientes', compact('avisosPendientes'));
-    })->name('avisos.pendientes');
-
-    // Ruta para marcar un aviso como leído (opcional)
-    Route::patch('/avisos/{avisoEnte}/marcar-leido', function ($avisoEnteId) {
-        $avisoEnte = AvisoEnte::findOrFail($avisoEnteId);
-
-        // Verificar que el aviso pertenece al ente del usuario
-        if ($avisoEnte->ente_id !== auth()->user()->ente->id) {
-            abort(403);
-        }
-
-        $avisoEnte->update([
-            'estado_envio' => 'leido',
-            'fecha_lectura' => now()
-        ]);
-
-        return back()->with('success', 'Aviso marcado como leído');
-    })->name('avisos.marcar-leido');
-
-    // Ruta para marcar todos como leídos (opcional)
-    Route::post('/avisos/marcar-todos-leidos', function () {
-        $ente = auth()->user()->ente;
-
-        if (!$ente) {
-            abort(404);
-        }
-
-        AvisoEnte::where('ente_id', $ente->id)
-            ->where('estado_envio', '!=', 'leido')
-            ->update([
-                'estado_envio' => 'leido',
-                'fecha_lectura' => now()
-            ]);
-
-        return back()->with('success', 'Todos los avisos marcados como leídos');
-    })->name('avisos.marcar-todos-leidos');
+    require __DIR__ . '/avisos.php';
 });

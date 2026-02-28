@@ -129,7 +129,7 @@
 
                                 {{-- Metadatos --}}
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
-                                    <div>
+                                    {{-- <div>
                                         <p class="text-xs text-gray-500">Estado de envío</p>
                                         <p class="text-sm font-medium">
                                             @switch($avisoEnte->estado_envio)
@@ -157,7 +157,7 @@
                                                     <span>{{ $avisoEnte->estado_envio }}</span>
                                             @endswitch
                                         </p>
-                                    </div>
+                                    </div> --}}
 
                                     <div>
                                         <p class="text-xs text-gray-500">Fecha de envío</p>
@@ -166,10 +166,10 @@
                                         </p>
                                     </div>
 
-                                    <div>
+                                    {{-- <div>
                                         <p class="text-xs text-gray-500">Intentos de envío</p>
                                         <p class="text-sm font-medium">{{ $avisoEnte->intentos_envio }}</p>
-                                    </div>
+                                    </div> --}}
 
                                     @if ($avisoEnte->fecha_lectura)
                                         <div>
@@ -203,13 +203,28 @@
                                 {{-- Contenido del aviso --}}
                                 <div class="prose max-w-none mb-4">
                                     <h4 class="text-sm font-semibold text-gray-700 mb-2">Contenido:</h4>
-                                    <div class="text-gray-700 whitespace-pre-line bg-gray-50 p-4 rounded-lg">
+                                    <div class="text-gray-700  bg-gray-50 p-4 rounded-lg">
                                         {{ $avisoEnte->aviso->texto }}
+                                        @if (!empty($avisoEnte->aviso->url))
+                                            <div class="mt-0">
+                                                <a href="{{ $avisoEnte->aviso->url }}" target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    class="inline-flex items-center text-[#6C143B] hover:text-[#4a0e29] font-medium">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                    Enlace relacionado
+                                                </a>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 
                                 {{-- Archivo adjunto --}}
-                                @if ($avisoEnte->aviso->archivo)
+                                {{-- @if ($avisoEnte->aviso->archivo)
                                     <div class="mt-4 pt-4 border-t border-gray-200">
                                         <a href="{{ route('avisos.descargar', $avisoEnte->id) }}" target="_blank"
                                             class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
@@ -221,7 +236,7 @@
                                             <span>Ver archivo adjunto</span>
                                         </a>
                                     </div>
-                                @endif
+                                @endif --}}
 
                                 {{-- Acciones --}}
                                 @if ($avisoEnte->estado_envio !== 'leido')
@@ -245,37 +260,37 @@
                                 @endif
                             </div>
                         </div>
-                        @empty
-                            {{-- Mensaje cuando no hay avisos --}}
-                            <div class="text-center py-12">
-                                <div class="mb-4">
-                                    <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-medium text-gray-900 mb-2">¡Todo al día!</h3>
-                                <p class="text-gray-500 mb-6">No tienes avisos pendientes por leer en este momento.</p>
-                                <a href="{{ route('dashboard') }}"
-                                    class="inline-flex items-center px-4 py-2 bg-[#6C143B] text-white rounded-md hover:bg-[#4a0e29] transition-colors">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                    </svg>
-                                    Volver al inicio
-                                </a>
+                    @empty
+                        {{-- Mensaje cuando no hay avisos --}}
+                        <div class="text-center py-12">
+                            <div class="mb-4">
+                                <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                </svg>
                             </div>
-                        @endforelse
+                            <h3 class="text-xl font-medium text-gray-900 mb-2">¡Todo al día!</h3>
+                            <p class="text-gray-500 mb-6">No tienes avisos pendientes por leer en este momento.</p>
+                            <a href="{{ route('dashboard') }}"
+                                class="inline-flex items-center px-4 py-2 bg-[#6C143B] text-white rounded-md hover:bg-[#4a0e29] transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                Volver al inicio
+                            </a>
+                        </div>
+                    @endforelse
 
-                        {{-- Paginación --}}
-                        @if ($avisosPendientes->hasPages())
-                            <div class="mt-6">
-                                {{ $avisosPendientes->links() }}
-                            </div>
-                        @endif
-                    </div>
+                    {{-- Paginación --}}
+                    @if ($avisosPendientes->hasPages())
+                        <div class="mt-6">
+                            {{ $avisosPendientes->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
-    </x-app-layout>
+    </div>
+</x-app-layout>

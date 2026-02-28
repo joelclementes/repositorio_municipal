@@ -251,7 +251,7 @@
                             </div>
 
                             <!-- Archivo adjunto -->
-                            @if ($avisoSeleccionado->aviso->archivo)
+                            {{-- @if ($avisoSeleccionado->aviso->archivo)
                                 <div class="mt-4 pt-4 border-t border-gray-200">
                                     <a href="{{ Storage::url($avisoSeleccionado->aviso->archivo) }}" target="_blank"
                                         class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
@@ -263,7 +263,7 @@
                                         <span>Ver archivo adjunto</span>
                                     </a>
                                 </div>
-                            @endif
+                            @endif --}}
                         </div>
 
                         <!-- Footer -->
