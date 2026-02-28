@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             CategoriasDocumentoSeeder::class,
             SubcategoriasDocumentoSeeder::class,
             DocumentoSeeder::class,
+            AvisoSeeder::class, // Temporal para las pruebas, luego se puede eliminar.
+            AvisosEntesSeeder::class, // Temporal para las pruebas, luego se puede eliminar.
         ]);
     }
 }
