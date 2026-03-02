@@ -17,12 +17,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            TiposEntesSeeder::class,
+            EnteSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
             EstadoSeeder::class,
             CategoriasDocumentoSeeder::class,
             SubcategoriasDocumentoSeeder::class,
             DocumentoSeeder::class,
+            AvisoSeeder::class, // Temporal para las pruebas, luego se puede eliminar.
+            AvisosEntesSeeder::class, // Temporal para las pruebas, luego se puede eliminar.
         ]);
     }
 }

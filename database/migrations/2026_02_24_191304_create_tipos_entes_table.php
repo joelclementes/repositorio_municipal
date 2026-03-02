@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('entes', function (Blueprint $table) {
+        Schema::create('tipos_entes', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->unique()->comment('Nombre del ente obligado');
-            $table->unsignedBigInteger('tipos_entes_id');
+            $table->string('nombre')->unique()->comment('Nombre del tipo de ente obligado');
             $table->timestamps();
-
-            $table->foreign('tipos_entes_id')->references('id')->on('tipos_entes');
         });
     }
 
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('entes');
+        Schema::dropIfExists('tipos_entes');
     }
 };

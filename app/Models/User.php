@@ -66,4 +66,45 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relación: Un usuario (EnteObligado) pertenece a un Ente
+     * Asumiendo que la tabla users tiene un campo ente_id
+     */
+    public function ente()
+    {
+        return $this->belongsTo(Ente::class);
+    }
+
+    /**
+     * Relación inversa: Un usuario puede tener muchos avisos a través del ente
+     * Útil para consultas rápidas
+     */
+    public function avisosPendientes()
+    {
+        if (!$this->ente) {
+            return collect();
+        }
+
+        return AvisoEnte::with('aviso')
+            ->where('ente_id', $this->ente->id)
+            ->where('estado_envio', '!=', 'leido')
+            ->whereHas('aviso', function ($query) {
+                $query->where('activo', true)
+                    ->where(function ($q) {
+                        $q->whereNull('fecha_expiracion')
+                            ->orWhere('fecha_expiracion', '>', now());
+                    });
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * Scope para obtener solo usuarios que son EnteObligado
+     */
+    public function scopeEntesObligados($query)
+    {
+        return $query->role('EnteObligado');
+    }
 }
