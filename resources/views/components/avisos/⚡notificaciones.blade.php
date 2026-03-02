@@ -126,6 +126,7 @@ new class extends Component {
 
         if ($this->avisoSeleccionado) {
             $this->mostrarModal = true;
+            $this->marcarComoLeido($avisoEnteId);
         }
     }
 

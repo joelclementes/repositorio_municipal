@@ -2,7 +2,7 @@
 
 use App\Models\AvisoEnte;
 use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Route;
 
 // Ruta para ver todos los avisos pendientes
 Route::get('/avisos/pendientes', function (Request $request) {
@@ -69,3 +69,7 @@ Route::post('/avisos/marcar-todos-leidos', function () {
 
     return back()->with('success', 'Todos los avisos marcados como leídos');
 })->name('avisos.marcar-todos-leidos');
+
+Route::get('/avisos/index', function (Request $request) {
+    return view('avisos.index');
+})->name('avisos.index');

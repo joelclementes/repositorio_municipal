@@ -43,7 +43,7 @@
         style="display: none;">
 
         <!-- Cabecera -->
-        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+        {{-- <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
             <div class="flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-gray-800">Notificaciones</h3>
                 @if ($cantidadPendientes > 0)
@@ -52,6 +52,11 @@
                         Marcar todas como leídas
                     </button>
                 @endif
+            </div>
+        </div> --}}
+        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">Notificaciones</h3>
             </div>
         </div>
 
@@ -150,14 +155,14 @@
         </div>
 
         <!-- Footer -->
-        @if ($cantidadPendientes > 0)
+        {{-- @if ($cantidadPendientes > 0)
             <div class="px-4 py-2 border-t border-gray-200 bg-gray-50 rounded-b-lg">
                 <a href="{{ route('avisos.pendientes') }}"
                     class="block text-center text-sm text-[#6C143B] hover:text-[#4a0e29] font-medium">
                     Ver todas las notificaciones ({{ $cantidadPendientes }})
                 </a>
             </div>
-        @endif
+        @endif --}}
     </div>
 
     <!-- Modal -->
@@ -269,7 +274,7 @@
                         <!-- Footer -->
                         <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
                             @if ($avisoSeleccionado->estado_envio !== 'leido')
-                                <button wire:click="marcarComoLeido({{ $avisoSeleccionado->id }})"
+                                {{-- <button wire:click="marcarComoLeido({{ $avisoSeleccionado->id }})"
                                     wire:loading.attr="disabled"
                                     class="px-4 py-2 bg-[#6C143B] hover:bg-[#4a0e29] text-white rounded-lg transition-colors flex items-center">
                                     <span wire:loading.remove
@@ -279,7 +284,7 @@
                                     <span wire:loading wire:target="marcarComoLeido({{ $avisoSeleccionado->id }})">
                                         Procesando...
                                     </span>
-                                </button>
+                                </button> --}}
                             @endif
                             <button @click="show = false"
                                 class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
