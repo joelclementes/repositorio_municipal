@@ -72,7 +72,7 @@ Route::post('/avisos/marcar-todos-leidos', function () {
 })->name('avisos.marcar-todos-leidos');
 
 Route::middleware('can:administrar')->group(function () {
-    Route::get('/avisos/create', [AvisoController::class, 'create'])->name('avisos.create');
+    Route::get('/avisos/crear', [AvisoController::class, 'create'])->name('avisos.crear');
     Route::get('/avisos/buscar-ente', [AvisoController::class, 'buscarEnte'])->name('avisos.buscarEnte');
 
 });

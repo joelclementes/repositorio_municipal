@@ -21,7 +21,7 @@ class AvisoController extends Controller
      */
     public function create()
     {
-        return view('avisos.create');
+        return view('avisos.crear');
     }
 
     /**
