@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aviso;
 use Illuminate\Http\Request;
+use App\Models\Ente;
 
 class AvisoController extends Controller
 {
@@ -12,7 +13,7 @@ class AvisoController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -20,7 +21,7 @@ class AvisoController extends Controller
      */
     public function create()
     {
-        //
+        return view('avisos.crear');
     }
 
     /**
@@ -61,5 +62,16 @@ class AvisoController extends Controller
     public function destroy(Aviso $aviso)
     {
         //
+    }
+
+    public function buscarEnte(Request $request)
+    {
+        $search = $request->input('q');
+
+        $entes = Ente::where('nombre', 'like', '%' . $search . '%')
+            ->orderBy('nombre')
+            ->get();
+
+        return response()->json($entes);
     }
 }

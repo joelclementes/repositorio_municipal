@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\AvisoEnte;
+use App\Http\Controllers\AvisoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +71,8 @@ Route::post('/avisos/marcar-todos-leidos', function () {
     return back()->with('success', 'Todos los avisos marcados como leídos');
 })->name('avisos.marcar-todos-leidos');
 
-Route::get('/avisos/index', function (Request $request) {
-    return view('avisos.index');
-})->name('avisos.index');
+Route::middleware('can:administrar')->group(function () {
+    Route::get('/avisos/crear', [AvisoController::class, 'create'])->name('avisos.crear');
+    Route::get('/avisos/buscar-ente', [AvisoController::class, 'buscarEnte'])->name('avisos.buscarEnte');
+
+});

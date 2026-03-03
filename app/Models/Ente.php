@@ -8,9 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Models\TiposEnte;
+
 class Ente extends Model
 {
     use HasFactory;
+
+    protected $appends = [
+        'tipo_ente_nombre',
+    ];
 
     protected $fillable = [
         'nombre',
@@ -22,7 +28,7 @@ class Ente extends Model
      */
     public function tipoEnte(): BelongsTo
     {
-        return $this->belongsTo(TipoEnte::class, 'tipos_entes_id');
+        return $this->belongsTo(TiposEnte::class, 'tipos_entes_id');
     }
 
     /**
@@ -49,5 +55,13 @@ class Ente extends Model
     public function avisoEntes(): HasMany
     {
         return $this->hasMany(AvisoEnte::class);
+    }
+
+    /**
+     * Accesor para obtener el nombre del tipo de ente
+     */
+    public function getTipoEnteNombreAttribute()
+    {
+        return $this->tipoEnte ? $this->tipoEnte->nombre : 'Sin tipo';
     }
 }
