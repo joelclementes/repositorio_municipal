@@ -102,7 +102,7 @@
                             <ul class="space-y-2">
                                 <li class="flex items-center text-gray-700 hover:text-[#b24280] cursor-pointer">
                                     <span class="w-2 h-2 rounded-full mr-2" style="background-color: #b24280;"></span>
-                                    <a href="{{ route('documentos.registrar') }}">Nuevo registro</a>
+                                    <a href="{{ route('documentos.registrar') }}"><a href="{{ route('documentos.recibidos.index') }}">Nuevo registro</a></a>
                                 </li>
                             </ul>
                         </div>
