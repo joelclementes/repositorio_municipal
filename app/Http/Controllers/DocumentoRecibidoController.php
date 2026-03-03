@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoriasDocumento;
 use App\Models\Documento;
 use App\Models\DocumentoRecibido;
 use App\Models\Ente;
@@ -15,7 +16,12 @@ class DocumentoRecibidoController extends Controller
      */
     public function index()
     {
-        //
+        $categorias = CategoriasDocumento::all();
+        $subcategorias = CategoriasDocumento::all();
+        $documentos = Documento::all();
+
+        return view('documentos.registrar', compact('categorias', 'subcategorias', 'documentos'));
+        
     }
 
     /**
