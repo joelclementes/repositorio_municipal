@@ -41,6 +41,10 @@ return new class extends Migration
             $table->foreignId('enviado_por')
                 ->nullable()
                 ->constrained('users');
+                
+                $table->foreignId('leido_por')
+                ->nullable()
+                ->constrained('users');
 
             $table->timestamps();
 

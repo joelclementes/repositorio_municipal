@@ -22,6 +22,7 @@
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entes</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Envió</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -52,6 +53,11 @@
                             <td class="px-4 py-3 text-sm text-gray-500">
                                 <span class="px-2 py-1 bg-gray-100 rounded-full text-xs">
                                     {{ $aviso->total_entes ?? $aviso->avisoEntes->count() }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-500">
+                                <span class="px-2 py-1 bg-gray-100 rounded-full text-xs">
+                                    {{ $aviso->creador->name ?? 'Desconocido'}}
                                 </span>
                             </td>
                         </tr>
@@ -111,13 +117,15 @@
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ente</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha envío</th>
+                            {{-- <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha envío</th> --}}
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha lectura</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leyó</th>
                             {{-- <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th> --}}
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($this->entesFiltrados as $avisoEnte)
+                        {{-- @dd($avisoEnte); --}}
                             <tr wire:key="ente-{{ $avisoEnte->id }}">
                                 <td class="px-4 py-3">
                                     <div class="text-sm font-medium text-gray-900">
@@ -135,11 +143,15 @@
                                         {{ ucfirst($avisoEnte->estado_envio) }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-500">
+                                {{-- <td class="px-4 py-3 text-sm text-gray-500">
                                     {{ $avisoEnte->fecha_envio ? $avisoEnte->fecha_envio->format('d/m/Y H:i') : 'No enviado' }}
-                                </td>
+                                </td> --}}
                                 <td class="px-4 py-3 text-sm text-gray-500">
                                     {{ $avisoEnte->fecha_lectura ? $avisoEnte->fecha_lectura->format('d/m/Y H:i') : 'No leído' }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-500">
+                                    {{-- {{ $avisoEnte->leido->name ? $avisoEnte->leido->name : 'No leído' }} --}}
+                                    {{ $avisoEnte->leido?->name ?? 'No leído' }}
                                 </td>
                                 {{-- <td class="px-4 py-3">
                                     <select wire:change="actualizarEstado({{ $avisoEnte->id }}, $event.target.value)"

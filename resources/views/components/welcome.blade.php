@@ -13,10 +13,7 @@
                         Bienvenido al Sistema de Información Financiera y Obras Municipales (SIFOM)
                     </h1>
                     <p class="text-gray-700 text-sm md:text-base leading-relaxed">
-                        Esta plataforma permite registrar y administrar de forma organizada las visitas realizadas al
-                        interior del Congreso del Estado de Veracruz, con información detallada sobre el visitante, la
-                        persona a quien visita, el motivo de la visita. Desde este panel podrás consultar, agregar y dar
-                        seguimiento a los registros, contribuyendo al control y seguridad institucional.
+                        Sistema institucional para la recepción y administración de información enviada por los entes obligados del Estado de Veracruz. A través de esta plataforma, el Congreso del Estado recibe, revisa y da seguimiento oportuno a los avisos, informes y documentación remitidos por Municipios, Comisiones e Institutos, garantizando el cumplimiento normativo y la transparencia institucional.
                     </p>
                 </div>
             </div>

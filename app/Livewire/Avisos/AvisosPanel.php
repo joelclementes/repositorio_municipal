@@ -22,7 +22,7 @@ class AvisosPanel extends Component
             ->when($this->searchAviso, function ($query) {
                 $query->where(function ($q) {
                     $q->where('titulo', 'like', '%' . $this->searchAviso . '%')
-                      ->orWhere('tipo_aviso', 'like', '%' . $this->searchAviso . '%');
+                        ->orWhere('tipo_aviso', 'like', '%' . $this->searchAviso . '%');
                 });
             })
             ->orderBy('created_at', 'desc')
@@ -47,7 +47,7 @@ class AvisosPanel extends Component
             return collect();
         }
 
-        $query = AvisoEnte::with('ente')
+        $query = AvisoEnte::with(['ente', 'leido']) // 👈 Agregar 'leido' aquí
             ->where('aviso_id', $this->avisoSeleccionadoId);
 
         if ($this->filtroEstado === 'leido') {
@@ -55,6 +55,14 @@ class AvisosPanel extends Component
         } elseif ($this->filtroEstado === 'no_leido') {
             $query->where('estado_envio', '!=', 'leido');
         }
+        // $query = AvisoEnte::with('ente')
+        //     ->where('aviso_id', $this->avisoSeleccionadoId);
+
+        // if ($this->filtroEstado === 'leido') {
+        //     $query->where('estado_envio', 'leido');
+        // } elseif ($this->filtroEstado === 'no_leido') {
+        //     $query->where('estado_envio', '!=', 'leido');
+        // }
 
         return $query->orderBy('created_at')->get();
     }
@@ -68,16 +76,16 @@ class AvisosPanel extends Component
     public function actualizarEstado($avisoEnteId, $nuevoEstado)
     {
         $avisoEnte = AvisoEnte::find($avisoEnteId);
-        
+
         if ($avisoEnte) {
             $avisoEnte->estado_envio = $nuevoEstado;
-            
+
             if ($nuevoEstado === 'leido') {
                 $avisoEnte->fecha_lectura = now();
             }
-            
+
             $avisoEnte->save();
-            
+
             $this->dispatch('estado-actualizado', message: 'Estado actualizado correctamente');
         }
     }

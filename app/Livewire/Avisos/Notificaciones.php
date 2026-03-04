@@ -139,6 +139,7 @@ class Notificaciones extends Component {
             $avisoEnte->update([
                 'estado_envio' => 'leido',
                 'fecha_lectura' => now(),
+                'leido_por' => auth()->id(),
             ]);
 
             // Forzar recarga
@@ -161,6 +162,7 @@ class Notificaciones extends Component {
                 ->update([
                     'estado_envio' => 'leido',
                     'fecha_lectura' => now(),
+                    'leido_por' => auth()->id(),
                 ]);
 
             // Forzar recarga
