@@ -165,14 +165,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M16 8h2m0 0h2m-2 0V6m0 2v2" />
                                     </svg>
-                                    Generar Notificaciones
+                                    Generar Avisos
                                 </h2>
                             </div>
                             <div class="p-4">
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #8974bf;"></span>
-                                        Notificaciones
+                                        Avisos
                                     </li>
                                 </ul>
                             </div>

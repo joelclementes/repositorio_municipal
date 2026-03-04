@@ -14,6 +14,7 @@
             </div>
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mt-4">
                 <div class="container mx-auto px-4 py-8">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Aviso nuevo</h3>
                     <form method="POST" action="{{ route('avisos.store') }}">
                         @csrf
 
