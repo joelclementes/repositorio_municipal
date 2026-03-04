@@ -9,8 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="container mx-auto px-4 py-8">
-                    
-
+                    <livewire:avisos.avisos-panel />
                 </div>
             </div>
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mt-4">
@@ -223,12 +222,12 @@
                             </span>
                         </div>
                         ${entesSeleccionados.length > 0 ? `
-                                        <button type="button" 
-                                                onclick="eliminarTodosEntes()"
-                                                class="text-xs text-red-600 hover:text-red-800 hover:underline transition-colors">
-                                            Eliminar todos
-                                        </button>
-                                    ` : ''}
+                                            <button type="button" 
+                                                    onclick="eliminarTodosEntes()"
+                                                    class="text-xs text-red-600 hover:text-red-800 hover:underline transition-colors">
+                                                Eliminar todos
+                                            </button>
+                                        ` : ''}
                     </div>
                     <div class="p-4 max-h-96 overflow-y-auto">
                         <div class="space-y-2">
