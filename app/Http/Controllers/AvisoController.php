@@ -137,7 +137,8 @@ class AvisoController extends Controller
      */
     public function index()
     {
-        // Puedes implementar después
+        $avisos = Aviso::where('creado_por', auth()->id())->get();
+        return view('avisos.index', compact('avisos'));
     }
 
     /**

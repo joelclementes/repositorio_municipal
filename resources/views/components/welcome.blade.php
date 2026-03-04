@@ -159,25 +159,27 @@
                 @can('administrar')
                     <div
                         class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <div class="px-4 py-3" style="background-color: #8974bf;">
-                            <h2 class="text-white font-bold text-lg flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 8h2m0 0h2m-2 0V6m0 2v2" />
-                                </svg>
-                                Generar Notificaciones
-                            </h2>
-                        </div>
-                        <div class="p-4">
-                            <ul class="space-y-2">
-                                <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
-                                    <span class="w-2 h-2 rounded-full mr-2" style="background-color: #8974bf;"></span>
-                                    Notificaciones
-                                </li>
-                            </ul>
-                        </div>
+                        <a href="{{ route('avisos.index') }}">
+                            <div class="px-4 py-3" style="background-color: #8974bf;">
+                                <h2 class="text-white font-bold text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 8h2m0 0h2m-2 0V6m0 2v2" />
+                                    </svg>
+                                    Generar Notificaciones
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
+                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #8974bf;"></span>
+                                        Notificaciones
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
                     </div>
                 @endcan
 
