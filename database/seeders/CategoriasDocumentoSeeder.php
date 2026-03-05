@@ -18,30 +18,35 @@ class CategoriasDocumentoSeeder extends Seeder
                 'categoria_Data' => [
                     'clave' => 'IEFM',
                     'nombre' => 'Integración del Estado Financiero Mensual',
+                    'roles_permitidos' => 'Tesorero',
                 ],
             ],
             [
                 'categoria_Data' => [
                     'clave' => 'IEFMOP',
                     'nombre' => 'Integración del Estado Financiero Mensual de Obra Pública',
+                    'roles_permitidos' => 'DirectorObrasPublicas',
                 ],
             ],
             [
                 'categoria_Data' => [
                     'clave' => 'OM',
                     'nombre' => 'Obligaciones Municipales',
+                    'roles_permitidos' => 'Tesorero',
                 ],
             ],
             [
                 'categoria_Data' => [
                     'clave' => 'CI',
                     'nombre' => 'Contralores internos',
+                    'roles_permitidos' => 'Contralor',
                 ],
             ],
             [
                 'categoria_Data' => [
                     'clave' => 'IMM',
                     'nombre' => 'Institutos Municipales de las Mujeres',
+                    'roles_permitidos' => 'Tesorero Organo Descentralizado',
                 ],
             ],
         ];

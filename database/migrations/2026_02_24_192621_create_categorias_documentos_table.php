@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('clave')->unique();
             $table->string('nombre')->unique();
+            $table->string('roles_permitidos');
             $table->timestamps();
         });
     }
