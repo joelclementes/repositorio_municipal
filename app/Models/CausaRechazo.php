@@ -9,6 +9,8 @@ class CausaRechazo extends Model
 {
     use HasFactory;
 
+    protected $table = 'causas_rechazo';
+
     protected $fillable = [
         'descripcion',
     ];

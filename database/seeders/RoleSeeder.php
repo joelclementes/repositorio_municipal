@@ -17,14 +17,17 @@ class RoleSeeder extends Seeder
         $rolSuperUsusario = Role::create(['name' => 'SuperUsuario']);
         $rolAdmin = Role::create(['name' => 'Administrador']);
         $rolRevisor = Role::create(['name' => 'Revisor']);
-        $rolEnte = Role::create(['name' => 'EnteObligado']);
+        // $rolEnte = Role::create(['name' => 'EnteObligado']);
+        $rolTesorero = Role::create(['name' => 'Tesorero']);
+        $rolDirectorObrasPublicas = Role::create(['name' => 'DirectorObrasPublicas']);
+        $rolContralor = Role::create(['name' => 'Contralor']);
 
         Permission::create(['name' => 'configurar'])->syncRoles([$rolSuperUsusario]);
 
         // Administrará catálogos, asignación de entes a los revisores, supervisará a los revisores, creará avisos.
         Permission::create(['name' => 'administrar'])->syncRoles([$rolAdmin,$rolSuperUsusario]);
 
-        Permission::create(['name' => 'registrar'])->syncRoles([$rolEnte,$rolSuperUsusario]);
+        Permission::create(['name' => 'registrar'])->syncRoles([$rolTesorero,$rolDirectorObrasPublicas,$rolContralor,$rolSuperUsusario]);
 
         Permission::create(['name' => 'revisar-documentos'])->syncRoles([$rolRevisor,$rolSuperUsusario]);
 

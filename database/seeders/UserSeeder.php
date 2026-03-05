@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
                     'password' => bcrypt('123456789'),
                     'ente_id' => 1,
                 ],
-                'role' => 'EnteObligado'
+                'role' => 'Tesorero'
             ],
         ];
 
