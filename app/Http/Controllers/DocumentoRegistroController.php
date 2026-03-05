@@ -14,27 +14,7 @@ class DocumentoRegistroController extends Controller
      */
     public function index()
     {
-        // obtener $categorias que contengan en el campo roles_premitidos el rol del usuario autenticado
-        $rolesUsuario = auth()->user()->roles->pluck('name')->toArray();
-
-        $categorias = CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
-            foreach ($rolesUsuario as $rol) {
-                $query->orWhereRaw("FIND_IN_SET(?, roles_permitidos)", [$rol]);
-            }
-        })->get();
-        // $categorias = CategoriasDocumento::all();
-
-
-        // obtener $subcategorias que contengan en el campo categoria_id el id de la categoria seleccionada
-        $subcategorias = SubCategoriasDocumento::whereIn('categoria_id', $categorias->pluck('id'))->get();
-        // $subcategorias = SubCategoriasDocumento::all();
-
-        // obtener $documentos que contengan en el campo subcategoria_id el id de la subcategoria seleccionada
-        $documentos = Documento::whereIn('subcategoria_id', $subcategorias->pluck('id'))->get();
-
-        // $documentos = Documento::all();
-
-        return view('documento.registro', compact('categorias', 'subcategorias', 'documentos'));
+        return view('documento.registro');
     }
 
     /**

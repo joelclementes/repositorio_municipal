@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('nombre', length: 255)->unique();
             $table->unsignedBigInteger('subcategoria_id');
             $table->string('periodicidad', length: 20);
-            $table->integer('fecha_limite');
+            $table->integer('fecha_inicio')->nullable();
+            $table->integer('fecha_limite')->nullable();
             $table->string('formato', length: 20)->comment('PDF ó XLSX');
             $table->timestamps();
 
