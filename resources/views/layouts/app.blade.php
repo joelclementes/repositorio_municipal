@@ -40,6 +40,7 @@
         </main>
     </div>
     <script src="{{ asset('js/jquery-4.0.0.min.js') }}"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('modals')
 
     @livewireScripts
