@@ -139,13 +139,10 @@ class AvisoController extends Controller
     {
 
 
-        // otro modo de usar el servicio
-        $reglasDocumentoService = new ReglasDocumentoService();
-
-        $oportunidad = $reglasDocumentoService->oportunidad('mensual',10);
-
-
-        dd($oportunidad);
+        // Ejemplo de uso del servicio de reglas de negocio para documentos
+        // $reglasDocumentoService = new ReglasDocumentoService();
+        // $oportunidad = $reglasDocumentoService->oportunidad('mensual',5);
+        // dd($oportunidad);
 
         $avisos = Aviso::where('creado_por', auth()->id())->get();
         return view('avisos.index', compact('avisos'));

@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('documentos_recibidos', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('entes_id');
+            $table->unsignedBigInteger('documentos_id');
+            $table->string('tipo_recepcion',length:125);
+            $table->date('fecha_recibido');
+            $table->date('fecha_cambio_estatus');
+            $table->string('nombre_archivo', length:125);
+            $table->unsignedBigInteger('estados_id');
+            $table->unsignedBigInteger('causas_rechazo_id');
+            $table->string('usuario_revisor',length:125);
+            $table->timestamps();
+
+            $table->foreign('entes_id')->references('id')->on('entes');
+            $table->foreign('documentos_id')->references('id')->on('documentos');
+            $table->foreign('estados_id')->references('id')->on('estados');
+            $table->foreign('causas_rechazo_id')->references('id')->on('causas_rechazo');
+            
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('documentos_recibidos');
+    }
+};

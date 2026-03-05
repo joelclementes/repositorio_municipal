@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\CategoriasDocumento;
+use App\Models\SubCategoriasDocumento;
+use App\Models\Documento;
 
 class DocumentoRegistroController extends Controller
 {
@@ -11,6 +14,9 @@ class DocumentoRegistroController extends Controller
      */
     public function index()
     {
+        $categorias = CategoriasDocumento::all();
+        $subcategorias = SubCategoriasDocumento::all();
+        $documentos = Documento::all();
         return view('documento.registro');
     }
 
