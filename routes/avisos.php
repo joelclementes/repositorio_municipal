@@ -33,8 +33,8 @@ Route::get('/avisos/pendientes', function (Request $request) {
         ->orderBy('created_at', 'desc')
         ->paginate(15);
 
-    return view('avisos.pendientes', compact('avisosPendientes'));
-})->name('avisos.pendientes');
+    return view('livewire.avisos.pendientes', compact('avisosPendientes'));
+})->name('livewire.avisos.pendientes');
 
 // Ruta para marcar un aviso como leído (opcional)
 Route::patch('/avisos/{avisoEnte}/marcar-leido', function ($avisoEnteId) {
@@ -72,7 +72,8 @@ Route::post('/avisos/marcar-todos-leidos', function () {
 })->name('avisos.marcar-todos-leidos');
 
 Route::middleware('can:administrar')->group(function () {
+    Route::get('/avisos', [AvisoController::class, 'index'])->name('avisos.index');
     Route::get('/avisos/crear', [AvisoController::class, 'create'])->name('avisos.crear');
     Route::get('/avisos/buscar-ente', [AvisoController::class, 'buscarEnte'])->name('avisos.buscarEnte');
-
+    Route::post('/avisos/store', [AvisoController::class, 'store'])->name('avisos.store');
 });

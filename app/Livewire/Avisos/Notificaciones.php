@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Avisos;
 
 use App\Models\AvisoEnte;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
 
-new class extends Component {
+class Notificaciones extends Component {
     public $cantidadPendientes = 0;
     public $mostrarDropdown = false;
     public $avisoSeleccionado = null;
@@ -139,6 +139,7 @@ new class extends Component {
             $avisoEnte->update([
                 'estado_envio' => 'leido',
                 'fecha_lectura' => now(),
+                'leido_por' => auth()->id(),
             ]);
 
             // Forzar recarga
@@ -161,6 +162,7 @@ new class extends Component {
                 ->update([
                     'estado_envio' => 'leido',
                     'fecha_lectura' => now(),
+                    'leido_por' => auth()->id(),
                 ]);
 
             // Forzar recarga
@@ -180,11 +182,8 @@ new class extends Component {
 
     public function render()
     {
-        return view('livewire.notificaciones-avisos');
+        return view('livewire.avisos.notificaciones-avisos');
     }
 };
 ?>
 
-{{-- <div>
-    Aquí las notificaciones
-</div> --}}

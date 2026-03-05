@@ -7,110 +7,129 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" id="avisosPanel">
                 <div class="container mx-auto px-4 py-8">
+                    <x-button class="ms-4 bg-vino-900 hover:bg-vino-800 focus:bg-vino-800 active:bg-vino-900"
+                        id="btnNuevoAviso">
+                        {{ __('Aviso nuevo') }}
+                    </x-button>
+                    <livewire:avisos.avisos-panel />
+                </div>
+            </div>
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mt-4" id="nuevoAvisoPanel" hidden>
+                <div class="container mx-auto px-4 py-8">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Aviso nuevo</h3>
+                    <form method="POST" action="{{ route('avisos.store') }}">
+                        @csrf
 
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <div>
-                                <x-label class="text-red-600" for="titulo" value="Título *" />
-                                <x-input id="titulo"
-                                    class="block mt-1 w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 "
-                                    type="text" name="titulo" required autofocus autocomplete="titulo" />
-                            </div>
-
-                            <div class="mt-4">
-                                <x-label class="text-red-600" for="tipo_visita_id" value="Tipo de aviso *" />
-                                <select id="tipo_visita_id" name="tipo_visita_id"
-                                    class="w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 rounded-md shadow-sm"
-                                    required>
-                                    <option value="" disabled selected>Seleccione un tipo</option>
-                                    <option value="Aviso">Aviso</option>
-                                    <option value="Invitación">Invitación</option>
-                                    <option value="Exhorto">Exhorto</option>
-                                    <option value="Convocatoria">Convocatoria</option>
-                                    <option value="Circular">Circular</option>
-                                </select>
-                            </div>
-
-
-                            <div class="mt-4">
-                                <x-label class="text-red-600" for="texto" value="Mensaje *" />
-                                <x-input id="texto"
-                                    class="block mt-1 w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 "
-                                    type="text" name="texto" required autofocus autocomplete="texto" />
-                            </div>
-
-                            <div class="mt-4">
-                                <x-label for="url" value="{{ __('Url (opcional)') }}" />
-                                <x-input id="url"
-                                    class="block mt-1 w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 "
-                                    type="text" name="url" required autofocus autocomplete="url" />
-                            </div>
-
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="mt-4">
-                                <x-label for="destinatarios" value="Destinatarios" />
-                                <div class="flex gap-6 mt-2">
-                                    <!-- Radio button para Administrativa -->
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" id="destinoTodos" name="destinatarios" value="todos"
-                                            class="border-vino-900 text-vino-900 focus:border-vino-900 focus:ring-vino-900"
-                                            autofocus />
-                                        <span class="ml-2 text-gray-700">Todos</span>
-                                    </label>
-
-                                    <!-- Radio button para Diputados -->
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" id="destinoSelec" name="destinatarios"
-                                            value="seleccionados"
-                                            class="border-vino-900 text-vino-900 focus:border-vino-900 focus:ring-vino-900" />
-                                        <span class="ml-2 text-gray-700">Selección</span>
-                                    </label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <x-label class="text-red-600" for="titulo" value="Título *" />
+                                    <x-input id="titulo"
+                                        class="block mt-1 w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 "
+                                        type="text" name="titulo" required autofocus autocomplete="titulo" />
                                 </div>
+
+                                <div class="mt-4">
+                                    <x-label class="text-red-600" for="tipo_visita_id" value="Tipo de aviso *" />
+                                    <select id="tipo_visita_id" name="tipo_visita_id"
+                                        class="w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 rounded-md shadow-sm"
+                                        required>
+                                        <option value="" disabled selected>Seleccione un tipo</option>
+                                        <option value="Aviso">Aviso</option>
+                                        <option value="Invitación">Invitación</option>
+                                        <option value="Exhorto">Exhorto</option>
+                                        <option value="Convocatoria">Convocatoria</option>
+                                        <option value="Circular">Circular</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="mt-4">
+                                    <x-label class="text-red-600" for="texto" value="Mensaje *" />
+                                    <x-input id="texto"
+                                        class="block mt-1 w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 "
+                                        type="text" name="texto" required autofocus autocomplete="texto" />
+                                </div>
+
+                                <div class="mt-4">
+                                    <x-label for="url" value="{{ __('Url (opcional)') }}" />
+                                    <x-input id="url"
+                                        class="block mt-1 w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 "
+                                        type="text" name="url" autofocus autocomplete="url" />
+                                </div>
+
                             </div>
 
-                            <div id="divSeleccion" hidden>
+                            <div class="space-y-4">
                                 <div class="mt-4">
-                                    <div class="flex-1">
-                                        <div class="relative">
-                                            <x-label class="text-red-600" for="inputEnte" value="Ente *" />
-                                            <input type="text" id="inputEnte"
-                                                class="w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 rounded-md shadow-sm"
-                                                autocomplete="off" placeholder="Escribe para buscar...">
-                                            <ul id="listaEntes"
-                                                class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-auto">
-                                            </ul>
+                                    <x-label for="destinatarios" value="Destinatarios" />
+                                    <div class="flex gap-6 mt-2">
+                                        <!-- Radio button para Administrativa -->
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" id="destinoTodos" name="destinatarios" value="todos"
+                                                class="border-vino-900 text-vino-900 focus:border-vino-900 focus:ring-vino-900"
+                                                autofocus />
+                                            <span class="ml-2 text-gray-700">Todos</span>
+                                        </label>
+
+                                        <!-- Radio button para Diputados -->
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" id="destinoSelec" name="destinatarios"
+                                                value="seleccionados"
+                                                class="border-vino-900 text-vino-900 focus:border-vino-900 focus:ring-vino-900" />
+                                            <span class="ml-2 text-gray-700">Selección</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="divSeleccion" hidden>
+                                    <div class="mt-4">
+                                        <div class="flex-1">
+                                            <div class="relative">
+                                                <x-label class="text-red-600" for="inputEnte" value="Ente *" />
+                                                <input type="text" id="inputEnte"
+                                                    class="w-full border-vino-900 focus:border-vino-900 focus:ring-vino-900 rounded-md shadow-sm"
+                                                    autocomplete="off" placeholder="Escribe para buscar...">
+                                                <ul id="listaEntes"
+                                                    class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-auto">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4" id="entesDestinatarios">
+                                        <div
+                                            class="text-center p-8 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+                                            <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            <p class="text-gray-400 text-sm">No hay entes seleccionados</p>
+                                            <p class="text-gray-300 text-xs mt-1">Busca y selecciona entes usando el
+                                                buscador</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-4" id="entesDestinatarios">
-                                    <div
-                                        class="text-center p-8 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
-                                        <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        <p class="text-gray-400 text-sm">No hay entes seleccionados</p>
-                                        <p class="text-gray-300 text-xs mt-1">Busca y selecciona entes usando el
-                                            buscador</p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <div class="flex items-center justify-end mt-4">
-                            <x-button class="ms-4 bg-vino-900 hover:bg-vino-800 focus:bg-vino-800 active:bg-vino-900">
-                                {{ __('Enviar') }}
-                            </x-button>
+                        <div>
+                            <div class="flex items-center justify-end mt-4">
+                                <x-button
+                                    class="ms-4 bg-vino-900 hover:bg-vino-800 focus:bg-vino-800 active:bg-vino-900"
+                                    id="btnEnviarAviso" type="submit">
+                                    {{ __('Enviar') }}
+                                </x-button>
+                                <x-button
+                                    class="ms-4 bg-gray-900 hover:bg-gray-800 focus:bg-gray-800 active:bg-gray-900"
+                                    id="btnCancelarAviso" type="button">
+                                    {{ __('Cancelar') }}
+                                </x-button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -119,6 +138,36 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            const btnCancelarAviso = document.getElementById('btnCancelarAviso');
+            btnCancelarAviso.addEventListener('click', function() {
+
+                document.getElementById('titulo').value = '';
+                document.getElementById('tipo_visita_id').value = '';
+                document.getElementById('texto').value = '';
+                document.getElementById('url').value = '';
+                document.getElementById('destinoTodos').checked = false;
+                document.getElementById('destinoSelec').checked = false;
+
+                document.getElementById('nuevoAvisoPanel').hidden = true;
+                document.getElementById('avisosPanel').hidden = false;
+                document.getElementById('entesDestinatarios').innerHTML = '';
+            });
+
+            const btnNuevoAviso = document.getElementById('btnNuevoAviso');
+            const avisosPanel = document.getElementById('avisosPanel');
+            const nuevoAvisoPanel = document.getElementById('nuevoAvisoPanel');
+
+            btnNuevoAviso.addEventListener('click', function() {
+                if (nuevoAvisoPanel.hidden) {
+                    nuevoAvisoPanel.hidden = false;
+                    avisosPanel.hidden = true;
+                } else {
+                    nuevoAvisoPanel.hidden = true;
+                    avisosPanel.hidden = false;
+                }
+            });
+
             const destinoTodos = document.getElementById('destinoTodos');
             const destinoSelec = document.getElementById('destinoSelec');
             const divSeleccion = document.getElementById('divSeleccion');
@@ -214,12 +263,12 @@
                             </span>
                         </div>
                         ${entesSeleccionados.length > 0 ? `
-                                    <button type="button" 
-                                            onclick="eliminarTodosEntes()"
-                                            class="text-xs text-red-600 hover:text-red-800 hover:underline transition-colors">
-                                        Eliminar todos
-                                    </button>
-                                ` : ''}
+                                                                                                                        <button type="button" 
+                                                                                                                                onclick="eliminarTodosEntes()"
+                                                                                                                                class="text-xs text-red-600 hover:text-red-800 hover:underline transition-colors">
+                                                                                                                            Eliminar todos
+                                                                                                                        </button>
+                                                                                                                    ` : ''}
                     </div>
                     <div class="p-4 max-h-96 overflow-y-auto">
                         <div class="space-y-2">
@@ -318,7 +367,6 @@
                             }
 
                             entesEncontrados.forEach(function(ente) {
-                                console.log(ente.tipo_ente_nombre);
                                 const li = document.createElement('li');
                                 li.className =
                                     'px-4 py-3 cursor-pointer hover:bg-vino-50 hover:text-vino-900 transition-all border-b border-gray-100 last:border-0';

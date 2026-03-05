@@ -27,6 +27,7 @@ class AvisoEnte extends Pivot
         'fecha_lectura',
         'intentos_envio',
         'enviado_por',
+        'leido_por',
     ];
 
     /**
@@ -36,6 +37,7 @@ class AvisoEnte extends Pivot
         'fecha_envio' => 'datetime',
         'fecha_lectura' => 'datetime',
         'intentos_envio' => 'integer',
+        'leido_por' => 'integer',
     ];
 
     /**
@@ -60,5 +62,10 @@ class AvisoEnte extends Pivot
     public function enviadoPor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'enviado_por');
+    }
+
+    public function leido(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'leido_por');
     }
 }

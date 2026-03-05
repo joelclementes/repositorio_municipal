@@ -20,4 +20,5 @@ Route::middleware([
 
     require __DIR__ . '/documentos.php';
     require __DIR__ . '/avisos.php';
+    require __DIR__ . '/documentoRegistro.php';
 });

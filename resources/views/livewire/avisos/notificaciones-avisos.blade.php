@@ -157,7 +157,7 @@
         <!-- Footer -->
         {{-- @if ($cantidadPendientes > 0)
             <div class="px-4 py-2 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-                <a href="{{ route('avisos.pendientes') }}"
+                <a href="{{ route('livewire.avisos.pendientes') }}"
                     class="block text-center text-sm text-[#6C143B] hover:text-[#4a0e29] font-medium">
                     Ver todas las notificaciones ({{ $cantidadPendientes }})
                 </a>
