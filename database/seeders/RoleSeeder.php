@@ -19,7 +19,8 @@ class RoleSeeder extends Seeder
         $rolRevisor = Role::create(['name' => 'Revisor']);
         // $rolEnte = Role::create(['name' => 'EnteObligado']);
         $rolTesorero = Role::create(['name' => 'Tesorero']);
-        $rolDirectorObrasPublicas = Role::create(['name' => 'DirectorObrasPublicas']);
+        $rolTesoreroOrganoDescentralizado = Role::create(['name' => 'Tesorero Organo Descentralizado']);
+        $rolDirectorObrasPublicas = Role::create(['name' => 'Director Obras Publicas']);
         $rolContralor = Role::create(['name' => 'Contralor']);
 
         Permission::create(['name' => 'configurar'])->syncRoles([$rolSuperUsusario]);
@@ -27,7 +28,7 @@ class RoleSeeder extends Seeder
         // Administrará catálogos, asignación de entes a los revisores, supervisará a los revisores, creará avisos.
         Permission::create(['name' => 'administrar'])->syncRoles([$rolAdmin,$rolSuperUsusario]);
 
-        Permission::create(['name' => 'registrar'])->syncRoles([$rolTesorero,$rolDirectorObrasPublicas,$rolContralor,$rolSuperUsusario]);
+        Permission::create(['name' => 'registrar'])->syncRoles([$rolTesorero,$rolTesoreroOrganoDescentralizado,$rolDirectorObrasPublicas,$rolContralor,$rolSuperUsusario]);
 
         Permission::create(['name' => 'revisar-documentos'])->syncRoles([$rolRevisor,$rolSuperUsusario]);
 

@@ -107,4 +107,5 @@ class User extends Authenticatable
     {
         return $query->role('EnteObligado');
     }
+
 }
