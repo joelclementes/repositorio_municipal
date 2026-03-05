@@ -8,6 +8,8 @@ use App\Models\Ente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
+use App\Services\ReglasDocumentoService;
 
 class AvisoController extends Controller
 {
@@ -61,7 +63,7 @@ class AvisoController extends Controller
             if ($request->destinatarios === 'todos') {
                 // Caso: Enviar a TODOS los entes
                 $entes = Ente::all();
-                
+
                 foreach ($entes as $ente) {
                     AvisoEnte::create([
                         'aviso_id' => $aviso->id,
@@ -71,13 +73,12 @@ class AvisoController extends Controller
                         'enviado_por' => auth()->id(),
                     ]);
                 }
-                
+
                 $mensaje = "Aviso creado y enviado a TODOS los entes ({$entes->count()} entes)";
-                
             } else {
                 // Caso: Enviar a entes SELECCIONADOS
                 $entesIds = $request->entes_seleccionados;
-                
+
                 foreach ($entesIds as $enteId) {
                     AvisoEnte::create([
                         'aviso_id' => $aviso->id,
@@ -87,7 +88,7 @@ class AvisoController extends Controller
                         'enviado_por' => null,
                     ]);
                 }
-                
+
                 $mensaje = "Aviso creado y enviado a " . count($entesIds) . " ente(s) seleccionado(s)";
             }
 
@@ -95,10 +96,9 @@ class AvisoController extends Controller
 
             return redirect()->route('avisos.create')
                 ->with('success', $mensaje);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return redirect()->back()
                 ->with('error', 'Error al crear el aviso: ' . $e->getMessage())
                 ->withInput();
@@ -111,7 +111,7 @@ class AvisoController extends Controller
     public function buscarEnte(Request $request)
     {
         $search = $request->input('q');
-        
+
         if (strlen($search) < 2) {
             return response()->json([]);
         }
@@ -121,7 +121,7 @@ class AvisoController extends Controller
             ->orderBy('nombre')
             ->limit(10)
             ->get()
-            ->map(function($ente) {
+            ->map(function ($ente) {
                 return [
                     'id' => $ente->id,
                     'nombre' => $ente->nombre,
@@ -137,6 +137,16 @@ class AvisoController extends Controller
      */
     public function index()
     {
+
+
+        // otro modo de usar el servicio
+        $reglasDocumentoService = new ReglasDocumentoService();
+
+        $oportunidad = $reglasDocumentoService->oportunidad('mensual',10);
+
+
+        dd($oportunidad);
+
         $avisos = Aviso::where('creado_por', auth()->id())->get();
         return view('avisos.index', compact('avisos'));
     }
