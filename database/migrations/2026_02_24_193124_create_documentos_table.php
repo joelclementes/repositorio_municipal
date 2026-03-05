@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('documentos', function (Blueprint $table) {
             $table->id();
             $table->string('clave')->unique();
-            $table->string('nombre',length:255)->unique();
+            $table->string('nombre', length: 255)->unique();
             $table->unsignedBigInteger('subcategoria_id');
+            $table->string('periodicidad', length: 20);
+            $table->integer('fecha_limite');
+            $table->string('formato', length: 20)->comment('PDF ó XLSX');
             $table->timestamps();
 
             $table->foreign('subcategoria_id')->references('id')->on('subcategorias_documentos');

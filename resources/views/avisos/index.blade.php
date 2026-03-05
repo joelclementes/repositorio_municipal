@@ -7,12 +7,16 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg" id="avisosPanel">
                 <div class="container mx-auto px-4 py-8">
+                    <x-button class="ms-4 bg-vino-900 hover:bg-vino-800 focus:bg-vino-800 active:bg-vino-900"
+                        id="btnNuevoAviso">
+                        {{ __('Aviso nuevo') }}
+                    </x-button>
                     <livewire:avisos.avisos-panel />
                 </div>
             </div>
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mt-4">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mt-4" id="nuevoAvisoPanel" hidden>
                 <div class="container mx-auto px-4 py-8">
                     <h3 class="text-lg font-semibold text-gray-700 mb-4">Aviso nuevo</h3>
                     <form method="POST" action="{{ route('avisos.store') }}">
@@ -114,8 +118,14 @@
                         <div>
                             <div class="flex items-center justify-end mt-4">
                                 <x-button
-                                    class="ms-4 bg-vino-900 hover:bg-vino-800 focus:bg-vino-800 active:bg-vino-900">
+                                    class="ms-4 bg-vino-900 hover:bg-vino-800 focus:bg-vino-800 active:bg-vino-900"
+                                    id="btnEnviarAviso" type="submit">
                                     {{ __('Enviar') }}
+                                </x-button>
+                                <x-button
+                                    class="ms-4 bg-gray-900 hover:bg-gray-800 focus:bg-gray-800 active:bg-gray-900"
+                                    id="btnCancelarAviso" type="button">
+                                    {{ __('Cancelar') }}
                                 </x-button>
                             </div>
                         </div>
@@ -128,6 +138,36 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            const btnCancelarAviso = document.getElementById('btnCancelarAviso');
+            btnCancelarAviso.addEventListener('click', function() {
+
+                document.getElementById('titulo').value = '';
+                document.getElementById('tipo_visita_id').value = '';
+                document.getElementById('texto').value = '';
+                document.getElementById('url').value = '';
+                document.getElementById('destinoTodos').checked = false;
+                document.getElementById('destinoSelec').checked = false;
+
+                document.getElementById('nuevoAvisoPanel').hidden = true;
+                document.getElementById('avisosPanel').hidden = false;
+                document.getElementById('entesDestinatarios').innerHTML = '';
+            });
+
+            const btnNuevoAviso = document.getElementById('btnNuevoAviso');
+            const avisosPanel = document.getElementById('avisosPanel');
+            const nuevoAvisoPanel = document.getElementById('nuevoAvisoPanel');
+
+            btnNuevoAviso.addEventListener('click', function() {
+                if (nuevoAvisoPanel.hidden) {
+                    nuevoAvisoPanel.hidden = false;
+                    avisosPanel.hidden = true;
+                } else {
+                    nuevoAvisoPanel.hidden = true;
+                    avisosPanel.hidden = false;
+                }
+            });
+
             const destinoTodos = document.getElementById('destinoTodos');
             const destinoSelec = document.getElementById('destinoSelec');
             const divSeleccion = document.getElementById('divSeleccion');
@@ -223,12 +263,12 @@
                             </span>
                         </div>
                         ${entesSeleccionados.length > 0 ? `
-                                            <button type="button" 
-                                                    onclick="eliminarTodosEntes()"
-                                                    class="text-xs text-red-600 hover:text-red-800 hover:underline transition-colors">
-                                                Eliminar todos
-                                            </button>
-                                        ` : ''}
+                                                                                                                        <button type="button" 
+                                                                                                                                onclick="eliminarTodosEntes()"
+                                                                                                                                class="text-xs text-red-600 hover:text-red-800 hover:underline transition-colors">
+                                                                                                                            Eliminar todos
+                                                                                                                        </button>
+                                                                                                                    ` : ''}
                     </div>
                     <div class="p-4 max-h-96 overflow-y-auto">
                         <div class="space-y-2">
@@ -327,7 +367,6 @@
                             }
 
                             entesEncontrados.forEach(function(ente) {
-                                console.log(ente.tipo_ente_nombre);
                                 const li = document.createElement('li');
                                 li.className =
                                     'px-4 py-3 cursor-pointer hover:bg-vino-50 hover:text-vino-900 transition-all border-b border-gray-100 last:border-0';
