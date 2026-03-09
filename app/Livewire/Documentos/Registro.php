@@ -21,8 +21,6 @@ class Registro extends Component
     {
 
         $periodosSeleccionados = Periodo::orderBy('id','desc')->get();
-
-
         return $periodosSeleccionados;
     }
 

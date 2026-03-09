@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('documentos_recibidos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('entes_id');
+            $table->unsignedBigInteger('ente_id');
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('documentos_id');
             $table->string('tipo_recepcion',length:125);
             $table->date('fecha_recibido');
@@ -25,7 +26,8 @@ return new class extends Migration
             $table->string('usuario_revisor',length:125);
             $table->timestamps();
 
-            $table->foreign('entes_id')->references('id')->on('entes');
+            $table->foreign('ente_id')->references('id')->on('entes');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('documentos_id')->references('id')->on('documentos');
             $table->foreign('estados_id')->references('id')->on('estados');
             $table->foreign('periodo_id')->references('id')->on('periodos');

@@ -8,7 +8,7 @@
             <option value="" class="text-gray-500">📅 Seleccione un periodo</option>
             @foreach ($this->periodos as $periodo)
                 <option value="{{ $periodo->id }}" class="py-1" {{ $periodo->is_active ? '' : 'disabled' }}>
-                    {{ ucfirst($periodo->nombre) }}</option>
+                    {{ ucfirst($periodo->descripcion) }}</option>
             @endforeach
         </select>
 
