@@ -5,26 +5,38 @@ namespace App\Livewire\Documentos;
 
 use App\Models\CategoriasDocumento;
 use App\Models\SubcategoriasDocumento;
+use App\Models\Periodo;
 use App\Models\Documento;
 use Livewire\Component;
 use Livewire\Attributes\Computed;
 
 class Registro extends Component
 {
+    public $periodosSeleccionados = '';
     public $categoriaSeleccionada = '';
     public $subcategoriaSeleccionada = '';
+
+    #[Computed]
+    public function periodos()
+    {
+
+        $periodosSeleccionados = Periodo::orderBy('id','desc')->get();
+
+
+        return $periodosSeleccionados;
+    }
 
     #[Computed]
     public function categorias()
     {
         $rolesUsuario = auth()->user()->roles->pluck('name')->toArray();
-        
+
         $categorias = CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
             foreach ($rolesUsuario as $rol) {
                 $query->orWhereRaw("FIND_IN_SET(?, roles_permitidos)", [$rol]);
             }
         })->get();
-        
+
         return $categorias;
     }
 
@@ -34,7 +46,7 @@ class Registro extends Component
         if (!$this->categoriaSeleccionada) {
             return collect();
         }
-        
+
         return SubcategoriasDocumento::where('categoria_id', $this->categoriaSeleccionada)->get();
     }
 
@@ -44,7 +56,7 @@ class Registro extends Component
         if (!$this->subcategoriaSeleccionada) {
             return collect();
         }
-        
+
         return Documento::where('subcategoria_id', $this->subcategoriaSeleccionada)
             ->orderBy('clave')
             ->get();
