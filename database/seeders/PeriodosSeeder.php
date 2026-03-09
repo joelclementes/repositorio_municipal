@@ -16,15 +16,19 @@ class PeriodosSeeder extends Seeder
         $periodos = [
             [
                 'periodo_data' => [
-                    'nombre' => 'Enero 2026',
+                    'mes' => 'Enero',
+                    'axo' => '2026',
+                    'descripcion' => 'Enero de 2026',
                     'fecha_inicio' => '2026-01-01',
                     'fecha_fin' => '2026-01-25',
-                    'is_active' => true,
+                    'is_active' => false,
                 ],
             ],
             [
                 'periodo_data' => [
-                    'nombre' => 'Febrero 2026',
+                    'mes' => 'Febrero',
+                    'axo' => '2026',
+                    'descripcion' => 'Febrero de 2026',
                     'fecha_inicio' => '2026-02-01',
                     'fecha_fin' => '2026-02-25',
                     'is_active' => true,
