@@ -121,14 +121,56 @@
                             </div>
 
                             {{-- Botón de acción --}}
-                            <button type="button"
+                            {{-- <button type="button"
                                 class="ml-4 px-3 py-1 bg-vino-900 hover:bg-vino-800 text-white text-sm rounded-md transition-colors flex items-center whitespace-nowrap">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                 </svg>
                                 Subir
-                            </button>
+                            </button> --}}
+                           <div class="flex flex-col space-y-2 mt-4 min-w-[140px]">
+                @php
+                    $formatos = explode(',', $documento->formato);
+                    $formatos = array_map('trim', $formatos); // Limpiar espacios
+                @endphp
+
+                {{-- Botón PDF --}}
+                @if(in_array('PDF', $formatos))
+                    <button type="button"
+                        class="w-full px-3 py-2 bg-vino-900 hover:bg-vino-800 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v4a1 1 0 001 1h4" />
+                            <text x="10" y="18" font-size="8" font-weight="bold" fill="currentColor" stroke="none">PDF</text>
+                        </svg>
+                        <span>Subir PDF</span>
+                    </button>
+                @endif
+
+                {{-- Botón Excel --}}
+                @if(in_array('XLSX', $formatos) || in_array('XLS', $formatos))
+                    <button type="button"
+                        class="w-full px-3 py-2 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                        style="background-color: #1D6F42;">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v4a1 1 0 001 1h4" />
+                            <text x="6" y="18" font-size="6" font-weight="bold" fill="currentColor" stroke="none">XLSX</text>
+                        </svg>
+                        <span>Subir Excel</span>
+                    </button>
+                @endif
+
+                {{-- Mensaje si no hay formatos reconocidos --}}
+                @if(empty($formatos) || (count($formatos) === 1 && empty($formatos[0])))
+                    <span class="text-xs text-gray-400 italic">Sin formatos especificados</span>
+                @endif
+            </div>
                         </div>
 
                         {{-- Barra de estado (opcional) --}}

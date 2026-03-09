@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('fecha_cambio_estatus');
             $table->string('nombre_archivo', length:125);
             $table->unsignedBigInteger('estados_id');
+            $table->unsignedBigInteger('periodo_id');
             $table->unsignedBigInteger('causas_rechazo_id');
             $table->string('usuario_revisor',length:125);
             $table->timestamps();
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->foreign('entes_id')->references('id')->on('entes');
             $table->foreign('documentos_id')->references('id')->on('documentos');
             $table->foreign('estados_id')->references('id')->on('estados');
+            $table->foreign('periodo_id')->references('id')->on('periodos');
             $table->foreign('causas_rechazo_id')->references('id')->on('causas_rechazo');
             
         });
