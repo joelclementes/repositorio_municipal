@@ -15,11 +15,12 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Inicio') }}
                     </x-nav-link>
-                    @role('SuperUsuario')
-                        <x-nav-link href="{{ route('dashboard') }}">
+                    @can('administrar')
+                        <x-nav-link href="{{ url('/admin') }}"
+                        target="_blank" rel="noopener noreferrer">
                             {{ __('Administración') }}
                         </x-nav-link>
-                    @endrole
+                    @endcan
                 </div>
             </div>
 

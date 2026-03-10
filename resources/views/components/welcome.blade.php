@@ -26,7 +26,7 @@
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                @can('configurar')
+                {{-- @can('configurar')
                     <div
                         class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
                         <div class="px-4 py-3" style="background-color:#ffa933 ">
@@ -50,7 +50,7 @@
                             </ul>
                         </div>
                     </div>
-                @endcan
+                @endcan --}}
 
                 {{-- @can('administrar')
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
