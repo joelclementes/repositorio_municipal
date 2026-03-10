@@ -9,7 +9,8 @@ class Periodo extends Model
     protected $table = 'periodos';
 
     protected $fillable = [
-        'nombre',
+        'mes',
+        'axo',
         'descripcion',
         'fecha_inicio',
         'fecha_fin',

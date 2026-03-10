@@ -66,7 +66,7 @@ class Registro extends Component
         }
 
         $enteId = auth()->user()->ente_id;
-        
+
         if (!$enteId) {
             return collect();
         }
@@ -144,7 +144,6 @@ class Registro extends Component
 
             DB::commit();
             $this->dispatch('notificacion', 'Registros generados correctamente', 'success');
-
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('notificacion', 'Error al generar registros: ' . $e->getMessage(), 'error');
@@ -154,7 +153,7 @@ class Registro extends Component
     public function abrirModalSubida($documentoRecibidoId, $tipo)
     {
         $documentoRecibido = DocumentosRecibido::with('documento')->find($documentoRecibidoId);
-        
+
         if ($documentoRecibido) {
             $this->documentoRecibidoSeleccionado = $documentoRecibido;
             $this->documentoSeleccionado = $documentoRecibido->documento;
@@ -174,6 +173,7 @@ class Registro extends Component
         $this->archivo = null;
         $this->descripcion = '';
     }
+
 
     public function guardarArchivo()
     {
@@ -197,10 +197,50 @@ class Registro extends Component
                 throw new \Exception('No se encontró el registro base del documento');
             }
 
-            $extension = $this->archivo->getClientOriginalExtension();
-            $nombreArchivo = time() . '_' . uniqid() . '.' . $extension;
+            // Obtener datos necesarios para el nombre del archivo
+            $ente = auth()->user()->ente; // Asumiendo que tienes la relación
+            $documento = $this->documentoSeleccionado;
+            $periodo = Periodo::find($this->periodosSeleccionados);
 
-            $rutaBase = 'documentos/' . $this->periodosSeleccionados . '/' . auth()->user()->ente_id . '/' . $this->documentoRecibidoSeleccionado->documentos_id;
+            if (!$ente || !$documento || !$periodo) {
+                throw new \Exception('No se pudieron obtener los datos necesarios');
+            }
+
+            // Extraer los 10 primeros caracteres del nombre del ente
+            $nombreEnte = substr($ente->nombre, 0, 10);
+
+            // Limpiar el nombre del ente (quitar espacios y caracteres especiales)
+            $nombreEnte = preg_replace('/[^a-zA-Z0-9]/', '', $nombreEnte);
+
+            // Obtener clave del documento
+            $claveDocumento = $documento->clave;
+
+            // Obtener año y mes del periodo
+            $anio = $periodo->axo; 
+            $mes = str_pad($periodo->mes, 2, '0', STR_PAD_LEFT); // Mes con 2 dígitos
+
+            // Fecha del sistema (formato: YYYYMMDD_HHMMSS)
+            $fechaSistema = now()->format('Ymd_His');
+
+            // Extensión del archivo
+            $extension = $this->archivo->getClientOriginalExtension();
+
+            // Construir el nombre del archivo: ente_clave_anio_mes_fecha.extension
+            $nombreArchivo = sprintf(
+                '%s_%s_%s_%s_%s.%s',
+                $nombreEnte,
+                $claveDocumento,
+                $anio,
+                $mes,
+                $fechaSistema,
+                $extension
+            );
+
+            // Limpiar cualquier carácter no deseado (excepto guiones bajos y puntos)
+            $nombreArchivo = preg_replace('/[^a-zA-Z0-9_.-]/', '', $nombreArchivo);
+
+            // $rutaBase = 'documentos/' . $this->periodosSeleccionados . '/' . auth()->user()->ente_id . '/' . $this->documentoRecibidoSeleccionado->documentos_id;
+            $rutaBase = 'documentos/' . $anio . '/' . $nombreEnte . '/'. $mes;
 
             $this->archivo->storeAs($rutaBase, $nombreArchivo, 'public');
 
@@ -219,7 +259,6 @@ class Registro extends Component
 
             $this->cerrarModal();
             $this->dispatch('archivo-subido', 'Archivo subido correctamente', 'success');
-
         } catch (\Exception $e) {
             $this->dispatch('archivo-subido', 'Error al subir el archivo: ' . $e->getMessage(), 'error');
         }

@@ -6,7 +6,7 @@
             required wire:model.live="periodosSeleccionados">
             <option value="" class="text-gray-500">📅 Seleccione un periodo</option>
             @foreach ($this->periodos as $periodo)
-                <option value="{{ $periodo->id }}" class="py-1">
+                <option value="{{ $periodo->id }}" class="py-1" {{!$periodo->is_active ? 'disabled' : ''}}>
                     {{ ucfirst($periodo->descripcion) }}
                 </option>
             @endforeach
@@ -100,7 +100,7 @@
                                     </span>
                                 </div>
                                 <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
-                                <p class="text-xs text-gray-500">Límite: día {{ $documento->fecha_limite }}</p>
+                                <p class="text-xs text-gray-500">Límite: del {{$documento->fecha_inicio}} al {{$documento->fecha_limite}}</p>
                                 
                                 {{-- Mostrar archivos subidos --}}
                                 @if($archivos->count() > 0)
@@ -278,7 +278,7 @@
 
             function mostrarNotificacion(mensaje, tipo = 'success') {
                 const colores = {
-                    success: 'bg-green-500',
+                    success: 'bg-green-700',
                     error: 'bg-red-500',
                     warning: 'bg-yellow-500',
                     info: 'bg-blue-500'
