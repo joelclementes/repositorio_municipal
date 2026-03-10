@@ -18,7 +18,6 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    require __DIR__ . '/documentos.php';
     require __DIR__ . '/avisos.php';
     require __DIR__ . '/documentoRegistro.php';
 });

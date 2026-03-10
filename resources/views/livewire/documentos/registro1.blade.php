@@ -6,7 +6,7 @@
             required wire:model.live="periodosSeleccionados">
             <option value="" class="text-gray-500">📅 Seleccione un periodo</option>
             @foreach ($this->periodos as $periodo)
-                <option value="{{ $periodo->id }}" class="py-1">
+                <option value="{{ $periodo->id }}" class="py-1" {{ !$periodo->is_active ? 'disabled' : '' }}>
                     {{ ucfirst($periodo->descripcion) }}
                 </option>
             @endforeach
@@ -14,7 +14,7 @@
 
         {{-- Select de Categorías --}}
         <select
-            class="w-full px-3 py-2 text-sm border border-vino-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 transition-colors mt-3"
+            class="w-full px-3 py-2 text-sm border border-vino-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white  disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 transition-colors mt-3"
             required wire:model.live="categoriaSeleccionada" {{ !$periodosSeleccionados ? 'disabled' : '' }}>
             @if (!$periodosSeleccionados)
                 <option value="" class="text-gray-400">⚠️ Primero seleccione un periodo</option>
@@ -70,7 +70,7 @@
     </div>
 
     {{-- Documentos relacionados --}}
-    @if ($this->documentosRecibidos->isNotEmpty())
+    @if ($this->documentos->isNotEmpty())
         <div class="mt-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-vino-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,18 +80,15 @@
                 Documentos requeridos
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @foreach ($this->documentosRecibidos as $documentoRecibido)
+            {{-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach ($this->documentos as $documento)
                     @php
-                        $documento = $documentoRecibido->documento;
                         $formatos = explode(',', $documento->formato);
                         $formatos = array_map('trim', $formatos);
-                        $archivos = $documentoRecibido->archivos;
-                        $tieneArchivoPDF = $archivos->where('tipo_recepcion', 'PDF')->count() > 0;
-                        $tieneArchivoExcel = $archivos->whereIn('tipo_recepcion', ['XLSX', 'XLS'])->count() > 0;
                     @endphp
 
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4">
+                    <div
+                        class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center mb-2">
@@ -101,67 +98,136 @@
                                 </div>
                                 <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
                                 <p class="text-xs text-gray-500">Límite: día {{ $documento->fecha_limite }}</p>
-                                
-                                {{-- Mostrar archivos subidos --}}
-                                @if($archivos->count() > 0)
-                                    <div class="mt-2 space-y-1">
-                                        @foreach($archivos as $archivo)
-                                            <div class="flex items-center text-xs {{ $archivo->causas_rechazo_id ? 'text-red-600' : 'text-green-600' }}">
-                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    @if($archivo->causas_rechazo_id)
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                    @else
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                    @endif
-                                                </svg>
-                                                <span class="truncate max-w-[150px]">{{ $archivo->nombre }}</span>
-                                                <span class="ml-1 text-gray-400">({{ strtoupper($archivo->tipo_recepcion) }})</span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
                             </div>
 
                             <div class="flex flex-col space-y-2 mt-4 min-w-[140px]">
                                 @if (in_array('PDF', $formatos))
-                                    <button type="button" 
-                                            wire:click="abrirModalSubida({{ $documentoRecibido->id }}, 'PDF')"
-                                            class="w-full px-3 py-2 {{ $tieneArchivoPDF ? 'bg-gray-400 cursor-not-allowed' : 'bg-vino-900 hover:bg-vino-800' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
-                                            {{ $tieneArchivoPDF ? 'disabled' : '' }}>
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button type="button" wire:click="abrirModalSubida({{ $documento->id }}, 'PDF')"
+                                        class="w-full px-3 py-2 bg-vino-900 hover:bg-vino-800 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 3v4a1 1 0 001 1h4" />
-                                            <text x="10" y="18" font-size="8" font-weight="bold" fill="currentColor" stroke="none">PDF</text>
+                                            <text x="10" y="18" font-size="8" font-weight="bold" fill="currentColor"
+                                                stroke="none">PDF</text>
                                         </svg>
-                                        <span>{{ $tieneArchivoPDF ? 'Ya subido' : 'Subir PDF' }}</span>
+                                        <span>Subir PDF</span>
                                     </button>
                                 @endif
 
                                 @if (in_array('XLSX', $formatos) || in_array('XLS', $formatos))
                                     <button type="button"
-                                            wire:click="abrirModalSubida({{ $documentoRecibido->id }}, '{{ in_array('XLSX', $formatos) ? 'XLSX' : 'XLS' }}')"
-                                            class="w-full px-3 py-2 {{ $tieneArchivoExcel ? 'bg-gray-400 cursor-not-allowed' : '' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
-                                            style="{{ $tieneArchivoExcel ? 'background-color: #9CA3AF;' : 'background-color: #1D6F42;' }}"
-                                            {{ $tieneArchivoExcel ? 'disabled' : '' }}>
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        wire:click="abrirModalSubida({{ $documento->id }}, '{{ in_array('XLSX', $formatos) ? 'XLSX' : 'XLS' }}')"
+                                        class="w-full px-3 py-2 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                                        style="background-color: #1D6F42;">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 3v4a1 1 0 001 1h4" />
-                                            <text x="6" y="18" font-size="6" font-weight="bold" fill="currentColor" stroke="none">XLSX</text>
+                                            <text x="6" y="18" font-size="6" font-weight="bold" fill="currentColor"
+                                                stroke="none">XLSX</text>
                                         </svg>
-                                        <span>{{ $tieneArchivoExcel ? 'Ya subido' : 'Subir Excel' }}</span>
+                                        <span>Subir Excel</span>
                                     </button>
                                 @endif
                             </div>
                         </div>
                     </div>
+
+                    
                 @endforeach
+            </div> --}}
+
+
+{{-- Dentro del card de cada documento --}}
+<div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4">
+    <div class="flex items-start justify-between">
+        <div class="flex-1">
+            <div class="flex items-center mb-2">
+                <span class="text-xs font-bold text-vino-900 bg-vino-50 px-2 py-1 rounded mr-2">
+                    {{ $documento->clave }}
+                </span>
             </div>
+            <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
+            <p class="text-xs text-gray-500">Límite: día {{ $documento->fecha_limite }}</p>
+            
+            {{-- Mostrar archivos subidos --}}
+            @php
+                $documentoRecibido = App\Models\DocumentosRecibido::where([
+                    'ente_id' => auth()->user()->ente_id,
+                    'periodo_id' => $periodosSeleccionados,
+                    'documentos_id' => $documento->id,
+                ])->first();
+            @endphp
+            
+            @if($documentoRecibido && $documentoRecibido->archivos->count() > 0)
+                <div class="mt-2 space-y-1">
+                    @foreach($documentoRecibido->archivos as $archivo)
+                        <div class="flex items-center text-xs {{ $archivo->causas_rechazo_id ? 'text-red-600' : 'text-green-600' }}">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                @if($archivo->causas_rechazo_id)
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                @else
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                @endif
+                            </svg>
+                            <span class="truncate max-w-[150px]">{{ $archivo->nombre }}</span>
+                            <span class="ml-1 text-gray-400">({{ strtoupper($archivo->tipo_recepcion) }})</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
-    @elseif($subcategoriaSeleccionada && $this->documentosRecibidos->isEmpty())
+
+        <div class="flex flex-col space-y-2 mt-4 min-w-[140px]">
+            @php
+                $formatos = explode(',', $documento->formato);
+                $formatos = array_map('trim', $formatos);
+                $tieneArchivo = $documentoRecibido && $documentoRecibido->archivos->count() > 0;
+            @endphp
+
+            @if (in_array('PDF', $formatos))
+                <button type="button" 
+                        wire:click="abrirModalSubida({{ $documento->id }}, 'PDF')"
+                        class="w-full px-3 py-2 {{ $tieneArchivo ? 'bg-gray-400 cursor-not-allowed' : 'bg-vino-900 hover:bg-vino-800' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                        {{ $tieneArchivo ? 'disabled' : '' }}>
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v4a1 1 0 001 1h4" />
+                        <text x="10" y="18" font-size="8" font-weight="bold" fill="currentColor" stroke="none">PDF</text>
+                    </svg>
+                    <span>{{ $tieneArchivo ? 'Ya subido' : 'Subir PDF' }}</span>
+                </button>
+            @endif
+
+            @if (in_array('XLSX', $formatos) || in_array('XLS', $formatos))
+                <button type="button"
+                        wire:click="abrirModalSubida({{ $documento->id }}, '{{ in_array('XLSX', $formatos) ? 'XLSX' : 'XLS' }}')"
+                        class="w-full px-3 py-2 {{ $tieneArchivo ? 'bg-gray-400 cursor-not-allowed' : '' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                        style="{{ $tieneArchivo ? 'background-color: #9CA3AF;' : 'background-color: #1D6F42;' }}"
+                        {{ $tieneArchivo ? 'disabled' : '' }}>
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v4a1 1 0 001 1h4" />
+                        <text x="6" y="18" font-size="6" font-weight="bold" fill="currentColor" stroke="none">XLSX</text>
+                    </svg>
+                    <span>{{ $tieneArchivo ? 'Ya subido' : 'Subir Excel' }}</span>
+                </button>
+            @endif
+        </div>
+    </div>
+</div>
+
+        </div>
+    @elseif($subcategoriaSeleccionada && $this->documentos->isEmpty())
         <div class="mt-6 p-8 bg-gray-50 border border-gray-200 rounded-lg text-center">
             <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -210,6 +276,7 @@
                     </div>
 
                     <div class="space-y-4">
+                        {{-- Input de archivo --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
                                 Archivo {{ $tipoSubida }} *
@@ -222,6 +289,7 @@
                             @enderror
                         </div>
 
+                        {{-- Descripción --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
                                 Descripción (opcional)
@@ -268,15 +336,6 @@
         <script>
             $wire.on('notificacion', (data) => {
                 const [mensaje, tipo] = data;
-                mostrarNotificacion(mensaje, tipo);
-            });
-
-            $wire.on('archivo-subido', (data) => {
-                const [mensaje, tipo] = data;
-                mostrarNotificacion(mensaje, tipo);
-            });
-
-            function mostrarNotificacion(mensaje, tipo = 'success') {
                 const colores = {
                     success: 'bg-green-500',
                     error: 'bg-red-500',
@@ -294,7 +353,7 @@
                 setTimeout(() => {
                     notificacion.remove();
                 }, 3000);
-            }
+            });
         </script>
     @endscript
 
@@ -304,6 +363,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             100% {
                 opacity: 1;
                 transform: translateY(0);
