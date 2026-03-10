@@ -10,6 +10,7 @@ class CategoriasDocumento extends Model
     protected $fillable = [
         'clave',
         'nombre',
+        'roles_permitidos',
     ];
 
     public function subcategorias()
