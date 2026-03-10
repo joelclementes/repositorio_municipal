@@ -14,6 +14,10 @@ class Documento extends Model
         'clave',
         'nombre',
         'subcategoria_id',
+        'periodicidad',
+        'fecha_inicio',
+        'fecha_limite',
+        'formato',
     ];
 
     public function subcategoria()

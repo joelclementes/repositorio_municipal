@@ -38,7 +38,7 @@ class CategoriasDocumentoSeeder extends Seeder
             [
                 'categoria_Data' => [
                     'clave' => 'CI',
-                    'nombre' => 'Contralores internos',
+                    'nombre' => 'Contralores Internos',
                     'roles_permitidos' => 'Contralor',
                 ],
             ],

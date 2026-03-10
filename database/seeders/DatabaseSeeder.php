@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             // AvisoSeeder::class,
             // AvisosEntesSeeder::class,
             PeriodosSeeder::class,
+
         ]);
     }
 }
