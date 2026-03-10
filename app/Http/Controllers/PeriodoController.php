@@ -10,9 +10,23 @@ class PeriodoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $periodos = Periodo::all();
+        $query = Periodo::query();
+        
+        // Aplicar filtro de búsqueda si existe
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('mes', 'LIKE', "%{$search}%")
+                  ->orWhere('axo', 'LIKE', "%{$search}%")
+                  ->orWhere('descripcion', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        // Aplicar paginación
+        $periodos = $query->paginate(10);
+        
         return view('periodos.registro', compact('periodos'));
     }
 

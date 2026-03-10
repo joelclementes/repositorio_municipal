@@ -85,7 +85,32 @@
     <div class="w-full mx-auto sm:px-4 lg:px-6 mt-8">
         <div class="bg-white shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Periodos Registrados</h3>
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900">Períodos Registrados</h3>
+                    
+                    <!-- Campo de búsqueda -->
+                    <div class="relative">
+                        <form method="GET" action="{{ route('periodos.registro.index') }}">
+                            <div class="flex items-center space-x-2">
+                                <input type="text" 
+                                       name="search" 
+                                       value="{{ request('search') }}"
+                                       placeholder="Buscar períodos..." 
+                                       class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-vino-500 focus:border-vino-500">
+                                <button type="submit" 
+                                        class="bg-vino-600 hover:bg-vino-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-vino-500">
+                                    🔍 Buscar
+                                </button>
+                                @if(request('search'))
+                                    <a href="{{ route('periodos.registro.index') }}" 
+                                       class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md focus:outline-none">
+                                        ✖ Limpiar
+                                    </a>
+                                @endif
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -100,9 +125,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Fecha Inicio</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Fecha Fin</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Estado</th>
+                                Fecha Fin</th>                            
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Cambiar Estado</th>
                         </tr>
@@ -122,12 +145,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $periodo->fecha_fin ? \Carbon\Carbon::parse($periodo->fecha_fin)->format('d/m/Y') : 'N/A' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 py-1 text-xs font-semibold rounded-full {{ $periodo->activo ?? false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $periodo->is_active ?? false ? 'Activo' : 'Inactivo' }}
-                                    </span>
-                                </td>
+                               
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex items-center">
                                         <input type="checkbox"
@@ -141,13 +159,32 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay períodos
-                                    registrados</td>
+                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                    @if(request('search'))
+                                        No se encontraron períodos con "{{ request('search') }}"
+                                    @else
+                                        No hay períodos registrados
+                                    @endif
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Paginación -->
+            @if($periodos->hasPages())
+                <div class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-700">
+                            Mostrando {{ $periodos->firstItem() }} a {{ $periodos->lastItem() }} de {{ $periodos->total() }} resultados
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            {{ $periodos->appends(request()->query())->links() }}
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
     {{-- </div> --}}
