@@ -25,9 +25,11 @@ class DatabaseSeeder extends Seeder
             CategoriasDocumentoSeeder::class,
             SubcategoriasDocumentoSeeder::class,
             DocumentoSeeder::class,
+            CausaRechazoSeeder::class,
             // AvisoSeeder::class,
             // AvisosEntesSeeder::class,
             PeriodosSeeder::class,
+
         ]);
     }
 }
