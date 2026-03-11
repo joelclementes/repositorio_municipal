@@ -18,6 +18,8 @@ class CategoriasDocumentoResource extends Resource
 {
     protected static ?string $model = CategoriasDocumento::class;
 
+    protected static ?int $navigationSort = 1;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'CategoriasDocumento';

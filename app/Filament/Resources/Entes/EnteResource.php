@@ -18,6 +18,8 @@ class EnteResource extends Resource
 {
     protected static ?string $model = Ente::class;
 
+    protected static ?int $navigationSort = 5;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'Ente';

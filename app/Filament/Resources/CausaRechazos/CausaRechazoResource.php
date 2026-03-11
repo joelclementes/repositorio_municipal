@@ -18,6 +18,10 @@ class CausaRechazoResource extends Resource
 {
     protected static ?string $model = CausaRechazo::class;
 
+    protected static ?int $navigationSort = 4;
+
+    protected static ?string $navigationLabel = 'Causas Rechazo'; 
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'CausaRechazo';
