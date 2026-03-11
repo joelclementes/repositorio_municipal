@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('mes');
             $table->string('axo');
+            $table->unique(['mes', 'axo'], 'unique_mes_anio_periodos');
             $table->text('descripcion')->nullable();
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
