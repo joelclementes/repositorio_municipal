@@ -24,6 +24,9 @@ class PeriodoController extends Controller
             });
         }
         
+        // Ordenar por año descendente y luego por mes descendente
+        $query->orderBy('axo', 'desc')->orderBy('mes', 'desc');
+        
         // Aplicar paginación
         $periodos = $query->paginate(10);
         
