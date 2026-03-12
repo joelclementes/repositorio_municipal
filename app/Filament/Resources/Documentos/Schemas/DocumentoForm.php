@@ -22,22 +22,27 @@ class DocumentoForm
                     ->searchable()
                     ->preload()
                     ->required(),
-                TextInput::make('periodicidad')
-                    ->placeholder('Ejemplo: anual, semestral, trimestral, mensual, etc.')
-                     ->extraInputAttributes([
-                        'oninput' => 'this.value = this.value.toLowerCase()' // Para minúsculas
-            ])
-                    ->required(),
+            //     TextInput::make('periodicidad')
+            //         ->placeholder('Ejemplo: anual, semestral, trimestral, mensual, etc.')
+            //          ->extraInputAttributes([
+            //             'oninput' => 'this.value = this.value.toLowerCase()' // Para minúsculas
+            // ])
+            //         ->required(),
                 TextInput::make('fecha_inicio')
-                    ->numeric(),
-                TextInput::make('fecha_limite')
-                    ->numeric(),
-                TextInput::make('formato')
-                    ->placeholder('Ejemplo: PDF, XLSX')
-                     ->extraInputAttributes([
-                        'oninput' => 'this.value = this.value.toUpperCase()' // Para mayúsculas
-                    ])
+                    ->numeric()
                     ->required(),
+                TextInput::make('fecha_limite')
+                    ->numeric()
+                    ->required(),
+                Select::make('formato')
+                    ->label('Formato del documento')
+                    ->options([
+                        'PDF' => 'PDF',
+                        'XLSX' => 'XLSX',
+                        'PDF, XLSX' => 'PDF y XLSX',
+                    ])
+                    ->searchable()
+                    ->preload(),
             ]);
     }
 }
