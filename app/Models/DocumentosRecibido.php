@@ -39,13 +39,6 @@ class DocumentosRecibido extends Model
         'usuario_revisor',
     ];
 
-    // protected $fillable = [
-    //     'ente_id',
-    //     'user_id',
-    //     'documentos_id',
-    //     'periodo_id',
-    // ];
-
     /**
      * Los atributos que deben ser convertidos a tipos nativos.
      *

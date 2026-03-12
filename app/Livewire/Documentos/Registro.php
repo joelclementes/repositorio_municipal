@@ -143,7 +143,7 @@ class Registro extends Component
             }
 
             DB::commit();
-            $this->dispatch('notificacion', 'Registros generados correctamente', 'success');
+            // $this->dispatch('notificacion', 'Registros generados correctamente', 'success');
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('notificacion', 'Error al generar registros: ' . $e->getMessage(), 'error');
@@ -246,7 +246,7 @@ class Registro extends Component
 
             ArchivoDocumentoRecibido::create([
                 'nombre' => $nombreArchivo,
-                'observaciones' => $this->descripcion,
+                'observaciones_ente' => $this->descripcion,
                 'documento_recibido_id' => $this->documentoRecibidoSeleccionado->id,
                 'ente_id' => auth()->user()->ente_id,
                 'user_id' => auth()->id(),

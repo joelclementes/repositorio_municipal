@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\EnteRevisor;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
             // AvisoSeeder::class,
             // AvisosEntesSeeder::class,
             PeriodosSeeder::class,
+            EntesRevisorSeeder::class,
 
         ]);
     }

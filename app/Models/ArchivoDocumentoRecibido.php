@@ -25,7 +25,7 @@ class ArchivoDocumentoRecibido extends Model
      */
     protected $fillable = [
         'nombre',
-        'observaciones',
+        'observaciones_ente',
         'documento_recibido_id',
         'ente_id',
         'user_id',

@@ -39,6 +39,24 @@ class UserSeeder extends Seeder
                 ],
                 'role' => 'Tesorero'
             ],
+            [
+                'user_data' => [
+                    'name' => 'Mtra. Lorena Rivera Ruiz',
+                    'email' => 'lrivera',
+                    'password' => bcrypt('123456789'),
+                    'ente_id' => 1,
+                ],
+                'role' => 'Revisor'
+            ],
+            [
+                'user_data' => [
+                    'name' => 'Mtra. Leticia Sedas Vargas',
+                    'email' => 'lsedas',
+                    'password' => bcrypt('123456789'),
+                    'ente_id' => 1,
+                ],
+                'role' => 'Revisor'
+            ],
         ];
 
         foreach ($usuarios as $usuario) {

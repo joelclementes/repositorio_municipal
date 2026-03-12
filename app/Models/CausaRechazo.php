@@ -14,4 +14,9 @@ class CausaRechazo extends Model
     protected $fillable = [
         'descripcion',
     ];
+
+    public function archivos()
+    {
+        return $this->hasMany(ArchivoDocumentoRecibido::class, 'causas_rechazo_id');
+    }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('archivo_documento_recibidos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->text('observaciones')->nullable();
+            $table->text('observaciones_ente')->nullable();
             
             $table->unsignedBigInteger('documento_recibido_id');
             $table->unsignedBigInteger('ente_id');
@@ -29,6 +29,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('documento_recibido_id')->references('id')->on('documentos_recibidos');
+            $table->foreign('ente_id')->references('id')->on('entes');
             $table->foreign('causas_rechazo_id')->references('id')->on('causas_rechazo');
 
         });

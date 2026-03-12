@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('clave')->unique();
             $table->string('nombre', length: 255)->unique();
             $table->unsignedBigInteger('subcategoria_id');
-            $table->string('periodicidad', length: 20);
+            $table->string('periodicidad', length: 20)->nullable();
             $table->integer('fecha_inicio')->nullable();
             $table->integer('fecha_limite')->nullable();
             $table->string('formato', length: 20)->comment('PDF ó XLSX');

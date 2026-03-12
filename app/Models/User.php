@@ -108,4 +108,10 @@ class User extends Authenticatable
         return $query->role('EnteObligado');
     }
 
+    // app/Models/User.php - Agrega esta relación
+    public function entesAsignados()
+    {
+        return $this->belongsToMany(Ente::class, 'entes_revisor', 'revisor_id', 'ente_id')
+            ->withTimestamps();
+    }
 }
