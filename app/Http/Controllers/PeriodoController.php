@@ -4,15 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\Periodo;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PeriodoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $periodos = Periodo::all();
+        $query = Periodo::query();
+        
+        // Aplicar filtro de búsqueda si existe
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('mes', 'LIKE', "%{$search}%")
+                  ->orWhere('axo', 'LIKE', "%{$search}%")
+                  ->orWhere('descripcion', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        // Ordenar por año descendente y luego por mes descendente
+        $query->orderBy('axo', 'desc')->orderBy('mes', 'desc');
+        
+        // Aplicar paginación
+        $periodos = $query->paginate(10);
+        
         return view('periodos.registro', compact('periodos'));
     }
 
@@ -39,11 +57,25 @@ class PeriodoController extends Controller
     {
         $validatedData = $request->validate([
             'mes' => 'required|string|max:125',
-            'anio' => 'required|integer',
+            'anio' => [
+                'required',
+                'integer',
+                Rule::unique('periodos', 'axo')->where(function ($query) use ($request) {
+                    return $query->where('mes', $request->mes);
+                })
+            ],
             'descripcion' => 'required|string',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             'activo' => 'nullable|boolean',
+        ], [
+            'anio.unique' => 'Ya existe un período registrado para el mes y año seleccionados.',
+            'mes.required' => 'El campo mes es obligatorio.',
+            'anio.required' => 'El campo año es obligatorio.',
+            'descripcion.required' => 'El campo descripción es obligatorio.',
+            'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
+            'fecha_fin.required' => 'La fecha de fin es obligatoria.',
+            'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
         ]);
 
         $periodo = new Periodo();
