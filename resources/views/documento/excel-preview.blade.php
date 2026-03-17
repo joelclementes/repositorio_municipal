@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vista previa - {{ $archivo->nombre }}</title>
+    <title>Vista previa - Archivo XLSX</title>
     <style>
         body {
             margin: 0;
@@ -127,7 +127,7 @@
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p>
-            Vista previa del archivo Excel. Para una mejor experiencia, 
+            Vista previa del archivo Excel. Puede 
             <a href="{{ $archivo->url }}" target="_blank" style="color: #1D6F42; font-weight: bold;">
                 descarga el archivo original
             </a>.

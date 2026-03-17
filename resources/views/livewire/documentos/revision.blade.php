@@ -192,24 +192,6 @@
                                                 Ver
                                             </a>
                                         @endif
-                                        {{-- @elseif(in_array($extension, ['xlsx', 'xls', 'csv']))
-                                            <button type="button" wire:click="verArchivo({{ $archivo->id }})"
-                                                class="px-3 py-2 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
-                                                style="background-color: #1D6F42;"
-                                                onmouseover="this.style.backgroundColor='#155833'"
-                                                onmouseout="this.style.backgroundColor='#1D6F42'">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <rect x="4" y="4" width="16" height="16" rx="2"
-                                                        stroke="currentColor" stroke-width="1.5" />
-                                                    <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor"
-                                                        stroke-width="2" stroke-linecap="round" />
-                                                    <text x="9" y="20" font-size="5" font-weight="bold"
-                                                        fill="currentColor" stroke="none">XLS</text>
-                                                </svg>
-                                                Ver
-                                            </button>
-                                        @endif --}}
 
                                         @if (!$archivo->usuario_revisor && !$archivo->causas_rechazo_id)
                                             <button type="button" wire:click="aprobarArchivo({{ $archivo->id }})"
@@ -223,8 +205,10 @@
                                                 Aprobar
                                             </button>
 
+                                            {{-- <button wire:click="debug({{ $archivo->id }})">Test</button> --}}
+                                            
                                             <button type="button"
-                                                wire:click="mostrarPanelRechazo({{ $archivo->id }})"
+                                                wire:click="mostrarElPanelRechazo({{ $archivo->id }})"
                                                 class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
@@ -234,6 +218,18 @@
                                                 </svg>
                                                 Rechazar
                                             </button>
+
+                                            {{-- <button type="button" x-data="{}"
+                                                @click="$wire.mostrarPanelRechazo({{ $archivo->id }})"
+                                                class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
+                                                </svg>
+                                                Rechazar
+                                            </button> --}}
                                         @endif
                                     </div>
                                 </div>
@@ -309,16 +305,6 @@
                     @endif
                 </div>
             </div>
-            {{-- @else
-
-            <div class="bg-gray-50 rounded-lg p-8 text-center text-gray-400">
-                <svg class="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <p class="text-lg">Complete los filtros para ver el visor</p>
-                <p class="text-sm mt-2">Seleccione periodo, ente, categoría y subcategoría</p>
-            </div> --}}
         @endif
     </div>
 

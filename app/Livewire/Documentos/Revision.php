@@ -70,9 +70,9 @@ class Revision extends Component
             return collect();
         }
 
-        return DocumentosRecibido::with(['documento', 'archivos' => function($query) {
-                $query->latest();
-            }])
+        return DocumentosRecibido::with(['documento', 'archivos' => function ($query) {
+            $query->latest();
+        }])
             ->where('ente_id', $this->enteSeleccionado)
             ->where('periodo_id', $this->periodosSeleccionados)
             ->whereHas('documento', function ($query) {
@@ -82,9 +82,51 @@ class Revision extends Component
             ->get();
     }
 
+    /**
+     * Resetear visor cuando cambia el período
+     */
+    public function updatedPeriodosSeleccionados()
+    {
+        $this->resetearVisor();
+        $this->enteSeleccionado = '';
+        $this->categoriaSeleccionada = '';
+        $this->subcategoriaSeleccionada = '';
+    }
+
+    /**
+     * Resetear visor cuando cambia el ente
+     */
+    public function updatedEnteSeleccionado()
+    {
+        $this->resetearVisor();
+        $this->categoriaSeleccionada = '';
+        $this->subcategoriaSeleccionada = '';
+    }
+
+    /**
+     * Resetear visor cuando cambia la categoría
+     */
     public function updatedCategoriaSeleccionada()
     {
+        $this->resetearVisor();
         $this->subcategoriaSeleccionada = '';
+    }
+
+    /**
+     * Resetear visor cuando cambia la subcategoría
+     */
+    public function updatedSubcategoriaSeleccionada()
+    {
+        $this->resetearVisor();
+    }
+
+    /**
+     * Método para resetear el visor y el archivo seleccionado
+     */
+    private function resetearVisor()
+    {
+        $this->archivoEnRevision = null;
+        $this->dispatch('visor-limpiado');
     }
 
     public function verArchivo($archivoId)
@@ -94,7 +136,7 @@ class Revision extends Component
             'documentoRecibido.periodo',
             'ente'
         ])->find($archivoId);
-        
+
         $this->dispatch('actualizar-visorpdf');
     }
 
@@ -102,7 +144,7 @@ class Revision extends Component
     {
         try {
             $archivo = ArchivoDocumentoRecibido::find($archivoId);
-            
+
             if ($archivo) {
                 $archivo->update([
                     'usuario_revisor' => auth()->id(),
@@ -120,13 +162,46 @@ class Revision extends Component
         }
     }
 
-    public function mostrarPanelRechazo($archivoId)
+    public function mostrarElPanelRechazo($archivoId)
     {
+
+        $archivo = ArchivoDocumentoRecibido::find($archivoId);
+
+        if (!$archivo) {
+            $this->dispatch('notificacion', 'Archivo no encontrado', 'error');
+            return;
+        }
+
         $this->archivoSeleccionado = ArchivoDocumentoRecibido::find($archivoId);
         $this->mostrarPanelRechazo = true;
         $this->causaRechazoId = '';
         $this->observacionesRevisor = '';
     }
+
+    // public function mostrarPanelRechazo($archivoId)
+    // {
+    //     try {
+    //         \Log::info('Intentando mostrar panel de rechazo para archivo: ' . $archivoId);
+
+    //         $archivo = ArchivoDocumentoRecibido::find($archivoId);
+
+    //         if (!$archivo) {
+    //             \Log::error('Archivo no encontrado: ' . $archivoId);
+    //             $this->dispatch('notificacion', 'Archivo no encontrado', 'error');
+    //             return;
+    //         }
+
+    //         $this->archivoSeleccionado = $archivo;
+    //         $this->mostrarPanelRechazo = true;
+    //         $this->causaRechazoId = '';
+    //         $this->observacionesRevisor = '';
+
+    //         \Log::info('Panel de rechazo abierto para archivo: ' . $archivoId);
+    //     } catch (\Exception $e) {
+    //         \Log::error('Error en mostrarPanelRechazo: ' . $e->getMessage());
+    //         $this->dispatch('notificacion', 'Error al abrir panel de rechazo', 'error');
+    //     }
+    // }
 
     public function rechazarArchivo()
     {
@@ -161,5 +236,10 @@ class Revision extends Component
     public function render()
     {
         return view('livewire.documentos.revision');
+    }
+
+    public function debug($archivoId)
+    {
+        dd('El componente funciona ' . $archivoId);
     }
 }
