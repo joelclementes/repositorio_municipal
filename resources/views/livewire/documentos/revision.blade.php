@@ -107,6 +107,7 @@
                         @php
                             $documento = $documentoRecibido->documento;
                             $archivos = $documentoRecibido->archivos;
+                            $clave = $documentoRecibido->clave;
                         @endphp
 
                         @foreach ($archivos as $archivo)
@@ -115,10 +116,6 @@
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
                                         <div class="flex items-center mb-2">
-                                            <span
-                                                class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded mr-2">
-                                                {{ $documento->clave }}
-                                            </span>
                                             @if ($archivo->causas_rechazo_id)
                                                 <span
                                                     class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Rechazado</span>
@@ -132,7 +129,7 @@
                                         </div>
                                         <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
                                         <p class="text-xs text-gray-500">
-                                            <span class="font-medium">Archivo:</span> {{ $archivo->nombre }}
+                                            {{ $archivo->nombre }}
                                         </p>
                                         <p class="text-xs text-gray-500">
                                             <span class="font-medium">Subido:</span>
@@ -225,8 +222,32 @@
                 <div class="bg-gray-100 rounded-lg p-4 h-[calc(100vh-300px)] overflow-auto">
                     @if ($archivoEnRevision)
                         @if (pathinfo($archivoEnRevision->nombre, PATHINFO_EXTENSION) === 'pdf')
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded mr-2">
+                                {{ $documento->clave ?? 'S/C' }}
+                            </span>
+                            <span>
+                                {{ asset(
+                                    'storage/documentos/' .
+                                        $archivoEnRevision->documentoRecibido->periodo->axo .
+                                        '/' .
+                                        $archivoEnRevision->ente->nombre .
+                                        '/' .
+                                        $archivoEnRevision->documentoRecibido->periodo->mes_nombre .
+                                        '/' .
+                                        $archivoEnRevision->nombre,
+                                ) }}
+                            </span>
                             <iframe
-                                src="{{ asset('storage/' . $archivoEnRevision->documentoRecibido->periodo_id . '/' . $archivoEnRevision->ente_id . '/' . $archivoEnRevision->documentoRecibido->documentos_id . '/' . $archivoEnRevision->nombre) }}#toolbar=0&navpanes=0"
+                                src="{{ asset(
+                                    'storage/documentos/' .
+                                        $archivoEnRevision->documentoRecibido->periodo->axo .
+                                        '/' .
+                                        $archivoEnRevision->ente->nombre .
+                                        '/' .
+                                        $archivoEnRevision->documentoRecibido->periodo->mes_nombre .
+                                        '/' .
+                                        $archivoEnRevision->nombre,
+                                ) }}#toolbar=0&navpanes=0"
                                 class="w-full h-full rounded-lg" frameborder="0">
                             </iframe>
                         @else
@@ -237,8 +258,7 @@
                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                                 <p class="text-gray-700 text-lg mb-2">Archivo Excel</p>
-                                <a href="{{ asset('storage/' . $archivoEnRevision->documentoRecibido->periodo_id . '/' . $archivoEnRevision->ente_id . '/' . $archivoEnRevision->documentoRecibido->documentos_id . '/' . $archivoEnRevision->nombre) }}"
-                                    target="_blank"
+                                <a href="{{ $archivoEnRevision->url }}" target="_blank"
                                     class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
                                     Descargar para visualizar
                                 </a>
@@ -258,7 +278,7 @@
                     @endif
                 </div>
             </div>
-        {{-- @else
+            {{-- @else
 
             <div class="bg-gray-50 rounded-lg p-8 text-center text-gray-400">
                 <svg class="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -25,7 +25,7 @@ class Revision extends Component
     public $archivoSeleccionado = null;
     public $causaRechazoId = '';
     public $observacionesRevisor = '';
-    public $archivoEnRevision = null; // Para el visor PDF
+    public $archivoEnRevision = null;
 
     public $causasRechazo = [];
 
@@ -43,20 +43,13 @@ class Revision extends Component
     #[Computed]
     public function entesAsignados()
     {
+        // Asegúrate de tener este método en el modelo User
         return auth()->user()->entesAsignados()->orderBy('nombre')->get();
     }
 
     #[Computed]
     public function categorias()
     {
-        $rolesUsuario = auth()->user()->roles->pluck('name')->toArray();
-
-        // return CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
-        //     foreach ($rolesUsuario as $rol) {
-        //         $query->orWhereRaw("FIND_IN_SET(?, roles_permitidos)", [$rol]);
-        //     }
-        // })->get();
-
         return CategoriasDocumento::orderBy('nombre')->get();
     }
 
@@ -96,10 +89,13 @@ class Revision extends Component
 
     public function verArchivo($archivoId)
     {
-        $this->archivoEnRevision = ArchivoDocumentoRecibido::with('documentoRecibido.documento')
-            ->find($archivoId);
+        $this->archivoEnRevision = ArchivoDocumentoRecibido::with([
+            'documentoRecibido.documento',
+            'documentoRecibido.periodo',
+            'ente'
+        ])->find($archivoId);
         
-        $this->dispatch('actualizar-visorpdf', url: $this->archivoEnRevision->url);
+        $this->dispatch('actualizar-visorpdf');
     }
 
     public function aprobarArchivo($archivoId)
@@ -164,6 +160,6 @@ class Revision extends Component
 
     public function render()
     {
-         return view('livewire.documentos.revision');
+        return view('livewire.documentos.revision');
     }
 }
