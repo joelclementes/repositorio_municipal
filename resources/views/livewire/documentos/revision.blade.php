@@ -153,7 +153,45 @@
                                     </div>
 
                                     <div class="flex flex-col space-y-2 ml-4">
-                                        <button type="button" wire:click="verArchivo({{ $archivo->id }})"
+                                        @php
+                                            $extension = pathinfo($archivo->nombre, PATHINFO_EXTENSION);
+                                        @endphp
+
+                                        {{-- Botón Ver con estilo según extensión --}}
+                                        @if ($extension === 'pdf')
+                                            <button type="button" wire:click="verArchivo({{ $archivo->id }})"
+                                                class="px-3 py-2 bg-[#C41E3A] hover:bg-[#A01830] text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M12 3v4a1 1 0 001 1h4" />
+                                                    <text x="9" y="18" font-size="6" font-weight="bold"
+                                                        fill="currentColor" stroke="none">PDF</text>
+                                                </svg>
+                                                Ver
+                                            </button>
+                                        @elseif(in_array($extension, ['xlsx', 'xls', 'csv']))
+                                            <button type="button" wire:click="verArchivo({{ $archivo->id }})"
+                                                class="px-3 py-2 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                                                style="background-color: #1D6F42;"
+                                                onmouseover="this.style.backgroundColor='#155833'"
+                                                onmouseout="this.style.backgroundColor='#1D6F42'">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <rect x="4" y="4" width="16" height="16" rx="2"
+                                                        stroke="currentColor" stroke-width="1.5" />
+                                                    <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" />
+                                                    <text x="9" y="20" font-size="5" font-weight="bold"
+                                                        fill="currentColor" stroke="none">XLS</text>
+                                                </svg>
+                                                Ver
+                                            </button>
+                                        @endif
+                                        {{-- <button type="button" wire:click="verArchivo({{ $archivo->id }})"
                                             class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -163,7 +201,7 @@
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                             Ver
-                                        </button>
+                                        </button> --}}
 
                                         @if (!$archivo->usuario_revisor && !$archivo->causas_rechazo_id)
                                             <button type="button" wire:click="aprobarArchivo({{ $archivo->id }})"
@@ -222,21 +260,6 @@
                 <div class="bg-gray-100 rounded-lg p-4 h-[calc(100vh-300px)] overflow-auto">
                     @if ($archivoEnRevision)
                         @if (pathinfo($archivoEnRevision->nombre, PATHINFO_EXTENSION) === 'pdf')
-                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded mr-2">
-                                {{ $documento->clave ?? 'S/C' }}
-                            </span>
-                            <span>
-                                {{ asset(
-                                    'storage/documentos/' .
-                                        $archivoEnRevision->documentoRecibido->periodo->axo .
-                                        '/' .
-                                        $archivoEnRevision->ente->nombre .
-                                        '/' .
-                                        $archivoEnRevision->documentoRecibido->periodo->mes_nombre .
-                                        '/' .
-                                        $archivoEnRevision->nombre,
-                                ) }}
-                            </span>
                             <iframe
                                 src="{{ asset(
                                     'storage/documentos/' .
