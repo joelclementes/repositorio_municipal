@@ -17,12 +17,12 @@ return new class extends Migration
             $table->text('observaciones_ente')->nullable();
             
             $table->unsignedBigInteger('documento_recibido_id');
-            $table->unsignedBigInteger('ente_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('ente_id')->comment('Id del ente que registró');
+            $table->unsignedBigInteger('user_id')->comment('Id del usuario que registró');
             $table->string('tipo_recepcion',length:125);
             $table->date('fecha_cambio_estatus')->nullable();
 
-            $table->string('usuario_revisor',length:125)->nullable();
+            $table->string('usuario_revisor',length:125)->nullable()->comment('Id del usuario que revisa el documento');
             $table->text('observaciones_revisor')->nullable();
             $table->unsignedBigInteger('causas_rechazo_id')->nullable();
             
