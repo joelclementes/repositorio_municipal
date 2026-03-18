@@ -22,14 +22,16 @@ return new class extends Migration
             $table->string('tipo_recepcion',length:125);
             $table->date('fecha_cambio_estatus')->nullable();
 
-            $table->string('usuario_revisor',length:125)->nullable()->comment('Id del usuario que revisa el documento');
+            $table->unsignedBigInteger('usuario_revisor')->nullable()->comment('Usuario que revisa el documento');
             $table->text('observaciones_revisor')->nullable();
             $table->unsignedBigInteger('causas_rechazo_id')->nullable();
             
             $table->timestamps();
-
+            
             $table->foreign('documento_recibido_id')->references('id')->on('documentos_recibidos');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('ente_id')->references('id')->on('entes');
+            $table->foreign('usuario_revisor')->references('id')->on('users');
             $table->foreign('causas_rechazo_id')->references('id')->on('causas_rechazo');
 
         });
