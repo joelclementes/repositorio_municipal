@@ -209,6 +209,29 @@
                             </div>
                         </a>
                     </div>
+
+                    <div
+                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
+                        <a href="{{ route('revisor.asignar.index') }}">
+                            <div class="px-4 py-3" style="background-color: #d5b55d;">
+                                <h2 class="text-white font-bold text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    Asigación de Entes
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
+                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #d5b55d;"></span>
+                                        Entes
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
+                    </div>
                 @endcan
 
             </div>
