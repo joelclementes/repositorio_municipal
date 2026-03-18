@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Ente;
+use App\Models\EnteRevisor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EnteRevisorController extends Controller
 {
@@ -11,15 +15,7 @@ class EnteRevisorController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return view('asignacion_revisores.index');
     }
 
     /**
@@ -27,38 +23,15 @@ class EnteRevisorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
-     * Display the specified resource.
+     * Remove asignaciones de un revisor
      */
-    public function show(string $id)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        // Este método podría ser para eliminar una asignación específica
+        // o podrías implementar un método para limpiar todas las asignaciones de un revisor
     }
 }
