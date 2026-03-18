@@ -114,4 +114,23 @@ class User extends Authenticatable
         return $this->belongsToMany(Ente::class, 'entes_revisor', 'revisor_id', 'ente_id')
             ->withTimestamps();
     }
+
+     /**
+     * Relación con los entes que revisa (como revisor)
+     */
+    public function entesRevisados()
+    {
+        return $this->hasMany(EnteRevisor::class, 'revisor_id');
+    }
+
+    /**
+     * Scope para obtener solo usuarios que son revisores
+     * Ajusta según tu lógica de roles
+     */
+    public function scopeRevisores($query)
+    {
+        return $query->whereHas('roles', function($q) {
+            $q->where('name', 'Revisor');
+        })->orWhere('tipo', 'Revisor');
+    }
 }
