@@ -95,6 +95,8 @@ class Registro extends Component
             return;
         }
 
+        session(['periodo_acuse' => $periodoId]);
+
         $enteId = auth()->user()->ente_id;
 
         if (!$enteId) {
