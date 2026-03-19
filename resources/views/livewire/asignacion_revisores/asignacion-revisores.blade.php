@@ -124,17 +124,17 @@
                         <div class="mb-4 flex justify-between items-center">
                             <label class="block text-sm font-medium text-gray-700">
                                 Municipios disponibles <span class="text-red-500">*</span>
-                                <span class="text-xs text-gray-500 ml-2">(los cambios se guardan automáticamente)</span>
+                                {{-- <span class="text-xs text-gray-500 ml-2">(los cambios se guardan automáticamente)</span> --}}
                             </label>
                             <div class="flex space-x-2">
                                 <button type="button" 
                                         wire:click="seleccionarTodos"
-                                        class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors">
+                                        class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors" hidden>
                                     Seleccionar todos
                                 </button>
                                 <button type="button" 
                                         wire:click="deseleccionarTodos"
-                                        class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors">
+                                        class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors" hidden>
                                     Deseleccionar todos
                                 </button>
                             </div>
@@ -219,7 +219,7 @@
                     {{-- Botón de cancelar solamente --}}
                     <div class="flex justify-end mt-8 pt-6 border-t border-gray-200">
                         <a href="{{ route('dashboard') }}" 
-                           class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors text-sm">
+                           class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors text-sm" hidden>
                             Cancelar
                         </a>
                     </div>
