@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('fecha_cambio_estatus')->nullable();
 
             $table->unsignedBigInteger('usuario_revisor')->nullable()->comment('Usuario que revisa el documento');
+            $table->unsignedBigInteger('estado_id');
             $table->text('observaciones_revisor')->nullable();
             $table->unsignedBigInteger('causas_rechazo_id')->nullable();
             
@@ -32,6 +33,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('ente_id')->references('id')->on('entes');
             $table->foreign('usuario_revisor')->references('id')->on('users');
+            $table->foreign('estado_id')->references('id')->on('estados');
             $table->foreign('causas_rechazo_id')->references('id')->on('causas_rechazo');
 
         });
