@@ -23,9 +23,14 @@ npm install
 npm run build
 ```
 
+Borrar caché
+```
+php artisan optimize:clear
+```
+
 ### Obten el .env con el equipo de desarrollo
 
-Ejecuta migraciones y seeders
+Ejecuta migraciones y seeders (cuando la BD es nueva)
 
 ```
 php artisan migrate
@@ -33,6 +38,11 @@ php artisan migrate
 
 ```
 php artisan db:seed
+```
+
+Si ya existe la BD ejecuta:
+```
+php artisan migrate:fresh --seed
 ```
 
 Crea un enlace simbólico en la carpeta pública (opcional)

@@ -148,6 +148,7 @@ class Revision extends Component
             if ($archivo) {
                 $archivo->update([
                     'usuario_revisor' => auth()->id(),
+                    'estado_id' => 2,
                     'observaciones_revisor' => null,
                     'causas_rechazo_id' => null,
                     'fecha_cambio_estatus' => now(),
@@ -214,6 +215,7 @@ class Revision extends Component
             if ($this->archivoSeleccionado) {
                 $this->archivoSeleccionado->update([
                     'usuario_revisor' => auth()->id(),
+                    'estado_id' => 3,
                     'observaciones_revisor' => $this->observacionesRevisor,
                     'causas_rechazo_id' => $this->causaRechazoId,
                     'fecha_cambio_estatus' => now(),

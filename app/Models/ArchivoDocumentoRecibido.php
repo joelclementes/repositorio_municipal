@@ -22,6 +22,7 @@ class ArchivoDocumentoRecibido extends Model
         'tipo_recepcion',
         'fecha_cambio_estatus',
         'usuario_revisor',
+        'estado_id',
         'observaciones_revisor',
         'causas_rechazo_id',
     ];
@@ -69,13 +70,13 @@ class ArchivoDocumentoRecibido extends Model
     {
         $periodo = $this->documentoRecibido->periodo;
         $ente = $this->ente;
-        
+
         // Construir la ruta: documentos/{axo}/{nombre_ente}/{mes_nombre}/{nombre_archivo}
-        return 'documentos/' . 
-           $periodo->axo . '/' . 
-           $ente->nombre . '/' . 
-           $periodo->mes_nombre . '/' .  // ← Esto ahora funcionará
-           $this->nombre;
+        return 'documentos/' .
+            $periodo->axo . '/' .
+            $ente->nombre . '/' .
+            $periodo->mes_nombre . '/' .  // ← Esto ahora funcionará
+            $this->nombre;
     }
 
     /**
@@ -92,11 +93,28 @@ class ArchivoDocumentoRecibido extends Model
     private function getMesNombre($mes)
     {
         $meses = [
-            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+            1 => 'Enero',
+            2 => 'Febrero',
+            3 => 'Marzo',
+            4 => 'Abril',
+            5 => 'Mayo',
+            6 => 'Junio',
+            7 => 'Julio',
+            8 => 'Agosto',
+            9 => 'Septiembre',
+            10 => 'Octubre',
+            11 => 'Noviembre',
+            12 => 'Diciembre'
         ];
-        
+
         return $meses[$mes] ?? 'Desconocido';
+    }
+
+    /**
+     * Relación con el Estado del documento
+     */
+    public function estado(): BelongsTo
+    {
+        return $this->belongsTo(Estado::class, 'estado_id');
     }
 }
