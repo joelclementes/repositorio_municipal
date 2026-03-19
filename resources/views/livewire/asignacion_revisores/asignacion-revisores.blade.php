@@ -1,7 +1,7 @@
 <div>
     {{-- Título --}}
     <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">Asignación de Revisores a Municipios</h1>
+        <h1 class="text-2xl font-semibold text-gray-800">Asignación de Entes a Revisores</h1>
         <p class="text-sm text-gray-600 mt-1">Selecciona un revisor y marca los municipios para asignarlos automáticamente</p>
     </div>
 
@@ -24,7 +24,7 @@
         </div>
     @endif
 
-    {{-- Indicador de guardado automático (opcional) --}}
+    {{-- Indicador de guardado automático --}}
     <div 
         x-data="{ show: false }"
         x-on:asignacion-guardada.window="show = true; setTimeout(() => show = false, 1500)"
@@ -39,7 +39,7 @@
         <span>Cambios guardados</span>
     </div>
 
-    {{-- Formulario (sin botón de guardar) --}}
+    {{-- Formulario --}}
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {{-- Columna izquierda: Lista de Revisores --}}
@@ -146,6 +146,14 @@
                                     @php
                                         $isAsignado = in_array($ente->id, $entesSeleccionados);
                                         $isDisabled = $ente->asignado_a_otro;
+                                        
+                                        // Buscar a quién está asignado este ente (si está asignado a otro)
+                                        $asignadoA = null;
+                                        if ($isDisabled) {
+                                            $asignacion = $entesAsignadosOtros->firstWhere('ente_id', $ente->id);
+                                            $asignadoA = $asignacion ? $asignacion->revisor->name : null;
+                                        }
+                                        
                                         $bgClass = $isAsignado ? 'bg-green-50' : ($isDisabled ? 'bg-gray-100' : 'bg-white');
                                         $borderClass = $isAsignado ? 'border-green-300' : ($isDisabled ? 'border-gray-300' : 'border-gray-200');
                                     @endphp
@@ -158,14 +166,29 @@
                                                class="w-4 h-4 text-vino-900 border-gray-300 rounded focus:ring-vino-900"
                                                {{ $isAsignado ? 'checked' : '' }}
                                                {{ $isDisabled ? 'disabled' : '' }}>
-                                        <label for="ente-{{ $ente->id }}" class="ml-3 block text-sm text-gray-700 flex-1 cursor-{{ $isDisabled ? 'not-allowed' : 'pointer' }}">
-                                            <span class="font-medium">{{ $ente->nombre }}</span>
-                                            @if($ente->tipoEnte)
-                                                <span class="text-xs text-gray-500 ml-2">({{ $ente->tipoEnte->nombre }})</span>
+                                        
+                                        <div class="ml-3 flex-1">
+                                            <label for="ente-{{ $ente->id }}" class="block text-sm text-gray-700 cursor-{{ $isDisabled ? 'not-allowed' : 'pointer' }}">
+                                                <span class="font-medium">{{ $ente->nombre }}</span>
+                                                @if($ente->tipoEnte)
+                                                    <span class="text-xs text-gray-500 ml-2">({{ $ente->tipoEnte->nombre }})</span>
+                                                @endif
+                                            </label>
+                                            
+                                            {{-- Mostrar información de asignación --}}
+                                            @if($isAsignado && $revisor_id)
+                                                <div class="text-xs text-green-600 mt-1">
+                                                    <span class="font-medium">Asignado a:</span> {{ $revisores->firstWhere('id', $revisor_id)->name }}
+                                                </div>
+                                            @elseif($isDisabled && $asignadoA)
+                                                <div class="text-xs text-gray-500 mt-1">
+                                                    <span class="font-medium">Asignado a:</span> {{ $asignadoA }}
+                                                </div>
                                             @endif
-                                        </label>
+                                        </div>
+                                        
                                         @if($isAsignado)
-                                            <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">Asignado</span>
+                                            <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">Actual</span>
                                         @elseif($isDisabled)
                                             <span class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">Ocupado</span>
                                         @endif
@@ -183,7 +206,7 @@
 
                         <p class="text-xs text-gray-500 mt-2">
                             <span class="inline-block w-3 h-3 bg-green-100 border border-green-300 rounded mr-1"></span> 
-                            Municipios ya asignados a este revisor
+                            Municipios asignados al revisor actual
                             <br>
                             <span class="inline-block w-3 h-3 bg-white border border-gray-300 rounded mr-1 mt-1"></span>
                             Municipios disponibles
