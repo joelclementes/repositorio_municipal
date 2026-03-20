@@ -24,5 +24,6 @@ Route::middleware([
     require __DIR__ . '/documentoRegistro.php';
     require __DIR__ . '/documentoRevision.php';
     require __DIR__ . '/asignacionEntes.php';
+    require __DIR__ . '/revisor.php';
 });
 
