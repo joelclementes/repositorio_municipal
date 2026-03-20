@@ -104,7 +104,8 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b24280] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #b24280;"></span>
-                                        Nuevo registro
+                                        Módulo que permite el alta de nuevos registros dentro del sistema, ya sea para incorporar información financiera,
+                                        documentación de obras municipales o cualquier otro informe requerido por los entes obligados.
                                     </li>
                                 </ul>
                             </div>
@@ -130,7 +131,8 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#5eb2c6] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #5eb2c6;"></span>
-                                        Revisión de documentos
+                                        Módulo que permite consultar y validar la documentación enviada por los entes obligados, facilitando 
+                                        la supervisión del cumplimiento normativo y la calidad de la información recibida.
                                     </li>
                                 </ul>
                             </div>
@@ -155,7 +157,7 @@
                             <ul class="space-y-2">
                                 <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                     <span class="w-2 h-2 rounded-full mr-2" style="background-color: #b64747;"></span>
-                                    Reportes
+                                    Módulo para la elaboración de reportes personalizados a partir de los datos capturados en el sistema.
                                 </li>
                             </ul>
                         </div>
@@ -180,7 +182,8 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #8974bf;"></span>
-                                        Avisos
+                                        Módulo que permite crear y enviar comunicados oficiales, notificaciones o recordatorios a los entes obligados, 
+                                        agilizando la comunicación institucional y el cumplimiento de plazos establecidos.
                                     </li>
                                 </ul>
                             </div>
@@ -203,7 +206,8 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #74c26e;"></span>
-                                        Administrar Períodos
+                                        Módulo para la configuración y gestión de los períodos de reporte, asegurando que la información se 
+                                        registre conforme a los calendarios establecidos por el Congreso.
                                     </li>
                                 </ul>
                             </div>
@@ -226,7 +230,8 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #d5b55d;"></span>
-                                        Entes
+                                        Módulo para la administración de los entes obligados, permitiendo asociar 
+                                        responsabilidades a usuarios según corresponda a cada uno.
                                     </li>
                                 </ul>
                             </div>
