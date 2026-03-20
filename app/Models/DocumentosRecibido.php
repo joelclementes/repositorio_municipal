@@ -6,44 +6,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DocumentosRecibido extends Model
 {
     use HasFactory;
 
-    /**
-     * La tabla asociada al modelo.
-     *
-     * @var string
-     */
     protected $table = 'documentos_recibidos';
 
-    /**
-     * Los atributos que son asignables en masa.
-     *
-     * @var array<int, string>
-     */
-
-     protected $fillable = [
+    protected $fillable = [
         'ente_id',
         'user_id',
         'documentos_id',
         'periodo_id',
-        'tipo_recepcion',
-        'fecha_recibido',
-        'fecha_cambio_estatus',
-        'nombre_archivo',
-        'descripcion',
-        'estados_id',
-        'causas_rechazo_id',
-        'usuario_revisor',
     ];
 
-    /**
-     * Los atributos que deben ser convertidos a tipos nativos.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -73,11 +50,13 @@ class DocumentosRecibido extends Model
         return $this->belongsTo(Documento::class, 'documentos_id');
     }
 
-    public function archivos()
+    /**
+     * Relación con los archivos de este documento recibido
+     */
+    public function archivos(): HasMany
     {
         return $this->hasMany(ArchivoDocumentoRecibido::class, 'documento_recibido_id');
     }
-
 
     /**
      * Relación con el Período
@@ -102,6 +81,4 @@ class DocumentosRecibido extends Model
     {
         return $query->where('periodo_id', $periodoId);
     }
-
-
 }

@@ -17,5 +17,8 @@ class Periodo extends Model
         'is_active',
     ];
 
-
+    public function getMesNombreAttribute()
+    {
+        return $this->mes ?? 'Desconocido';
+    }
 }

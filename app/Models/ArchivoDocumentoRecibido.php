@@ -11,18 +11,8 @@ class ArchivoDocumentoRecibido extends Model
 {
     use HasFactory;
 
-    /**
-     * La tabla asociada al modelo.
-     *
-     * @var string
-     */
     protected $table = 'archivo_documento_recibidos';
 
-    /**
-     * Los atributos que son asignables en masa.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'nombre',
         'observaciones_ente',
@@ -32,15 +22,11 @@ class ArchivoDocumentoRecibido extends Model
         'tipo_recepcion',
         'fecha_cambio_estatus',
         'usuario_revisor',
+        'estado_id',
         'observaciones_revisor',
         'causas_rechazo_id',
     ];
 
-    /**
-     * Los atributos que deben ser convertidos a tipos nativos.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'fecha_cambio_estatus' => 'date',
     ];
@@ -78,19 +64,57 @@ class ArchivoDocumentoRecibido extends Model
     }
 
     /**
-     * Accesor para obtener la ruta del archivo
+     * Accesor para obtener la ruta del archivo (CORREGIDO)
      */
     public function getRutaAttribute(): string
     {
-        $documentoRecibido = $this->documentoRecibido;
-        return 'documentos/' . $documentoRecibido->periodo_id . '/' . $this->ente_id . '/' . $documentoRecibido->documentos_id . '/' . $this->nombre;
+        $periodo = $this->documentoRecibido->periodo;
+        $ente = $this->ente;
+
+        // Construir la ruta: documentos/{axo}/{nombre_ente}/{mes_nombre}/{nombre_archivo}
+        return 'documentos/' .
+            $periodo->axo . '/' .
+            $ente->nombre . '/' .
+            $periodo->mes_nombre . '/' .  // ← Esto ahora funcionará
+            $this->nombre;
     }
 
     /**
-     * Accesor para obtener la URL del archivo
+     * Accesor para obtener la URL del archivo (CORREGIDO)
      */
     public function getUrlAttribute(): string
     {
         return asset('storage/' . $this->ruta);
+    }
+
+    /**
+     * Helper para obtener nombre del mes
+     */
+    private function getMesNombre($mes)
+    {
+        $meses = [
+            1 => 'Enero',
+            2 => 'Febrero',
+            3 => 'Marzo',
+            4 => 'Abril',
+            5 => 'Mayo',
+            6 => 'Junio',
+            7 => 'Julio',
+            8 => 'Agosto',
+            9 => 'Septiembre',
+            10 => 'Octubre',
+            11 => 'Noviembre',
+            12 => 'Diciembre'
+        ];
+
+        return $meses[$mes] ?? 'Desconocido';
+    }
+
+    /**
+     * Relación con el Estado del documento
+     */
+    public function estado(): BelongsTo
+    {
+        return $this->belongsTo(Estado::class, 'estado_id');
     }
 }

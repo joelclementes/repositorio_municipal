@@ -152,6 +152,10 @@ class Registro extends Component
 
     public function abrirModalSubida($documentoRecibidoId, $tipo)
     {
+        // Asegurar que no hay datos previos
+        $this->archivo = null;
+        $this->descripcion = '';
+
         $documentoRecibido = DocumentosRecibido::with('documento')->find($documentoRecibidoId);
 
         if ($documentoRecibido) {
@@ -159,8 +163,6 @@ class Registro extends Component
             $this->documentoSeleccionado = $documentoRecibido->documento;
             $this->tipoSubida = $tipo;
             $this->mostrarModal = true;
-            $this->archivo = null;
-            $this->descripcion = '';
         }
     }
 
@@ -172,8 +174,10 @@ class Registro extends Component
         $this->tipoSubida = '';
         $this->archivo = null;
         $this->descripcion = '';
-    }
 
+        $this->reset(['mostrarModal', 'documentoRecibidoSeleccionado', 'documentoSeleccionado', 'tipoSubida', 'descripcion']);
+        $this->archivo = null;
+    }
 
     public function guardarArchivo()
     {
@@ -198,7 +202,7 @@ class Registro extends Component
             }
 
             // Obtener datos necesarios para el nombre del archivo
-            $ente = auth()->user()->ente; // Asumiendo que tienes la relación
+            $ente = auth()->user()->ente;
             $documento = $this->documentoSeleccionado;
             $periodo = Periodo::find($this->periodosSeleccionados);
 
@@ -208,24 +212,22 @@ class Registro extends Component
 
             // Extraer los 10 primeros caracteres del nombre del ente
             $nombreEnte = substr($ente->nombre, 0, 10);
-
-            // Limpiar el nombre del ente (quitar espacios y caracteres especiales)
             $nombreEnte = preg_replace('/[^a-zA-Z0-9]/', '', $nombreEnte);
 
             // Obtener clave del documento
             $claveDocumento = $documento->clave;
 
             // Obtener año y mes del periodo
-            $anio = $periodo->axo; 
-            $mes = str_pad($periodo->mes, 2, '0', STR_PAD_LEFT); // Mes con 2 dígitos
+            $anio = $periodo->axo;
+            $mes = str_pad($periodo->mes, 2, '0', STR_PAD_LEFT);
 
-            // Fecha del sistema (formato: YYYYMMDD_HHMMSS)
+            // Fecha del sistema
             $fechaSistema = now()->format('Ymd_His');
 
             // Extensión del archivo
             $extension = $this->archivo->getClientOriginalExtension();
 
-            // Construir el nombre del archivo: ente_clave_anio_mes_fecha.extension
+            // Construir el nombre del archivo
             $nombreArchivo = sprintf(
                 '%s_%s_%s_%s_%s.%s',
                 $nombreEnte,
@@ -236,11 +238,9 @@ class Registro extends Component
                 $extension
             );
 
-            // Limpiar cualquier carácter no deseado (excepto guiones bajos y puntos)
             $nombreArchivo = preg_replace('/[^a-zA-Z0-9_.-]/', '', $nombreArchivo);
 
-            // $rutaBase = 'documentos/' . $this->periodosSeleccionados . '/' . auth()->user()->ente_id . '/' . $this->documentoRecibidoSeleccionado->documentos_id;
-            $rutaBase = 'documentos/' . $anio . '/' . $nombreEnte . '/'. $mes;
+            $rutaBase = 'documentos/' . $anio . '/' . $nombreEnte . '/' . $mes;
 
             $this->archivo->storeAs($rutaBase, $nombreArchivo, 'public');
 
@@ -253,15 +253,53 @@ class Registro extends Component
                 'tipo_recepcion' => $this->tipoSubida,
                 'fecha_cambio_estatus' => null,
                 'usuario_revisor' => null,
+                'estado_id' => 1,
                 'observaciones_revisor' => null,
                 'causas_rechazo_id' => null,
             ]);
 
-            $this->cerrarModal();
+            // IMPORTANTE: Resetear todas las propiedades del formulario
+            $this->reset([
+                'mostrarModal',
+                'documentoRecibidoSeleccionado',
+                'documentoSeleccionado',
+                'tipoSubida',
+                'descripcion'
+            ]);
+            $this->archivo = null; // Limpiar el archivo
+
             $this->dispatch('archivo-subido', 'Archivo subido correctamente', 'success');
+
+            $this->limpiarFormulario();
         } catch (\Exception $e) {
             $this->dispatch('archivo-subido', 'Error al subir el archivo: ' . $e->getMessage(), 'error');
         }
+    }
+
+// En app/Livewire/Documentos/Registro.php
+
+    /**
+     * Hook que se ejecuta antes de cada actualización de propiedad
+     */
+    public function updating($property, $value)
+    {
+        if ($property === 'mostrarModal' && $value === false) {
+            $this->limpiarFormulario();
+        }
+    }
+
+    /**
+     * Limpiar completamente el formulario
+     */
+    private function limpiarFormulario()
+    {
+        $this->reset([
+            'archivo',
+            'descripcion',
+            'documentoRecibidoSeleccionado',
+            'documentoSeleccionado',
+            'tipoSubida'
+        ]);
     }
 
     public function render()
