@@ -72,24 +72,36 @@
                         <div class="p-6">
                             @php 
                                 $progresoPorEnte = $this->progresoPorEnte;
-                                $totalGlobal = $progresoPorEnte->sum('total');
+                                $totalEsperadosGlobal = $progresoPorEnte->sum('total_esperados');
+                                $totalRecibidosGlobal = $progresoPorEnte->sum('total_recibidos');
                                 $completadosGlobal = $progresoPorEnte->sum('completados');
-                                $porcentajeGlobal = $totalGlobal > 0 ? round(($completadosGlobal / $totalGlobal) * 100, 2) : 0;
+                                
+                                $porcentajeRecibidosGlobal = $totalEsperadosGlobal > 0 ? round(($totalRecibidosGlobal / $totalEsperadosGlobal) * 100, 2) : 0;
+                                $porcentajeCompletadosGlobal = $totalRecibidosGlobal > 0 ? round(($completadosGlobal / $totalRecibidosGlobal) * 100, 2) : 0;
+                                $porcentajeGeneralGlobal = $totalEsperadosGlobal > 0 ? round(($completadosGlobal / $totalEsperadosGlobal) * 100, 2) : 0;
                             @endphp
                             
                             <!-- Estadísticas globales -->
-                            <div class="grid grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                            <div class="grid grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-gray-900">{{ $totalGlobal }}</div>
-                                    <div class="text-sm text-gray-500">Total Global</div>
+                                    <div class="text-2xl font-bold text-blue-700">{{ $totalEsperadosGlobal }}</div>
+                                    <div class="text-sm text-gray-500">Esperados</div>
+                                    <div class="text-xs text-gray-400">Global</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-orange-600">{{ $totalRecibidosGlobal }}</div>
+                                    <div class="text-sm text-gray-500">Recibidos</div>
+                                    <div class="text-xs text-gray-400">{{ $porcentajeRecibidosGlobal }}%</div>
                                 </div>
                                 <div class="text-center">
                                     <div class="text-2xl font-bold text-green-600">{{ $completadosGlobal }}</div>
-                                    <div class="text-sm text-gray-500">Completados Global</div>
+                                    <div class="text-sm text-gray-500">Completados</div>
+                                    <div class="text-xs text-gray-400">{{ $porcentajeCompletadosGlobal }}%</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-blue-600">{{ $porcentajeGlobal }}%</div>
-                                    <div class="text-sm text-gray-500">Progreso Global</div>
+                                    <div class="text-2xl font-bold text-purple-600">{{ $porcentajeGeneralGlobal }}%</div>
+                                    <div class="text-sm text-gray-500">Progreso</div>
+                                    <div class="text-xs text-gray-400">General</div>
                                 </div>
                             </div>
 
@@ -106,45 +118,85 @@
                                                 {{ $ente['ente_nombre'] }}
                                             </h5>
                                             <div class="text-sm text-gray-500">
-                                                {{ $ente['completados'] }}/{{ $ente['total'] }} documentos
+                                                {{ $ente['completados'] }}/{{ $ente['total_recibidos'] }}/{{ $ente['total_esperados'] }}
+                                                <span class="text-xs">(Completados/Recibidos/Esperados)</span>
                                             </div>
                                         </div>
                                         
-                                        <!-- Estadísticas del ente -->
-                                        <div class="grid grid-cols-3 gap-4 mb-4 text-center">
+                                        <!-- Estadísticas del ente con 4 columnas -->
+                                        <div class="grid grid-cols-4 gap-3 mb-4 text-center">
                                             <div>
-                                                <div class="text-lg font-bold text-gray-700">{{ $ente['total'] }}</div>
-                                                <div class="text-xs text-gray-500">Total</div>
+                                                <div class="text-lg font-bold text-blue-700">{{ $ente['total_esperados'] }}</div>
+                                                <div class="text-xs text-gray-500">Esperados</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-lg font-bold text-orange-600">{{ $ente['total_recibidos'] }}</div>
+                                                <div class="text-xs text-gray-500">Recibidos</div>
                                             </div>
                                             <div>
                                                 <div class="text-lg font-bold text-green-600">{{ $ente['completados'] }}</div>
                                                 <div class="text-xs text-gray-500">Completados</div>
                                             </div>
                                             <div>
-                                                <div class="text-lg font-bold text-blue-600">{{ $ente['porcentaje'] }}%</div>
+                                                <div class="text-lg font-bold text-purple-600">{{ $ente['porcentaje_general'] }}%</div>
                                                 <div class="text-xs text-gray-500">Progreso</div>
                                             </div>
                                         </div>
 
-                                        <!-- Barra de progreso del ente -->
-                                        <div class="w-full bg-gray-200 rounded-full h-4">
-                                            <div 
-                                                class="h-4 rounded-full transition-all duration-300 {{ $ente['porcentaje'] >= 75 ? 'bg-green-500' : ($ente['porcentaje'] >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
-                                                style="width: {{ min($ente['porcentaje'], 100) }}%">
+                                        <!-- Barras de progreso múltiples -->
+                                        <div class="space-y-2 mb-3">
+                                            <!-- Barra de documentos recibidos vs esperados -->
+                                            <div>
+                                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                                    <span>Documentos Recibidos</span>
+                                                    <span>{{ $ente['porcentaje_recibidos'] }}%</span>
+                                                </div>
+                                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                                    <div 
+                                                        class="h-3 rounded-full transition-all duration-300 {{ $ente['porcentaje_recibidos'] >= 75 ? 'bg-orange-500' : ($ente['porcentaje_recibidos'] >= 50 ? 'bg-orange-400' : 'bg-orange-300') }}"
+                                                        style="width: {{ min($ente['porcentaje_recibidos'], 100) }}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Barra de documentos completados vs recibidos -->
+                                            <div>
+                                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                                    <span>Documentos Completados</span>
+                                                    <span>{{ $ente['porcentaje_completados'] }}%</span>
+                                                </div>
+                                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                                    <div 
+                                                        class="h-3 rounded-full transition-all duration-300 {{ $ente['porcentaje_completados'] >= 75 ? 'bg-green-500' : ($ente['porcentaje_completados'] >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
+                                                        style="width: {{ min($ente['porcentaje_completados'], 100) }}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Barra de progreso general (completados vs esperados) -->
+                                            <div>
+                                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                                    <span>Progreso General</span>
+                                                    <span>{{ $ente['porcentaje_general'] }}%</span>
+                                                </div>
+                                                <div class="w-full bg-gray-200 rounded-full h-4">
+                                                    <div 
+                                                        class="h-4 rounded-full transition-all duration-300 {{ $ente['porcentaje_general'] >= 75 ? 'bg-purple-500' : ($ente['porcentaje_general'] >= 50 ? 'bg-purple-400' : 'bg-purple-300') }}"
+                                                        style="width: {{ min($ente['porcentaje_general'], 100) }}%">
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         
                                         <div class="text-xs text-gray-500 mt-2">
-                                            @if($ente['total'] == 0)
+                                            @if($ente['total_esperados'] == 0)
                                                 Sin documentos asignados en este período
-                                            @elseif($ente['porcentaje'] == 100)
+                                            @elseif($ente['porcentaje_general'] == 100)
                                                 ✅ Todas las revisiones completadas
-                                            @elseif($ente['porcentaje'] >= 75)
-                                                🟢 Progreso excelente
-                                            @elseif($ente['porcentaje'] >= 50)
-                                                🟡 Progreso moderado
-                                            @else
-                                                🔴 Requiere atención
+                                            @elseif($ente['porcentaje_recibidos'] < 100)
+                                                📥 {{ $ente['total_esperados'] - $ente['total_recibidos'] }} documento(s) pendiente(s) de recibir
+                                            @elseif($ente['porcentaje_completados'] < 100)
+                                                📋 {{ $ente['total_recibidos'] - $ente['completados'] }} documento(s) pendiente(s) de revisar
                                             @endif
                                         </div>
                                     </div>
@@ -162,8 +214,10 @@
                                 @endforelse
                             </div>
 
-                            <div class="text-xs text-gray-500 mt-6 text-center">
-                                Estados considerados como completados: Aprobado (2), Observado (3)
+                            <div class="text-xs text-gray-500 mt-6 text-center space-y-1">
+                                <p><strong>Esperados:</strong> Total de documentos que deberían ser recibidos (documentos_recibidos)</p>
+                                <p><strong>Recibidos:</strong> Total de documentos realmente recibidos (archivo_documento_recibidos)</p>
+                                <p><strong>Completados:</strong> Documentos con estados Aprobado (2) u Observado (3)</p>
                             </div>
                         </div>
                     </div>

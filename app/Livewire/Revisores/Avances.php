@@ -28,18 +28,10 @@ class Avances extends Component
             return collect(); // Retorna colección vacía si no hay periodo seleccionado
         }
 
-        // Obtener los ente_id que tienen documentos recibidos en el periodo seleccionado
-        $entesConDocumentos = DocumentosRecibido::where('periodo_id', $this->periodosSeleccionados)
-            ->distinct()
-            ->pluck('ente_id');
-
-        // Obtener los revisores asignados a esos entes
-        $revisoresIds = EnteRevisor::whereIn('ente_id', $entesConDocumentos)
-            ->distinct()
-            ->pluck('revisor_id');
-
-        // Devolver los usuarios que son revisores
-        return User::whereIn('id', $revisoresIds)
+        // Obtener TODOS los usuarios que tienen el rol "Revisor"
+        return User::whereHas('roles', function($query) {
+                $query->where('name', 'Revisor');
+            })
             ->orderBy('name', 'asc')
             ->get();
     }
@@ -52,20 +44,37 @@ class Avances extends Component
     public function getProgresoRevisorProperty()
     {
         if (!$this->revisorSeleccionado || !$this->periodosSeleccionados) {
-            return ['total' => 0, 'completados' => 0, 'porcentaje' => 0];
+            return [
+                'total_esperados' => 0, 
+                'total_recibidos' => 0, 
+                'completados' => 0, 
+                'porcentaje_recibidos' => 0, 
+                'porcentaje_completados' => 0,
+                'porcentaje_general' => 0
+            ];
         }
 
         // Obtener progreso global sumando todos los entes
         $progresoPorEnte = $this->progresoPorEnte;
         
-        $totalDocumentos = $progresoPorEnte->sum('total');
+        $totalEsperados = $progresoPorEnte->sum('total_esperados');
+        $totalRecibidos = $progresoPorEnte->sum('total_recibidos');
         $archivosCompletados = $progresoPorEnte->sum('completados');
-        $porcentaje = $totalDocumentos > 0 ? round(($archivosCompletados / $totalDocumentos) * 100, 2) : 0;
+        
+        $porcentajeRecibidos = $totalEsperados > 0 ? round(($totalRecibidos / $totalEsperados) * 100, 2) : 0;
+        $porcentajeCompletados = $totalRecibidos > 0 ? round(($archivosCompletados / $totalRecibidos) * 100, 2) : 0;
+        $porcentajeGeneral = $totalEsperados > 0 ? round(($archivosCompletados / $totalEsperados) * 100, 2) : 0;
 
         return [
-            'total' => $totalDocumentos,
+            'total_esperados' => $totalEsperados,
+            'total_recibidos' => $totalRecibidos,
             'completados' => $archivosCompletados,
-            'porcentaje' => $porcentaje
+            'porcentaje_recibidos' => $porcentajeRecibidos,
+            'porcentaje_completados' => $porcentajeCompletados,
+            'porcentaje_general' => $porcentajeGeneral,
+            // Mantener compatibilidad con código existente
+            'total' => $totalEsperados,
+            'porcentaje' => $porcentajeGeneral
         ];
     }
 
@@ -87,12 +96,19 @@ class Avances extends Component
             
             if (!$ente) continue;
 
-            // Total de documentos recibidos para este ente en el período
-            $totalDocumentos = DocumentosRecibido::where('periodo_id', $this->periodosSeleccionados)
+            // Total de documentos que se DEBERÍAN recibir (documentos_recibidos)
+            $totalEsperados = DocumentosRecibido::where('periodo_id', $this->periodosSeleccionados)
                 ->where('ente_id', $ente->id)
                 ->count();
 
-            // Archivos completados (estado_id = 2, 3) para este ente
+            // Total de documentos REALMENTE recibidos (archivo_documento_recibidos)
+            $totalRecibidos = ArchivoDocumentoRecibido::whereHas('documentoRecibido', function ($query) use ($ente) {
+                    $query->where('periodo_id', $this->periodosSeleccionados)
+                        ->where('ente_id', $ente->id);
+                })
+                ->count();
+
+            // Archivos completados/revisados (estado_id = 2, 3)
             $archivosCompletados = ArchivoDocumentoRecibido::whereIn('estado_id', [2, 3])
                 ->whereHas('documentoRecibido', function ($query) use ($ente) {
                     $query->where('periodo_id', $this->periodosSeleccionados)
@@ -100,14 +116,23 @@ class Avances extends Component
                 })
                 ->count();
 
-            $porcentaje = $totalDocumentos > 0 ? round(($archivosCompletados / $totalDocumentos) * 100, 2) : 0;
+            // Calcular porcentajes
+            $porcentajeRecibidos = $totalEsperados > 0 ? round(($totalRecibidos / $totalEsperados) * 100, 2) : 0;
+            $porcentajeCompletados = $totalRecibidos > 0 ? round(($archivosCompletados / $totalRecibidos) * 100, 2) : 0;
+            $porcentajeGeneral = $totalEsperados > 0 ? round(($archivosCompletados / $totalEsperados) * 100, 2) : 0;
 
             $progresoEntes->push([
                 'ente_id' => $ente->id,
                 'ente_nombre' => $ente->nombre,
-                'total' => $totalDocumentos,
+                'total_esperados' => $totalEsperados,
+                'total_recibidos' => $totalRecibidos,
                 'completados' => $archivosCompletados,
-                'porcentaje' => $porcentaje
+                'porcentaje_recibidos' => $porcentajeRecibidos,
+                'porcentaje_completados' => $porcentajeCompletados,
+                'porcentaje_general' => $porcentajeGeneral,
+                // Mantener compatibilidad con el código existente
+                'total' => $totalEsperados,
+                'porcentaje' => $porcentajeGeneral
             ]);
         }
 
