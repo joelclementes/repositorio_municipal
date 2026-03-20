@@ -60,19 +60,19 @@ class UsuariosForm
                     ->preload()
                     ->required()
                     ->rules([
-                    function () {
-                        return function (string $attribute, $value, $fail) {
-                            $user = auth()->user();
-                            // Si el usuario no es SuperUsuario y trata de asignar el rol SuperUsuario
-                            if (!$user->hasRole('SuperUsuario')) {
-                                $rolSuperUsuario = Role::where('name', 'SuperUsuario')->first();
-                                if ($rolSuperUsuario && $value == $rolSuperUsuario->id) {
-                                    $fail('No tienes permiso para asignar el rol de SuperUsuario.');
+                        function () {
+                            return function (string $attribute, $value, $fail) {
+                                $user = auth()->user();
+                                // Si el usuario no es SuperUsuario y trata de asignar el rol SuperUsuario
+                                if (!$user->hasRole('SuperUsuario')) {
+                                    $rolSuperUsuario = Role::where('name', 'SuperUsuario')->first();
+                                    if ($rolSuperUsuario && $value == $rolSuperUsuario->id) {
+                                        $fail('No tienes permiso para asignar el rol de SuperUsuario.');
+                                    }
                                 }
-                            }
-                        };
-                    }
-                ]),
+                            };
+                        }
+                    ]),
                 Select::make('ente_id')
                     ->label('Ente')
                     ->relationship('ente', 'nombre') 
