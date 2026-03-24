@@ -26,7 +26,7 @@ class Notificaciones extends Component {
 
         $user = auth()->user();
 
-        if (!$user->hasRole('EnteObligado')) {
+        if (!$user->can('registrar')) {
             return [];
         }
 
@@ -67,12 +67,11 @@ class Notificaciones extends Component {
 
         $user = auth()->user();
 
-        if (!$user->hasRole('EnteObligado')) {
+        if (!$user->can('registrar')) {
             return;
         }
 
         $ente = $user->ente;
-
         if ($ente) {
             $this->cantidadPendientes = AvisoEnte::where('ente_id', $ente->id)
                 ->where('estado_envio', '!=', 'leido')

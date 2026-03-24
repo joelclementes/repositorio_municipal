@@ -47,7 +47,7 @@ class AvisosPanel extends Component
             return collect();
         }
 
-        $query = AvisoEnte::with(['ente', 'leido']) // 👈 Agregar 'leido' aquí
+        $query = AvisoEnte::with(['ente', 'leido'])
             ->where('aviso_id', $this->avisoSeleccionadoId);
 
         if ($this->filtroEstado === 'leido') {
