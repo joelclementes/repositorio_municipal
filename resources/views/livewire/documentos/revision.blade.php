@@ -111,15 +111,19 @@
                         @endphp
 
                         @foreach ($archivos as $archivo)
+                            @php
+                                $estado_archivo = $archivo->estado_nombre;
+                                $extension = pathinfo($archivo->nombre, PATHINFO_EXTENSION);
+                            @endphp
                             <div
                                 class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 {{ $archivo->causas_rechazo_id ? 'border-l-4 border-l-red-500' : ($archivo->usuario_revisor ? 'border-l-4 border-l-green-500' : '') }}">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
                                         <div class="flex items-center mb-2">
-                                            @if ($archivo->causas_rechazo_id)
+                                            @if ($estado_archivo == 'Rechazado')
                                                 <span
                                                     class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Rechazado</span>
-                                            @elseif($archivo->usuario_revisor)
+                                            @elseif($estado_archivo == 'Aprobado')
                                                 <span
                                                     class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">Aprobado</span>
                                             @else
@@ -153,9 +157,6 @@
                                     </div>
 
                                     <div class="flex flex-col space-y-2 ml-4">
-                                        @php
-                                            $extension = pathinfo($archivo->nombre, PATHINFO_EXTENSION);
-                                        @endphp
 
                                         {{-- Botón Ver con estilo según extensión --}}
                                         @if ($extension === 'pdf')
@@ -193,7 +194,7 @@
                                             </a>
                                         @endif
 
-                                        @if (!$archivo->usuario_revisor && !$archivo->causas_rechazo_id)
+                                        @if ($estado_archivo === 'Recibido')
                                             <button type="button" wire:click="aprobarArchivo({{ $archivo->id }})"
                                                 class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
@@ -205,8 +206,6 @@
                                                 Aprobar
                                             </button>
 
-                                            {{-- <button wire:click="debug({{ $archivo->id }})">Test</button> --}}
-                                            
                                             <button type="button"
                                                 wire:click="mostrarElPanelRechazo({{ $archivo->id }})"
                                                 class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
@@ -218,18 +217,6 @@
                                                 </svg>
                                                 Rechazar
                                             </button>
-
-                                            {{-- <button type="button" x-data="{}"
-                                                @click="$wire.mostrarPanelRechazo({{ $archivo->id }})"
-                                                class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
-                                                </svg>
-                                                Rechazar
-                                            </button> --}}
                                         @endif
                                     </div>
                                 </div>

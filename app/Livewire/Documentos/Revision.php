@@ -71,7 +71,7 @@ class Revision extends Component
         }
 
         return DocumentosRecibido::with(['documento', 'archivos' => function ($query) {
-            $query->latest();
+            $query->latest()->with('estado');
         }])
             ->where('ente_id', $this->enteSeleccionado)
             ->where('periodo_id', $this->periodosSeleccionados)

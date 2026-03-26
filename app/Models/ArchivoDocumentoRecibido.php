@@ -117,4 +117,8 @@ class ArchivoDocumentoRecibido extends Model
     {
         return $this->belongsTo(Estado::class, 'estado_id');
     }
+
+    public function getEstadoNombreAttribute(): string{
+        return $this->estado?->nombre ?? 'Sin estado';
+    }
 }
