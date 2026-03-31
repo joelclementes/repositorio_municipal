@@ -19,6 +19,7 @@ class DocumentosRecibido extends Model
         'user_id',
         'documentos_id',
         'periodo_id',
+        'formato',
     ];
 
     protected $casts = [
@@ -80,5 +81,13 @@ class DocumentosRecibido extends Model
     public function scopePorPeriodo($query, $periodoId)
     {
         return $query->where('periodo_id', $periodoId);
+    }
+
+    /**
+     * Accesor para obtener el formato del documento relacionado
+     */
+    public function getFormatoAttribute(): ?string
+    {
+        return $this->documento ? $this->documento->formato : null;
     }
 }

@@ -107,7 +107,24 @@
                                 {{-- Mostrar archivos subidos --}}
                                 @if ($archivos->count() > 0)
                                     <div class="mt-2 space-y-1">
+                                        @php
+                                            $autorizadoReenviarPDF = 0;
+                                            $autorizadoReenviarXLSX = 0;
+                                        @endphp
                                         @foreach ($archivos as $archivo)
+                                            @php
+                                                if ($archivo->tipo_recepcion === 'PDF') {
+                                                    if ($archivo->autorizado_reenviar) {
+                                                        $autorizadoReenviarPDF = 1;
+                                                    }
+                                                } elseif ($archivo->tipo_recepcion === 'XLSX') {
+                                                    if ($archivo->autorizado_reenviar) {
+                                                        $autorizadoReenviarXLSX = 1;
+                                                    }
+                                                }
+                                                // $strAutorizPDF = 'PDF - ' . $autorizadoReenviarPDF;
+                                                // $strAutorizXLSX = 'XLSX - ' . $autorizadoReenviarXLSX;
+                                            @endphp
                                             <div
                                                 class="flex items-center text-xs {{ $archivo->causas_rechazo_id ? 'text-red-600' : 'text-green-600' }}">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
@@ -121,8 +138,6 @@
                                                     @endif
                                                 </svg>
                                                 <span class="truncate max-w-[150px]">{{ $archivo->nombre }}</span>
-                                                <span
-                                                    class="ml-1 text-gray-400">({{ strtoupper($archivo->tipo_recepcion) }})</span>
                                             </div>
                                         @endforeach
                                     </div>
@@ -133,8 +148,8 @@
                                 @if (in_array('PDF', $formatos))
                                     <button type="button"
                                         wire:click="abrirModalSubida({{ $documentoRecibido->id }}, 'PDF')"
-                                        class="w-full px-3 py-2 {{ $tieneArchivoPDF ? 'bg-gray-400 cursor-not-allowed' : 'bg-vino-900 hover:bg-vino-800' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
-                                        {{ $tieneArchivoPDF ? 'disabled' : '' }}>
+                                        class="w-full px-3 py-2 {{ $tieneArchivoPDF && !$autorizadoReenviarPDF ? 'bg-gray-400 cursor-not-allowed' : 'bg-vino-900 hover:bg-vino-800' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                                        {{ $tieneArchivoPDF && !$autorizadoReenviarPDF ? 'disabled' : '' }}>
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -144,16 +159,16 @@
                                             <text x="10" y="18" font-size="8" font-weight="bold" fill="currentColor"
                                                 stroke="none">PDF</text>
                                         </svg>
-                                        <span>{{ $tieneArchivoPDF ? 'Ya subido' : 'Subir PDF' }}</span>
+                                        <span>{{ $tieneArchivoPDF && !$autorizadoReenviarPDF ? 'Ya subido' : 'Subir PDF' }}</span>
                                     </button>
                                 @endif
 
                                 @if (in_array('XLSX', $formatos) || in_array('XLS', $formatos))
                                     <button type="button"
                                         wire:click="abrirModalSubida({{ $documentoRecibido->id }}, '{{ in_array('XLSX', $formatos) ? 'XLSX' : 'XLS' }}')"
-                                        class="w-full px-3 py-2 {{ $tieneArchivoExcel ? 'bg-gray-400 cursor-not-allowed' : '' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
-                                        style="{{ $tieneArchivoExcel ? 'background-color: #9CA3AF;' : 'background-color: #1D6F42;' }}"
-                                        {{ $tieneArchivoExcel ? 'disabled' : '' }}>
+                                        class="w-full px-3 py-2 {{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'bg-gray-400 cursor-not-allowed' : '' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                                        style="{{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'background-color: #9CA3AF;' : 'background-color: #1D6F42;' }}"
+                                        {{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'disabled' : '' }}>
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -163,7 +178,7 @@
                                             <text x="6" y="18" font-size="6" font-weight="bold" fill="currentColor"
                                                 stroke="none">XLSX</text>
                                         </svg>
-                                        <span>{{ $tieneArchivoExcel ? 'Ya subido' : 'Subir Excel' }}</span>
+                                        <span>{{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'Ya subido' : 'Subir Excel' }}</span>
                                     </button>
                                 @endif
                             </div>
@@ -226,8 +241,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">
                                 Archivo {{ $tipoSubida }} *
                             </label>
-                            <input type="file" wire:model="archivo" 
-                                {{-- Esto fuerza que el input se reinicie --}}
+                            <input type="file" wire:model="archivo" {{-- Esto fuerza que el input se reinicie --}}
                                 accept="{{ $tipoSubida === 'PDF' ? '.pdf' : '.xlsx,.xls,.csv' }}"
                                 class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-vino-50 file:text-vino-900 hover:file:bg-vino-100">
                             {{-- <input type="file" wire:model="archivo"

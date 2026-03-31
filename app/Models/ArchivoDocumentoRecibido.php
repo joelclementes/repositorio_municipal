@@ -25,6 +25,7 @@ class ArchivoDocumentoRecibido extends Model
         'estado_id',
         'observaciones_revisor',
         'causas_rechazo_id',
+        'autorizado_reenviar',
     ];
 
     protected $casts = [
@@ -118,7 +119,13 @@ class ArchivoDocumentoRecibido extends Model
         return $this->belongsTo(Estado::class, 'estado_id');
     }
 
-    public function getEstadoNombreAttribute(): string{
+    public function getEstadoNombreAttribute(): string
+    {
         return $this->estado?->nombre ?? 'Sin estado';
+    }
+
+    public function getCausaRechazoDescripcionAttribute(): string
+    {
+        return $this->causaRechazo?->descripcion ?? '';
     }
 }
