@@ -91,40 +91,38 @@
                         $tieneArchivoExcel = $archivos->whereIn('tipo_recepcion', ['XLSX', 'XLS'])->count() > 0;
                     @endphp
 
-                    <div
-                        class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <div class="flex items-center mb-2">
-                                    <span class="text-xs font-bold text-vino-900 bg-vino-50 px-2 py-1 rounded mr-2">
-                                        {{ $documento->clave }}
-                                    </span>
-                                </div>
-                                <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
-                                <p class="text-xs text-gray-500">Límite: del {{ $documento->fecha_inicio }} al
-                                    {{ $documento->fecha_limite }}</p>
+                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4">
 
-                                {{-- Mostrar archivos subidos --}}
-                                @if ($archivos->count() > 0)
-                                    <div class="mt-2 space-y-1">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs font-bold text-vino-900 bg-vino-50 px-2 py-1 rounded mr-2">
+                                    {{ $documento->clave }}
+                                </span>
+                            </div>
+                            <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
+                            <p class="text-xs text-gray-500">Límite: del {{ $documento->fecha_inicio }} al
+                                {{ $documento->fecha_limite }}</p>
+
+                            {{-- Mostrar archivos subidos --}}
+                            @if ($archivos->count() > 0)
+                                <div class="mt-2 space-y-1">
+                                    @php
+                                        $autorizadoReenviarPDF = 0;
+                                        $autorizadoReenviarXLSX = 0;
+                                    @endphp
+                                    @foreach ($archivos as $archivo)
                                         @php
-                                            $autorizadoReenviarPDF = 0;
-                                            $autorizadoReenviarXLSX = 0;
-                                        @endphp
-                                        @foreach ($archivos as $archivo)
-                                            @php
-                                                if ($archivo->tipo_recepcion === 'PDF') {
-                                                    if ($archivo->autorizado_reenviar) {
-                                                        $autorizadoReenviarPDF = 1;
-                                                    }
-                                                } elseif ($archivo->tipo_recepcion === 'XLSX') {
-                                                    if ($archivo->autorizado_reenviar) {
-                                                        $autorizadoReenviarXLSX = 1;
-                                                    }
+                                            if ($archivo->tipo_recepcion === 'PDF') {
+                                                if ($archivo->autorizado_reenviar) {
+                                                    $autorizadoReenviarPDF = 1;
                                                 }
-                                                // $strAutorizPDF = 'PDF - ' . $autorizadoReenviarPDF;
-                                                // $strAutorizXLSX = 'XLSX - ' . $autorizadoReenviarXLSX;
-                                            @endphp
+                                            } elseif ($archivo->tipo_recepcion === 'XLSX') {
+                                                if ($archivo->autorizado_reenviar) {
+                                                    $autorizadoReenviarXLSX = 1;
+                                                }
+                                            }
+                                        @endphp
+                                        <div class="bg-slate-100 mb-2 p-2 rounded-md">
                                             <div
                                                 class="flex items-center text-xs {{ $archivo->causas_rechazo_id ? 'text-red-600' : 'text-green-600' }}">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
@@ -137,12 +135,25 @@
                                                             stroke-width="2" d="M5 13l4 4L19 7" />
                                                     @endif
                                                 </svg>
-                                                <span class="truncate max-w-[150px]">{{ $archivo->nombre }}</span>
+                                                <span
+                                                    class="text-xs truncate max-w-[250px]">{{ substr($archivo->nombre, strpos($archivo->nombre, '_') + 1) }}</span>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
+                                            <div
+                                                class="flex items-center text-xs {{ $archivo->causas_rechazo_id ? 'text-red-600' : 'text-green-600' }}">
+                                                <span
+                                                    class="text-xs truncate max-w-[250px]">{{ $archivo->estado->nombre }}</span>
+                                            </div>
+                                            <div
+                                                class="flex items-center text-xs {{ $archivo->causas_rechazo_id ? 'text-red-600' : 'text-green-600' }}">
+                                                <span
+                                                    class="text-xs truncate max-w-[250px]">{{ $archivo->causaRechazo?->descripcion ??  '' }}</span>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+
 
                             <div class="flex flex-col space-y-2 mt-4 min-w-[140px]">
                                 @if (in_array('PDF', $formatos))

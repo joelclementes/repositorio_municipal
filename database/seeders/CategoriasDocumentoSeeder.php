@@ -25,7 +25,7 @@ class CategoriasDocumentoSeeder extends Seeder
                 'categoria_Data' => [
                     'clave' => 'IEFMOP',
                     'nombre' => 'Integración del Estado Financiero Mensual de Obra Pública',
-                    'roles_permitidos' => 'DirectorObrasPublicas',
+                    'roles_permitidos' => 'Director Obras Publicas',
                 ],
             ],
             [

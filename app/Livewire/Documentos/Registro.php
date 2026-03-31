@@ -240,6 +240,25 @@ class Registro extends Component
 
             $nombreArchivo = preg_replace('/[^a-zA-Z0-9_.-]/', '', $nombreArchivo);
 
+
+            // Obtenemos el nombre base (hasta el cuarto guión bajo)
+            // El formato es: ente_clave_anio_mes_fecha.extension
+            $partes = explode('_', $nombreArchivo);
+            $nombreBase = implode('_', array_slice($partes, 0, 4));
+
+            // Buscamos archivo existente con el mismo nombre base y tipo_recepcion
+            $archivoExistente = ArchivoDocumentoRecibido::where('nombre', 'like', $nombreBase . '_%')
+                ->where('tipo_recepcion', $this->tipoSubida)
+                ->where('documento_recibido_id', $this->documentoRecibidoSeleccionado->id)
+                ->first();
+
+            // Si existe y tiene autorizado_reenviar = 1, actualizar a 0
+            if ($archivoExistente && $archivoExistente->autorizado_reenviar == 1) {
+                $archivoExistente->update([
+                    'autorizado_reenviar' => 0
+                ]);
+            }
+
             $rutaBase = 'documentos/' . $anio . '/' . $nombreEnte . '/' . $mes;
 
             $this->archivo->storeAs($rutaBase, $nombreArchivo, 'public');
