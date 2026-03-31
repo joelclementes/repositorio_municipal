@@ -107,116 +107,161 @@
                         @php
                             $documento = $documentoRecibido->documento;
                             $archivos = $documentoRecibido->archivos;
-                            $clave = $documentoRecibido->clave;
                         @endphp
 
+                        {{-- Agrupador por documento (opcional, para mantener contexto) --}}
+                        <div class="mb-2">
+                            <div class="bg-gray-100 px-3 py-2 rounded-t-lg border border-gray-200 border-b-0">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span class="text-xs font-bold text-vino-900 bg-vino-50 px-2 py-1 rounded mr-2">
+                                            {{ $documento->clave }}
+                                        </span>
+                                        <span
+                                            class="text-sm font-semibold text-gray-700">{{ $documento->nombre }}</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">
+                                        {{ $archivos->count() }} archivo(s)
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Límite: del {{ $documento->fecha_inicio }} al {{ $documento->fecha_limite }}
+                                </p>
+                            </div>
+                        </div>
+
+                        {{-- Cards individuales por cada archivo --}}
                         @foreach ($archivos as $archivo)
                             @php
                                 $estado_archivo = $archivo->estado_nombre;
                                 $extension = pathinfo($archivo->nombre, PATHINFO_EXTENSION);
+                                $esPendiente = $estado_archivo === 'Recibido';
                             @endphp
+
                             <div
-                                class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 {{ $archivo->causas_rechazo_id ? 'border-l-4 border-l-red-500' : ($archivo->usuario_revisor ? 'border-l-4 border-l-green-500' : '') }}">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex-1">
-                                        <div class="flex items-center mb-2">
-                                            @if ($estado_archivo == 'Rechazado')
+                                class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden {{ $archivo->causas_rechazo_id ? 'border-l-4 border-l-red-500' : ($archivo->usuario_revisor ? 'border-l-4 border-l-green-500' : '') }}">
+                                {{-- Contenido del card --}}
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center mb-2">
+                                                {{-- Badge de estado --}}
+                                                @if ($estado_archivo == 'Rechazado')
+                                                    <span
+                                                        class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Rechazado</span>
+                                                @elseif($estado_archivo == 'Aprobado')
+                                                    <span
+                                                        class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">Aprobado</span>
+                                                @else
+                                                    <span
+                                                        class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded">Pendiente</span>
+                                                @endif
+
+                                                {{-- Tipo de archivo --}}
                                                 <span
-                                                    class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Rechazado</span>
-                                            @elseif($estado_archivo == 'Aprobado')
-                                                <span
-                                                    class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">Aprobado</span>
-                                            @else
-                                                <span
-                                                    class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded">Pendiente</span>
-                                            @endif
-                                        </div>
-                                        <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
-                                        <p class="text-xs text-gray-500">
-                                            {{ $archivo->nombre }}
-                                        </p>
-                                        <p class="text-xs text-gray-500">
-                                            <span class="font-medium">Subido:</span>
-                                            {{ $archivo->created_at->format('d/m/Y H:i') }}
-                                        </p>
-                                        @if ($archivo->observaciones_ente)
-                                            <p class="text-xs text-gray-600 mt-1 italic">
-                                                "{{ $archivo->observaciones_ente }}"
+                                                    class="text-xs text-gray-400 ml-2">({{ strtoupper($extension) }})</span>
+                                            </div>
+
+                                            <h4 class="font-semibold text-gray-900 mb-1">{{ $archivo->nombre }}</h4>
+
+                                            <p class="text-xs text-gray-500">
+                                                <span class="font-medium">Subido:</span>
+                                                {{ $archivo->created_at->format('d/m/Y H:i') }}
                                             </p>
-                                        @endif
-                                        @if ($archivo->causas_rechazo_id)
-                                            <p class="text-xs text-red-600 mt-1">
-                                                Causa: {{ $archivo->causaRechazo?->descripcion }}
-                                            </p>
-                                            @if ($archivo->observaciones_revisor)
-                                                <p class="text-xs text-gray-600 mt-1">
-                                                    Obs: {{ $archivo->observaciones_revisor }}
+
+                                            @if ($archivo->observaciones_ente)
+                                                <p class="text-xs text-gray-600 mt-1 italic">
+                                                    "{{ $archivo->observaciones_ente }}"
                                                 </p>
                                             @endif
-                                        @endif
+
+                                            @if ($archivo->causas_rechazo_id)
+                                                <p class="text-xs text-red-600 mt-1">
+                                                    Causa: {{ $archivo->causaRechazo?->descripcion }}
+                                                </p>
+                                                @if ($archivo->observaciones_revisor)
+                                                    <p class="text-xs text-gray-600 mt-1">
+                                                        Obs: {{ $archivo->observaciones_revisor }}
+                                                    </p>
+                                                @endif
+                                            @endif
+                                        </div>
                                     </div>
+                                </div>
 
-                                    <div class="flex flex-col space-y-2 ml-4">
-
-                                        {{-- Botón Ver con estilo según extensión --}}
-                                        @if ($extension === 'pdf')
-                                            <button type="button" wire:click="verArchivo({{ $archivo->id }})"
-                                                class="px-3 py-2 bg-[#C41E3A] hover:bg-[#A01830] text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M12 3v4a1 1 0 001 1h4" />
-                                                    <text x="9" y="18" font-size="6" font-weight="bold"
-                                                        fill="currentColor" stroke="none">PDF</text>
-                                                </svg>
+                                {{-- Footer: Botones en forma de círculos --}}
+                                <div class="border-t border-gray-200 bg-gray-50 px-4 py-3">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        {{-- Botón Ver --}}
+                                        <div class="relative group">
+                                            @if ($extension === 'pdf')
+                                                <button type="button" wire:click="verArchivo({{ $archivo->id }})"
+                                                    class="w-9 h-9 rounded-full bg-gray-200 hover:bg-[#C41E3A] text-gray-500 hover:text-white transition-all duration-200 flex items-center justify-center shadow-sm"
+                                                    title="Ver PDF">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                </button>
+                                            @elseif(in_array($extension, ['xlsx', 'xls', 'csv']))
+                                                <a href="{{ route('excel.preview', $archivo->id) }}" target="_blank"
+                                                    class="w-9 h-9 rounded-full bg-gray-200 hover:bg-[#1D6F42] text-gray-500 hover:text-white transition-all duration-200 flex items-center justify-center shadow-sm"
+                                                    title="Ver Excel">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <rect x="4" y="4" width="16" height="16"
+                                                            rx="2" stroke="currentColor"
+                                                            stroke-width="1.5" />
+                                                        <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round" />
+                                                    </svg>
+                                                </a>
+                                            @endif
+                                            <span
+                                                class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                                                 Ver
-                                            </button>
-                                        @elseif(in_array($extension, ['xlsx', 'xls', 'csv']))
-                                            <a href="{{ route('excel.preview', $archivo->id) }}" target="_blank"
-                                                class="px-3 py-2 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
-                                                style="background-color: #1D6F42;"
-                                                onmouseover="this.style.backgroundColor='#155833'"
-                                                onmouseout="this.style.backgroundColor='#1D6F42'"
-                                                title="Ver archivo Excel">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <rect x="4" y="4" width="16" height="16" rx="2"
-                                                        stroke="currentColor" stroke-width="1.5" />
-                                                    <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor"
-                                                        stroke-width="2" stroke-linecap="round" />
-                                                    <text x="9" y="20" font-size="5" font-weight="bold"
-                                                        fill="currentColor" stroke="none">XLS</text>
-                                                </svg>
-                                                Ver
-                                            </a>
-                                        @endif
+                                            </span>
+                                        </div>
 
-                                        @if ($estado_archivo === 'Recibido')
-                                            <button type="button" wire:click="aprobarArchivo({{ $archivo->id }})"
-                                                class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                                </svg>
-                                                Aprobar
-                                            </button>
+                                        {{-- Botones de Aprobar/Rechazar (solo si está pendiente) --}}
+                                        @if ($esPendiente)
+                                            <div class="relative group">
+                                                <button type="button"
+                                                    wire:click="aprobarArchivo({{ $archivo->id }})"
+                                                    class="w-9 h-9 rounded-full bg-gray-200 hover:bg-green-600 text-gray-500 hover:text-white transition-all duration-200 flex items-center justify-center shadow-sm"
+                                                    title="Aprobar">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+                                                <span
+                                                    class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                    Aprobar
+                                                </span>
+                                            </div>
 
-                                            <button type="button"
-                                                wire:click="mostrarElPanelRechazo({{ $archivo->id }})"
-                                                class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
-                                                </svg>
-                                                Rechazar
-                                            </button>
+                                            <div class="relative group">
+                                                <button type="button"
+                                                    wire:click="mostrarElPanelRechazo({{ $archivo->id }})"
+                                                    class="w-9 h-9 rounded-full bg-gray-200 hover:bg-red-600 text-gray-500 hover:text-white transition-all duration-200 flex items-center justify-center shadow-sm"
+                                                    title="Rechazar">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                                <span
+                                                    class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                    Rechazar
+                                                </span>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -245,7 +290,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
-                    Visor de archivos
+                    Visor de archivos PDF
                 </h3>
 
                 <div class="bg-gray-100 rounded-lg p-4 h-[calc(100vh-300px)] overflow-auto">
