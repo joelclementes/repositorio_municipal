@@ -15,6 +15,7 @@ class EstadoSeeder extends Seeder
     {
         $estados = [
             ['nombre' => 'Recibido',],
+            ['nombre' => 'Recibido extemporáneo',],
             ['nombre' => 'Aprobado',],
             ['nombre' => 'Rechazado',],
         ];
