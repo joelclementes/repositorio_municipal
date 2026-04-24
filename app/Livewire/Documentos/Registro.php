@@ -13,6 +13,8 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
+use App\Models\Estado;
+use App\Services\ReglasDocumentoService;
 
 class Registro extends Component
 {
@@ -263,6 +265,26 @@ class Registro extends Component
 
             $this->archivo->storeAs($rutaBase, $nombreArchivo, 'public');
 
+
+            // Reglas para el estado del documento (Recibido o Recibido extemporáneo ----------
+            $reglasDocumentoService = app(ReglasDocumentoService::class);
+
+            $estadoRecibidoId = Estado::where('nombre', 'Recibido')->value('id');
+            $estadoExtemporaneoId = Estado::where('nombre', 'Recibido extemporáneo')->value('id');
+
+            if (!$estadoRecibidoId || !$estadoExtemporaneoId) {
+                throw new \Exception('No se encontraron estados "Recibido" y/o "Recibido extemporáneo".');
+            }
+
+            $esOportuno = $reglasDocumentoService->esOportuno(
+                $documento,
+                $periodo,
+                now()
+            );
+
+            $estadoId = $esOportuno ? $estadoRecibidoId : $estadoExtemporaneoId;
+            // Fin Reglas ---------------------------------------------------------------------
+
             ArchivoDocumentoRecibido::create([
                 'nombre' => $nombreArchivo,
                 'observaciones_ente' => $this->descripcion,
@@ -272,7 +294,7 @@ class Registro extends Component
                 'tipo_recepcion' => $this->tipoSubida,
                 'fecha_cambio_estatus' => null,
                 'usuario_revisor' => null,
-                'estado_id' => 1,
+                'estado_id' => $estadoId,
                 'observaciones_revisor' => null,
                 'causas_rechazo_id' => null,
             ]);

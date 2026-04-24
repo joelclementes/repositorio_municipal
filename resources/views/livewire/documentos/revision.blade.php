@@ -135,7 +135,11 @@
                             @php
                                 $estado_archivo = $archivo->estado_nombre;
                                 $extension = pathinfo($archivo->nombre, PATHINFO_EXTENSION);
-                                $esPendiente = $estado_archivo === 'Recibido';
+                                // $esPendiente = $estado_archivo === 'Recibido';
+                                $esPendiente = in_array($estado_archivo, [
+                                    'Recibido',
+                                    'Recibido extemporáneo',
+                                ], true);
                             @endphp
 
                             <div

@@ -34,6 +34,16 @@ class PeriodosSeeder extends Seeder
                     'is_active' => true,
                 ],
             ],
+            [
+                'periodo_data' => [
+                    'mes' => 'Abril',
+                    'axo' => '2026',
+                    'descripcion' => 'Abril de 2026',
+                    'fecha_inicio' => '2026-04-01',
+                    'fecha_fin' => '2026-04-30',
+                    'is_active' => true,
+                ],
+            ],
         ];
 
         foreach ($periodos as $periodo) {

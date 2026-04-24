@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('clave')->unique();
             $table->string('nombre', length: 255)->unique();
             $table->unsignedBigInteger('subcategoria_id');
+            $table->string('regla_presentacion', 60)
+                ->default('todo_el_anio')
+                ->comment('Regla para validar presentación oportuna/extemporánea');
             $table->string('periodicidad', length: 20)->nullable();
             $table->integer('fecha_inicio')->nullable();
             $table->integer('fecha_limite')->nullable();

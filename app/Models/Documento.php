@@ -15,6 +15,7 @@ class Documento extends Model
         'nombre',
         'subcategoria_id',
         'periodicidad',
+        'regla_presentacion',
         'fecha_inicio',
         'fecha_limite',
         'formato',
@@ -25,5 +26,5 @@ class Documento extends Model
         return $this->belongsTo(SubcategoriasDocumento::class, 'subcategoria_id');
     }
 
-    
+
 }
