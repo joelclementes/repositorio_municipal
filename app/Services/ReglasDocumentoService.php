@@ -18,15 +18,19 @@ class ReglasDocumentoService
         $fechaRecepcion = $fechaRecepcion ? $fechaRecepcion->copy() : now();
 
         [$inicioPeriodo, $finPeriodo] = $this->rangoMesPeriodo($periodo);
+        $anioActual = $fechaRecepcion->year;
         $mesPeriodo = $this->mesANumero($periodo->mes);
         $mesActual = $fechaRecepcion->month;
         $anioPeriodo = (int) $periodo->axo;
 
         $regla = $documento->regla_presentacion ?? 'todo_el_anio';
 
-        return match ($regla) {
+
+
+        $esOportuno = match ($regla) {
             'trimestral_ene_abr_jul_oct' =>
                 in_array($mesActual, [1, 4, 7, 10], true),
+
             'dia_1_mes' =>
                 $fechaRecepcion->between($inicioPeriodo, $finPeriodo)
                 && $fechaRecepcion->day === 1,
@@ -36,38 +40,56 @@ class ReglasDocumentoService
                 && $fechaRecepcion->day >= 16
                 && $fechaRecepcion->day <= 25,
 
+            'enero_1_31' =>
+                $anioActual === $anioPeriodo
+                && $fechaRecepcion->month === 1,
+
+            'marzo_1_31' =>
+                $anioActual === $anioPeriodo
+                && $fechaRecepcion->month === 3,
+
+            'abril_1_30' =>
+                $anioActual === $anioPeriodo
+                && $fechaRecepcion->month === 4,
+
             'enero_abril' =>
-                $fechaRecepcion->year === $anioPeriodo
+                $anioActual === $anioPeriodo
                 && $fechaRecepcion->month >= 1
                 && $fechaRecepcion->month <= 4,
 
             'septiembre_15_30' =>
-                $fechaRecepcion->year === $anioPeriodo
+                $anioActual === $anioPeriodo
                 && $fechaRecepcion->month === 9
                 && $fechaRecepcion->day >= 15
                 && $fechaRecepcion->day <= 30,
 
             'enero_1_a_marzo_31' =>
-                $fechaRecepcion->year === $anioPeriodo
+                $anioActual === $anioPeriodo
                 && $fechaRecepcion->month >= 1
                 && $fechaRecepcion->month <= 3,
 
-            'enero_1_31' =>
-                $fechaRecepcion->year === $anioPeriodo
-                && $fechaRecepcion->month === 1,
-
-            'marzo_1_31' =>
-                $fechaRecepcion->year === $anioPeriodo
-                && $fechaRecepcion->month === 3,
-
-            'abril_1_30' =>
-                $fechaRecepcion->year === $anioPeriodo
-                && $fechaRecepcion->month === 4,
-
             'todo_el_anio' =>
-                $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
+                true,
+                // $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
+
             default => false,
         };
+
+        dd([
+            'regla' => $regla,
+            'mesActual' => $mesActual,
+            'mesPeriodo' => $mesPeriodo,
+            'diaActual' => $fechaRecepcion->day,
+            'anioActual' => $fechaRecepcion->year,
+            'anioPeriodo' => $anioPeriodo,
+            'inicioPeriodo' => $inicioPeriodo?->toDateTimeString(),
+            'finPeriodo' => $finPeriodo?->toDateTimeString(),
+            'estaEnRango' => $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
+            'esOportuno' => $esOportuno,
+            ]);
+
+        return $esOportuno;
+
     }
 
     /**

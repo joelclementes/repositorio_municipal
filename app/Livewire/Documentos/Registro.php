@@ -267,6 +267,7 @@ class Registro extends Component
 
 
             // Reglas para el estado del documento (Recibido o Recibido extemporáneo ----------
+
             $reglasDocumentoService = app(ReglasDocumentoService::class);
 
             $estadoRecibidoId = Estado::where('nombre', 'Recibido')->value('id');
@@ -283,8 +284,15 @@ class Registro extends Component
 
 
             $estadoId = $esOportuno ? $estadoRecibidoId : $estadoExtemporaneoId;
-            // $estadoId = !$esOportuno ? $estadoExtemporaneoId : $estadoRecibidoId;
-            // dd('estadoId: ' . $estadoId);
+
+            dd([
+                'Regla del documento ' => $documento->regla_presentacion,
+                'Inicio del periodo  ' => $periodo->fecha_inicio,
+                'Fin del periodo     ' => $periodo->fecha_fin,
+                'Fecha de hoy        ' => now()->toDateString(),
+                'esOportuno          ' => $esOportuno,
+                'estadoId            ' => $estadoId,
+            ]);
             // Fin Reglas ---------------------------------------------------------------------
 
             ArchivoDocumentoRecibido::create([

@@ -47,7 +47,7 @@
         </select>
 
         {{-- Indicador de selección actual --}}
-        @if ($periodosSeleccionados && $categoriaSeleccionada && $subcategoriaSeleccionada)
+{{--         @if ($periodosSeleccionados && $categoriaSeleccionada && $subcategoriaSeleccionada)
             <div
                 class="mt-2 p-2 bg-green-50 border border-green-200 rounded-md text-xs text-green-700 flex items-center flex-wrap">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +66,7 @@
                     {{ $this->subcategorias->firstWhere('id', $subcategoriaSeleccionada)?->nombre }}
                 </span>
             </div>
-        @endif
+        @endif --}}
     </div>
 
     {{-- Documentos relacionados --}}
