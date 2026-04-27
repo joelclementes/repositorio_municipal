@@ -64,7 +64,7 @@
                     <label for="descripcion" class="text-gray-700 font-bold w-48 mr-4">Descripción:</label>
                     <textarea id="descripcion" name="descripcion"
                         class="w-full px-3 py-2 text-sm border {{ $errors->has('descripcion') ? 'border-red-500' : 'border-vino-900' }} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white"
-                        required>{{ old('descripcion') }}</textarea>
+                        required placeholder="La descripción que especifique aquí se mostrará cuando el Ente obligado seleccione un periodo para subir archivos.">{{ old('descripcion') }}</textarea>
                 </div>
                 <div class="mb-4 flex items-center">
                     <label for="fecha_inicio" class="text-gray-700 font-bold w-48 mr-4">Fecha de Inicio:</label>
@@ -223,7 +223,7 @@
                 if (registroDiv.hasAttribute('hidden')) {
                     registroDiv.removeAttribute('hidden');
                     document.getElementById('btnRegistroPeriodo').hidden=true;
-                    
+
                 } else {
                     registroDiv.setAttribute('hidden', '');
                     document.getElementById('btnRegistroPeriodo').hidden=false;
@@ -231,7 +231,7 @@
             });
 
             btnCancelarPeriodo.addEventListener('click', function() {
-                registroDiv.setAttribute('hidden', '');                
+                registroDiv.setAttribute('hidden', '');
                 document.getElementById('btnRegistroPeriodo').hidden=false;
             });
 

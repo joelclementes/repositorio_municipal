@@ -104,6 +104,19 @@ class Registro extends Component
             return;
         }
 
+
+
+        // Validación al seleccionar período para cargar el Periodo y detener el flujo si no existe.
+        $periodo = Periodo::find($periodoId);
+
+        if (!$periodo) {
+            $this->dispatch('notificacion', 'No se encontró el período seleccionado', 'error');
+            return;
+        }
+        // Fin validación
+
+
+        $reglasDocumentoService = app(ReglasDocumentoService::class);
         $rolesUsuario = auth()->user()->roles->pluck('name')->toArray();
 
         $categoriasPermitidas = CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
@@ -133,6 +146,11 @@ class Registro extends Component
                     'periodo_id' => $periodoId,
                     'documentos_id' => $documento->id,
                 ])->exists();
+
+                // Si no cumple la regla, no se agrega el registro.
+                if (!$reglasDocumentoService->debeRegistrarDocumentoEnPeriodo($documento, $periodo)) {
+                    continue;
+                }
 
                 if (!$existe) {
                     DocumentosRecibido::create([
@@ -285,14 +303,14 @@ class Registro extends Component
 
             $estadoId = $esOportuno ? $estadoRecibidoId : $estadoExtemporaneoId;
 
-            dd([
+            /*dd([
                 'Regla del documento ' => $documento->regla_presentacion,
                 'Inicio del periodo  ' => $periodo->fecha_inicio,
                 'Fin del periodo     ' => $periodo->fecha_fin,
                 'Fecha de hoy        ' => now()->toDateString(),
                 'esOportuno          ' => $esOportuno,
                 'estadoId            ' => $estadoId,
-            ]);
+            ]); */
             // Fin Reglas ---------------------------------------------------------------------
 
             ArchivoDocumentoRecibido::create([
@@ -327,7 +345,7 @@ class Registro extends Component
         }
     }
 
-// En app/Livewire/Documentos/Registro.php
+    // En app/Livewire/Documentos/Registro.php
 
     /**
      * Hook que se ejecuta antes de cada actualización de propiedad

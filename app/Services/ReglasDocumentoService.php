@@ -75,7 +75,7 @@ class ReglasDocumentoService
             default => false,
         };
 
-        dd([
+/*         dd([
             'regla' => $regla,
             'mesActual' => $mesActual,
             'mesPeriodo' => $mesPeriodo,
@@ -86,7 +86,7 @@ class ReglasDocumentoService
             'finPeriodo' => $finPeriodo?->toDateTimeString(),
             'estaEnRango' => $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
             'esOportuno' => $esOportuno,
-            ]);
+            ]); */
 
         return $esOportuno;
 
@@ -134,5 +134,45 @@ class ReglasDocumentoService
         }
 
         return $mapa[$mesNormalizado];
+    }
+
+    public function debeRegistrarDocumentoEnPeriodo(Documento $documento, Periodo $periodo): bool
+    {
+        $mesPeriodo = $this->normalizarMesPeriodo($periodo->mes);
+        $regla = $documento->regla_presentacion;
+
+        return match ($regla) {
+            'trimestral_ene_abr_jul_oct' => in_array($mesPeriodo, ['enero', 'abril', 'julio', 'octubre'], true),
+            'enero_1_31' => $mesPeriodo === 'enero',
+            'marzo_1_31' => $mesPeriodo === 'marzo',
+            'abril_1_30' => $mesPeriodo === 'abril',
+            'enero_abril' => in_array($mesPeriodo, ['enero', 'febrero', 'marzo', 'abril'], true),
+            'septiembre_15_30' => $mesPeriodo === 'septiembre',
+            'enero_1_a_marzo_31' => in_array($mesPeriodo, ['enero', 'febrero', 'marzo'], true),
+            default => true,
+        };
+    }
+
+    private function normalizarMesPeriodo(string $mes): string
+    {
+        $mes = mb_strtolower(trim($mes), 'UTF-8');
+
+        $meses = [
+            '1' => 'enero',
+            '2' => 'febrero',
+            '3' => 'marzo',
+            '4' => 'abril',
+            '5' => 'mayo',
+            '6' => 'junio',
+            '7' => 'julio',
+            '8' => 'agosto',
+            '9' => 'septiembre',
+            '10' => 'octubre',
+            '11' => 'noviembre',
+            '12' => 'diciembre',
+            'setiembre' => 'septiembre',
+        ];
+
+        return $meses[$mes] ?? $mes;
     }
 }

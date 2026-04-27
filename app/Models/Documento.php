@@ -23,5 +23,15 @@ class Documento extends Model
         return $this->belongsTo(SubcategoriasDocumento::class, 'subcategoria_id');
     }
 
+    public static function reglasPresentacionOptions(): array
+    {
+        return config('documentos.reglas_presentacion', []);
+    }
 
+    public function getReglaPresentacionEtiquetaAttribute(): string
+    {
+        $opciones = self::reglasPresentacionOptions();
+
+        return $opciones[$this->regla_presentacion] ?? $this->regla_presentacion;
+    }
 }

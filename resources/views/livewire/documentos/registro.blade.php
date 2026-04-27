@@ -47,26 +47,27 @@
         </select>
 
         {{-- Indicador de selección actual --}}
-{{--         @if ($periodosSeleccionados && $categoriaSeleccionada && $subcategoriaSeleccionada)
+        @if ($periodosSeleccionados && $categoriaSeleccionada && $subcategoriaSeleccionada)
             <div
                 class="mt-2 p-2 bg-green-50 border border-green-200 rounded-md text-xs text-green-700 flex items-center flex-wrap">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-medium mr-1">Selección:</span>
+                {{-- <span class="font-medium mr-1">Selección:</span> --}}
+                <span class="font-medium mr-1">Descipcion:</span>
                 <span class="font-semibold bg-green-100 px-2 py-0.5 rounded-full">
                     {{ $this->periodos->firstWhere('id', $periodosSeleccionados)?->descripcion }}
                 </span>
-                <span class="mx-1">→</span>
+                {{--                 <span class="mx-1">→</span>
                 <span class="font-semibold bg-green-100 px-2 py-0.5 rounded-full">
                     {{ $this->categorias->firstWhere('id', $categoriaSeleccionada)?->nombre }}
                 </span>
                 <span class="mx-1">→</span>
                 <span class="font-semibold bg-green-100 px-2 py-0.5 rounded-full">
                     {{ $this->subcategorias->firstWhere('id', $subcategoriaSeleccionada)?->nombre }}
-                </span>
+                </span> --}}
             </div>
-        @endif --}}
+        @endif
     </div>
 
     {{-- Documentos relacionados --}}
@@ -91,7 +92,8 @@
                         $tieneArchivoExcel = $archivos->whereIn('tipo_recepcion', ['XLSX', 'XLS'])->count() > 0;
                     @endphp
 
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4">
+                    <div
+                        class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4">
 
                         <div class="flex-1">
                             <div class="flex items-center mb-2">
@@ -100,7 +102,9 @@
                                 </span>
                             </div>
                             <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
-                            <p class="text-xs text-gray-500">Se entrega: {{ $documento->regla_presentacion }}</p>
+                            {{-- <p class="text-xs text-gray-500">Se entrega: {{ $documento->regla_presentacion }}</p> --}}
+                            {{-- resources/views/livewire/documentos/registro.blade.php --}}
+                            <p class="text-xs text-gray-500">Presentación: {{ $documento->regla_presentacion_etiqueta }}</p>
 
                             {{-- Mostrar archivos subidos --}}
                             @if ($archivos->count() > 0)
@@ -145,7 +149,7 @@
                                             <div
                                                 class="flex items-center text-xs {{ $archivo->causas_rechazo_id ? 'text-red-600' : 'text-green-600' }}">
                                                 <span
-                                                    class="text-xs truncate max-w-[250px]">{{ $archivo->causaRechazo?->descripcion ??  '' }}</span>
+                                                    class="text-xs truncate max-w-[250px]">{{ $archivo->causaRechazo?->descripcion ?? '' }}</span>
                                             </div>
                                         </div>
                                     @endforeach
