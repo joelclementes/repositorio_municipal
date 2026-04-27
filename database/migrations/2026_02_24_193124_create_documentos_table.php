@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('regla_presentacion', 60)
                 ->default('todo_el_anio')
                 ->comment('Regla para validar presentación oportuna/extemporánea');
-            $table->string('periodicidad', length: 20)->nullable();
-            $table->integer('fecha_inicio')->nullable();
-            $table->integer('fecha_limite')->nullable();
+            // $table->string('periodicidad', length: 20)->nullable();
+            // $table->integer('fecha_inicio')->nullable();
+            // $table->integer('fecha_limite')->nullable();
             $table->string('formato', length: 20)->comment('PDF ó XLSX');
             $table->timestamps();
 

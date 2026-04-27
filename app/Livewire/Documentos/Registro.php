@@ -275,14 +275,16 @@ class Registro extends Component
             if (!$estadoRecibidoId || !$estadoExtemporaneoId) {
                 throw new \Exception('No se encontraron estados "Recibido" y/o "Recibido extemporáneo".');
             }
-
             $esOportuno = $reglasDocumentoService->esOportuno(
                 $documento,
                 $periodo,
                 now()
             );
 
+
             $estadoId = $esOportuno ? $estadoRecibidoId : $estadoExtemporaneoId;
+            // $estadoId = !$esOportuno ? $estadoExtemporaneoId : $estadoRecibidoId;
+            // dd('estadoId: ' . $estadoId);
             // Fin Reglas ---------------------------------------------------------------------
 
             ArchivoDocumentoRecibido::create([

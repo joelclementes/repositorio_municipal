@@ -15,21 +15,18 @@ class ReglasDocumentoService
      */
     public function esOportuno(Documento $documento, Periodo $periodo, ?Carbon $fechaRecepcion = null): bool
     {
-        $fechaRecepcion = $fechaRecepcion ?: now();
+        $fechaRecepcion = $fechaRecepcion ? $fechaRecepcion->copy() : now();
 
         [$inicioPeriodo, $finPeriodo] = $this->rangoMesPeriodo($periodo);
         $mesPeriodo = $this->mesANumero($periodo->mes);
+        $mesActual = $fechaRecepcion->month;
         $anioPeriodo = (int) $periodo->axo;
 
         $regla = $documento->regla_presentacion ?? 'todo_el_anio';
 
         return match ($regla) {
-            // NUEVA: aplica solo para periodos Ene/Abr/Jul/Oct y dentro del mes del periodo
             'trimestral_ene_abr_jul_oct' =>
-                in_array($mesPeriodo, [1, 4, 7, 10], true)
-                && $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
-
-            // Mensuales por día
+                in_array($mesActual, [1, 4, 7, 10], true),
             'dia_1_mes' =>
                 $fechaRecepcion->between($inicioPeriodo, $finPeriodo)
                 && $fechaRecepcion->day === 1,
@@ -39,27 +36,6 @@ class ReglasDocumentoService
                 && $fechaRecepcion->day >= 16
                 && $fechaRecepcion->day <= 25,
 
-            // Mes completo específico
-            // 'todo_enero' =>
-            //     $mesPeriodo === 1
-            //     && $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
-
-            // 'todo_abril' =>
-            //     $mesPeriodo === 4
-            //     && $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
-
-            // 'todo_julio' =>
-            //     $mesPeriodo === 7
-            //     && $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
-
-            // 'todo_octubre' =>
-            //     $mesPeriodo === 10
-            //     && $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
-
-            // Genérica: dentro del mes del periodo seleccionado
-
-
-            // Ventanas anuales opcionales
             'enero_abril' =>
                 $fechaRecepcion->year === $anioPeriodo
                 && $fechaRecepcion->month >= 1

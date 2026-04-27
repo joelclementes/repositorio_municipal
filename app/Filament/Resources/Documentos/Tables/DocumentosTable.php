@@ -20,14 +20,14 @@ class DocumentosTable
                     ->searchable(),
                 TextColumn::make('subcategoria.nombre')
                     ->sortable(),
-                TextColumn::make('periodicidad')
-                    ->searchable(),
-                TextColumn::make('fecha_inicio')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('fecha_limite')
-                    ->numeric()
-                    ->sortable(),
+                // TextColumn::make('periodicidad')
+                //     ->searchable(),
+                // TextColumn::make('fecha_inicio')
+                //     ->numeric()
+                //     ->sortable(),
+                // TextColumn::make('fecha_limite')
+                //     ->numeric()
+                //     ->sortable(),
                 TextColumn::make('formato')
                     ->searchable(),
                 TextColumn::make('created_at')

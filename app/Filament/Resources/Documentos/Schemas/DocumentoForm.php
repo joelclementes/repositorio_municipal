@@ -22,12 +22,12 @@ class DocumentoForm
                     ->searchable()
                     ->preload()
                     ->required(),
-                TextInput::make('fecha_inicio')
-                    ->numeric()
-                    ->required(),
-                TextInput::make('fecha_limite')
-                    ->numeric()
-                    ->required(),
+                // TextInput::make('fecha_inicio')
+                //     ->numeric()
+                //     ->required(),
+                // TextInput::make('fecha_limite')
+                //     ->numeric()
+                //     ->required(),
                 Select::make('regla_presentacion')
                     ->label('Regla de presentación')
                     ->options([

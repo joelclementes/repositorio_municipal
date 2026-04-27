@@ -14,10 +14,7 @@ class Documento extends Model
         'clave',
         'nombre',
         'subcategoria_id',
-        'periodicidad',
         'regla_presentacion',
-        'fecha_inicio',
-        'fecha_limite',
         'formato',
     ];
 

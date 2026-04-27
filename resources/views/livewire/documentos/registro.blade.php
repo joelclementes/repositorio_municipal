@@ -100,8 +100,7 @@
                                 </span>
                             </div>
                             <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
-                            <p class="text-xs text-gray-500">Límite: del {{ $documento->fecha_inicio }} al
-                                {{ $documento->fecha_limite }}</p>
+                            <p class="text-xs text-gray-500">Se entrega: {{ $documento->regla_presentacion }}</p>
 
                             {{-- Mostrar archivos subidos --}}
                             @if ($archivos->count() > 0)

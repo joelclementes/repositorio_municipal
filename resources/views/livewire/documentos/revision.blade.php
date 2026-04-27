@@ -124,9 +124,9 @@
                                         {{ $archivos->count() }} archivo(s)
                                     </span>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1">
+                                {{-- <p class="text-xs text-gray-500 mt-1">
                                     Límite: del {{ $documento->fecha_inicio }} al {{ $documento->fecha_limite }}
-                                </p>
+                                </p> --}}
                             </div>
                         </div>
 
