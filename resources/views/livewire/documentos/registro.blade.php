@@ -90,6 +90,29 @@
                         $archivos = $documentoRecibido->archivos;
                         $tieneArchivoPDF = $archivos->where('tipo_recepcion', 'PDF')->count() > 0;
                         $tieneArchivoExcel = $archivos->whereIn('tipo_recepcion', ['XLSX', 'XLS'])->count() > 0;
+
+                        $autorizadoReenviarPDF = 0;
+                        $autorizadoReenviarXLSX = 0;
+
+                        foreach ($archivos as $archivo) {
+                            if ($archivo->tipo_recepcion === 'PDF' && $archivo->autorizado_reenviar) {
+                                $autorizadoReenviarPDF = 1;
+                            }
+
+                            if (
+                                in_array($archivo->tipo_recepcion, ['XLSX', 'XLS'], true) &&
+                                $archivo->autorizado_reenviar
+                            ) {
+                                $autorizadoReenviarXLSX = 1;
+                            }
+                        }
+
+                        $estadoReglaPdf = $this->estadoSubidaPorRegla($documentoRecibido, 'PDF');
+                        $estadoReglaExcel = $this->estadoSubidaPorRegla($documentoRecibido, 'XLSX');
+
+                        $bloqueadoPdf = ($tieneArchivoPDF && !$autorizadoReenviarPDF) || !$estadoReglaPdf['habilitado'];
+                        $bloqueadoExcel =
+                            ($tieneArchivoExcel && !$autorizadoReenviarXLSX) || !$estadoReglaExcel['habilitado'];
                     @endphp
 
                     <div
@@ -104,7 +127,8 @@
                             <h4 class="font-semibold text-gray-900 mb-1">{{ $documento->nombre }}</h4>
                             {{-- <p class="text-xs text-gray-500">Se entrega: {{ $documento->regla_presentacion }}</p> --}}
                             {{-- resources/views/livewire/documentos/registro.blade.php --}}
-                            <p class="text-xs text-gray-500">Presentación: {{ $documento->regla_presentacion_etiqueta }}</p>
+                            <p class="text-xs text-gray-500">Presentación:
+                                {{ $documento->regla_presentacion_etiqueta }}</p>
 
                             {{-- Mostrar archivos subidos --}}
                             @if ($archivos->count() > 0)
@@ -160,10 +184,14 @@
 
                             <div class="flex flex-col space-y-2 mt-4 min-w-[140px]">
                                 @if (in_array('PDF', $formatos))
-                                    <button type="button"
+                                    {{-- <button type="button"
                                         wire:click="abrirModalSubida({{ $documentoRecibido->id }}, 'PDF')"
                                         class="w-full px-3 py-2 {{ $tieneArchivoPDF && !$autorizadoReenviarPDF ? 'bg-gray-400 cursor-not-allowed' : 'bg-vino-900 hover:bg-vino-800' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
-                                        {{ $tieneArchivoPDF && !$autorizadoReenviarPDF ? 'disabled' : '' }}>
+                                        {{ $tieneArchivoPDF && !$autorizadoReenviarPDF ? 'disabled' : '' }}> --}}
+                                    <button type="button"
+                                        wire:click="abrirModalSubida({{ $documentoRecibido->id }}, 'PDF')"
+                                        class="w-full px-3 py-2 {{ $bloqueadoPdf ? 'bg-gray-400 cursor-not-allowed' : 'bg-vino-900 hover:bg-vino-800' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                                        {{ $bloqueadoPdf ? 'disabled' : '' }}>
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -173,16 +201,22 @@
                                             <text x="10" y="18" font-size="8" font-weight="bold" fill="currentColor"
                                                 stroke="none">PDF</text>
                                         </svg>
-                                        <span>{{ $tieneArchivoPDF && !$autorizadoReenviarPDF ? 'Ya subido' : 'Subir PDF' }}</span>
+                                        {{-- <span>{{ $tieneArchivoPDF && !$autorizadoReenviarPDF ? 'Ya subido' : 'Subir PDF' }}</span> --}}
+                                        <span>{{ $bloqueadoPdf ? 'Ya subido' : 'Subir PDF' }}</span>
                                     </button>
                                 @endif
 
                                 @if (in_array('XLSX', $formatos) || in_array('XLS', $formatos))
-                                    <button type="button"
+                                    {{-- <button type="button"
                                         wire:click="abrirModalSubida({{ $documentoRecibido->id }}, '{{ in_array('XLSX', $formatos) ? 'XLSX' : 'XLS' }}')"
                                         class="w-full px-3 py-2 {{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'bg-gray-400 cursor-not-allowed' : '' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
                                         style="{{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'background-color: #9CA3AF;' : 'background-color: #1D6F42;' }}"
-                                        {{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'disabled' : '' }}>
+                                        {{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'disabled' : '' }}> --}}
+                                    <button type="button"
+                                        wire:click="abrirModalSubida({{ $documentoRecibido->id }}, '{{ in_array('XLSX', $formatos) ? 'XLSX' : 'XLS' }}')"
+                                        class="w-full px-3 py-2 {{ $bloqueadoExcel ? 'bg-gray-400 cursor-not-allowed' : '' }} text-white text-sm rounded-md transition-colors flex items-center justify-center whitespace-nowrap"
+                                        style="{{ $bloqueadoExcel ? 'background-color: #9CA3AF;' : 'background-color: #1D6F42;' }}"
+                                        {{ $bloqueadoExcel ? 'disabled' : '' }}>
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -192,7 +226,8 @@
                                             <text x="6" y="18" font-size="6" font-weight="bold" fill="currentColor"
                                                 stroke="none">XLSX</text>
                                         </svg>
-                                        <span>{{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'Ya subido' : 'Subir Excel' }}</span>
+                                        {{-- <span>{{ $tieneArchivoExcel && !$autorizadoReenviarXLSX ? 'Ya subido' : 'Subir Excel' }}</span> --}}
+                                        <span>{{ $bloqueadoExcel ? 'Ya subido' : 'Subir Excel' }}</span>
                                     </button>
                                 @endif
                             </div>

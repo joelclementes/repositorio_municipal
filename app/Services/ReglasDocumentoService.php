@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Documento;
 use App\Models\Periodo;
+use App\Models\ArchivoDocumentoRecibido;
 use Carbon\Carbon;
 use InvalidArgumentException;
 
@@ -29,53 +30,53 @@ class ReglasDocumentoService
 
         $esOportuno = match ($regla) {
             'trimestral_ene_abr_jul_oct' =>
-                in_array($mesActual, [1, 4, 7, 10], true),
+            in_array($mesActual, [1, 4, 7, 10], true),
 
             'dia_1_mes' =>
-                $fechaRecepcion->between($inicioPeriodo, $finPeriodo)
+            $fechaRecepcion->between($inicioPeriodo, $finPeriodo)
                 && $fechaRecepcion->day === 1,
 
             'dias_16_25_mes' =>
-                $fechaRecepcion->between($inicioPeriodo, $finPeriodo)
+            $fechaRecepcion->between($inicioPeriodo, $finPeriodo)
                 && $fechaRecepcion->day >= 16
                 && $fechaRecepcion->day <= 25,
 
             'enero_1_31' =>
-                $anioActual === $anioPeriodo
+            $anioActual === $anioPeriodo
                 && $fechaRecepcion->month === 1,
 
             'marzo_1_31' =>
-                $anioActual === $anioPeriodo
+            $anioActual === $anioPeriodo
                 && $fechaRecepcion->month === 3,
 
             'abril_1_30' =>
-                $anioActual === $anioPeriodo
+            $anioActual === $anioPeriodo
                 && $fechaRecepcion->month === 4,
 
             'enero_abril' =>
-                $anioActual === $anioPeriodo
+            $anioActual === $anioPeriodo
                 && $fechaRecepcion->month >= 1
                 && $fechaRecepcion->month <= 4,
 
             'septiembre_15_30' =>
-                $anioActual === $anioPeriodo
+            $anioActual === $anioPeriodo
                 && $fechaRecepcion->month === 9
                 && $fechaRecepcion->day >= 15
                 && $fechaRecepcion->day <= 30,
 
             'enero_1_a_marzo_31' =>
-                $anioActual === $anioPeriodo
+            $anioActual === $anioPeriodo
                 && $fechaRecepcion->month >= 1
                 && $fechaRecepcion->month <= 3,
 
             'todo_el_anio' =>
-                true,
-                // $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
+            true,
+            // $fechaRecepcion->between($inicioPeriodo, $finPeriodo),
 
             default => false,
         };
 
-/*         dd([
+        /*         dd([
             'regla' => $regla,
             'mesActual' => $mesActual,
             'mesPeriodo' => $mesPeriodo,
@@ -89,7 +90,6 @@ class ReglasDocumentoService
             ]); */
 
         return $esOportuno;
-
     }
 
     /**
@@ -174,5 +174,82 @@ class ReglasDocumentoService
         ];
 
         return $meses[$mes] ?? $mes;
+    }
+
+    /**
+     * Evalúa si para reglas de "una sola entrega en rango" el documento ya fue subido
+     * en el año del periodo y dentro del rango de meses definido por la regla.
+     *
+     * Retorna:
+     * - habilitado: bool
+     * - ya_subido: bool
+     * - leyenda: ?string
+     */
+    public function evaluarBloqueoPorReglaYSubidaPrevia(
+        Documento $documento,
+        Periodo $periodo,
+        int $enteId,
+        ?string $tipoRecepcion = null
+    ): array {
+        $regla = $documento->regla_presentacion ?? 'todo_el_anio';
+        $anio = (int) $periodo->axo;
+
+        // Mes actual del periodo seleccionado
+        $mesPeriodo = $this->mesANumero((string) $periodo->mes);
+
+        // Ventana de meses por regla
+        [$mesInicio, $mesFin] = match ($regla) {
+            'enero_abril' => [1, 4],
+            'enero_1_a_marzo_31' => [1, 3],
+            'todo_el_anio' => [1, 12],
+            default => [null, null],
+        };
+
+        // Si no es una de las reglas objetivo, no aplicar bloqueo transversal
+        if ($mesInicio === null) {
+            return [
+                'habilitado' => true,
+                'ya_subido' => false,
+                'leyenda' => null,
+            ];
+        }
+
+        // Si el periodo seleccionado está fuera de la ventana de la regla, no bloquea aquí
+        // (normalmente ni siquiera debería aparecer por debeRegistrarDocumentoEnPeriodo)
+        if ($mesPeriodo < $mesInicio || $mesPeriodo > $mesFin) {
+            return [
+                'habilitado' => true,
+                'ya_subido' => false,
+                'leyenda' => null,
+            ];
+        }
+
+        $query = ArchivoDocumentoRecibido::query()
+            ->where('ente_id', $enteId)
+            ->whereHas('documentoRecibido', function ($q) use ($documento, $anio, $mesInicio, $mesFin) {
+                $q->where('documentos_id', $documento->id)
+                    ->whereHas('periodo', function ($qp) use ($anio, $mesInicio, $mesFin) {
+                        $qp->where('axo', $anio)
+                            ->whereBetween('mes', [$mesInicio, $mesFin]);
+                    });
+            });
+
+        if (!empty($tipoRecepcion)) {
+            $query->where('tipo_recepcion', $tipoRecepcion);
+        }
+
+        // Respeta reenvío autorizado (si lo manejas)
+        $query->where(function ($q) {
+            $q->whereNull('autorizado_reenviar')
+                ->orWhere('autorizado_reenviar', 0);
+        });
+
+        $yaSubido = $query->exists();
+
+        return [
+            'habilitado' => !$yaSubido,
+            'ya_subido' => $yaSubido,
+            'leyenda' => $yaSubido ? 'Ya se subió' : null,
+        ];
     }
 }

@@ -9,6 +9,7 @@ use App\Models\DocumentosRecibido;
 use App\Models\ArchivoDocumentoRecibido;
 use App\Models\Periodo;
 use App\Models\CausaRechazo;
+use App\Models\Estado;
 use Livewire\Component;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
@@ -144,11 +145,12 @@ class Revision extends Component
     {
         try {
             $archivo = ArchivoDocumentoRecibido::find($archivoId);
+            $estadoAprobado = Estado::where('nombre', 'Aprobado')->value('id');
 
             if ($archivo) {
                 $archivo->update([
                     'usuario_revisor' => auth()->id(),
-                    'estado_id' => 2,
+                    'estado_id' => $estadoAprobado,
                     'observaciones_revisor' => null,
                     'causas_rechazo_id' => null,
                     'fecha_cambio_estatus' => now(),
@@ -211,11 +213,13 @@ class Revision extends Component
             'observacionesRevisor' => 'nullable|string|max:500',
         ]);
 
+        $estadoRechazado = Estado::where('nombre', 'Rechazado')->value('id');
+
         try {
             if ($this->archivoSeleccionado) {
                 $this->archivoSeleccionado->update([
                     'usuario_revisor' => auth()->id(),
-                    'estado_id' => 3,
+                    'estado_id' => $estadoRechazado,
                     'observaciones_revisor' => $this->observacionesRevisor,
                     'causas_rechazo_id' => $this->causaRechazoId,
                     'fecha_cambio_estatus' => now(),

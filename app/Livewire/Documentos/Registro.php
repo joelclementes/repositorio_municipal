@@ -371,6 +371,29 @@ class Registro extends Component
         ]);
     }
 
+    public function estadoSubidaPorRegla(\App\Models\DocumentosRecibido $documentoRecibido, string $tipoRecepcion): array
+    {
+        $periodo = \App\Models\Periodo::find($this->periodosSeleccionados);
+
+        if (!$periodo || !$documentoRecibido->documento || !auth()->user()?->ente_id) {
+            return [
+                'habilitado' => true,
+                'ya_subido' => false,
+                'leyenda' => null,
+            ];
+        }
+
+        /** @var \App\Services\ReglasDocumentoService $reglas */
+        $reglas = app(\App\Services\ReglasDocumentoService::class);
+
+        return $reglas->evaluarBloqueoPorReglaYSubidaPrevia(
+            $documentoRecibido->documento,
+            $periodo,
+            (int) auth()->user()->ente_id,
+            $tipoRecepcion
+        );
+    }
+
     public function render()
     {
         return view('livewire.documentos.registro');
