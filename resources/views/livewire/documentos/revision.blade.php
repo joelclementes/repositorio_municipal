@@ -69,11 +69,12 @@
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-medium mr-1">Revisando:</span>
+                {{-- <span class="font-medium mr-1">Revisando:</span> --}}
+                <span class="font-medium mr-1">Descripción:</span>
                 <span class="font-semibold bg-blue-100 px-2 py-0.5 rounded-full">
                     {{ $this->periodos->firstWhere('id', $periodosSeleccionados)?->descripcion }}
                 </span>
-                <span class="mx-1">→</span>
+{{--                 <span class="mx-1">→</span>
                 <span class="font-semibold bg-blue-100 px-2 py-0.5 rounded-full">
                     {{ $this->entesAsignados->firstWhere('id', $enteSeleccionado)?->nombre }}
                 </span>
@@ -84,7 +85,7 @@
                 <span class="mx-1">→</span>
                 <span class="font-semibold bg-blue-100 px-2 py-0.5 rounded-full">
                     {{ $this->subcategorias->firstWhere('id', $subcategoriaSeleccionada)?->nombre }}
-                </span>
+                </span> --}}
             </div>
         @endif
     </div>
