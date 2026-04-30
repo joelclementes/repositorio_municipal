@@ -17,7 +17,7 @@ class DocumentosRecibido extends Model
     protected $fillable = [
         'ente_id',
         'user_id',
-        'documentos_id',
+        'documento_id',
         'periodo_id',
         'formato',
     ];
@@ -48,7 +48,7 @@ class DocumentosRecibido extends Model
      */
     public function documento(): BelongsTo
     {
-        return $this->belongsTo(Documento::class, 'documentos_id');
+        return $this->belongsTo(Documento::class, 'documento_id');
     }
 
     /**

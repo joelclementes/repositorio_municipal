@@ -29,10 +29,25 @@
             <form method="POST" action="{{ route('periodos.registro.store') }}">
                 @csrf
                 <div class="mb-4 flex items-center">
+                    <label for="mes_numero" class="text-gray-700 font-bold w-48 mr-4">Mes:</label>
+
+                    <select id="mes_numero" name="mes_numero"
+                        class="w-full px-3 py-2 text-sm border {{ $errors->has('mes_numero') ? 'border-red-500' : 'border-vino-900' }} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white"
+                        required>
+                        <option value="" class="text-gray-500">📅 Seleccione un mes</option>
+
+                        @foreach ($meses as $numero => $nombre)
+                            <option value="{{ $numero }}"
+                                {{ (int) old('mes_numero') === (int) $numero ? 'selected' : '' }}>
+                                {{ ucfirst($nombre) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                {{--                 <div class="mb-4 flex items-center">
                     <label for="mes" class="text-gray-700 font-bold w-48 mr-4">Mes:</label>
                     @php
                         $meses = explode(',', env('APP_MESES_SELECTOR'));
-                        //dd($meses[1]);
                     @endphp
                     <select id="mes" name="mes"
                         class="w-full px-3 py-2 text-sm border {{ $errors->has('mes') ? 'border-red-500' : 'border-vino-900' }} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white"
@@ -42,7 +57,7 @@
                             <option value="{{ $mes }}" {{ old('mes') == $mes ? 'selected' : '' }} class="py-1">{{ $mes }}</option>
                         @endforeach
                     </select>
-                </div>
+                </div> --}}
                 <div class="mb-4 flex items-center">
                     <label for="anio" class="text-gray-700 font-bold w-48 mr-4">Año:</label>
                     @php
@@ -55,7 +70,8 @@
                         required wire:model.live="periodosSeleccionados">
                         <option value="" class="text-gray-500">📅 Seleccione un año</option>
                         @for ($i = $año_inicio; $i <= $año_fin; $i++)
-                            <option name="anio" value="{{ $i }}" {{ old('anio') == $i ? 'selected' : '' }} class="py-1">
+                            <option name="anio" value="{{ $i }}"
+                                {{ old('anio') == $i ? 'selected' : '' }} class="py-1">
                                 {{ $i }}</option>
                         @endfor
                     </select>
@@ -64,7 +80,8 @@
                     <label for="descripcion" class="text-gray-700 font-bold w-48 mr-4">Descripción:</label>
                     <textarea id="descripcion" name="descripcion"
                         class="w-full px-3 py-2 text-sm border {{ $errors->has('descripcion') ? 'border-red-500' : 'border-vino-900' }} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white"
-                        required placeholder="La descripción que especifique aquí se mostrará cuando el Ente obligado seleccione un periodo para subir archivos.">{{ old('descripcion') }}</textarea>
+                        required
+                        placeholder="La descripción que especifique aquí se mostrará cuando el Ente obligado seleccione un periodo para subir archivos.">{{ old('descripcion') }}</textarea>
                 </div>
                 <div class="mb-4 flex items-center">
                     <label for="fecha_inicio" class="text-gray-700 font-bold w-48 mr-4">Fecha de Inicio:</label>
@@ -82,13 +99,15 @@
                     <label for="activo" class="text-gray-700 font-bold w-48 mr-4">Activo:</label>
                     <div class="flex items-center">
                         <input type="hidden" name="activo" value="0">
-                        <input type="checkbox" id="activo" name="activo" value="1" {{ old('activo', '1') ? 'checked' : '' }}
+                        <input type="checkbox" id="activo" name="activo" value="1"
+                            {{ old('activo', '1') ? 'checked' : '' }}
                             class="h-4 w-4 text-vino-600 focus:ring-vino-500 border-vino-300 rounded">
                         <label for="activo" class="ml-2 text-sm text-gray-600">Periodo activo</label>
                     </div>
                 </div>
                 <div class="flex items-center justify-end">
-                    <x-button type="submit" class="ms-4 bg-vino-900 hover:bg-vino-800 focus:bg-vino-800 active:bg-vino-900">
+                    <x-button type="submit"
+                        class="ms-4 bg-vino-900 hover:bg-vino-800 focus:bg-vino-800 active:bg-vino-900">
                         Enviar
                     </x-button>
                     <x-button class="ms-4 bg-gray-900 hover:bg-gray-800 focus:bg-gray-800 active:bg-gray-900"
@@ -215,24 +234,24 @@
             const registroDiv = document.getElementById('registro-periodo');
 
             // Verificar si hay errores al cargar la página y ajustar el estado del botón
-            @if($errors->any())
+            @if ($errors->any())
                 btnRegistroPeriodo.hidden = true;
             @endif
 
             btnRegistroPeriodo.addEventListener('click', function() {
                 if (registroDiv.hasAttribute('hidden')) {
                     registroDiv.removeAttribute('hidden');
-                    document.getElementById('btnRegistroPeriodo').hidden=true;
+                    document.getElementById('btnRegistroPeriodo').hidden = true;
 
                 } else {
                     registroDiv.setAttribute('hidden', '');
-                    document.getElementById('btnRegistroPeriodo').hidden=false;
+                    document.getElementById('btnRegistroPeriodo').hidden = false;
                 }
             });
 
             btnCancelarPeriodo.addEventListener('click', function() {
                 registroDiv.setAttribute('hidden', '');
-                document.getElementById('btnRegistroPeriodo').hidden=false;
+                document.getElementById('btnRegistroPeriodo').hidden = false;
             });
 
             // Manejar cambios en los checkboxes de estado

@@ -8,69 +8,65 @@ use Illuminate\Validation\Rule;
 
 class PeriodoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    private array $meses = [
+        1 => 'enero',
+        2 => 'febrero',
+        3 => 'marzo',
+        4 => 'abril',
+        5 => 'mayo',
+        6 => 'junio',
+        7 => 'julio',
+        8 => 'agosto',
+        9 => 'septiembre',
+        10 => 'octubre',
+        11 => 'noviembre',
+        12 => 'diciembre',
+    ];
+
     public function index(Request $request)
     {
         $query = Periodo::query();
-        
-        // Aplicar filtro de búsqueda si existe
+
         if ($request->filled('search')) {
             $search = $request->search;
+
             $query->where(function ($q) use ($search) {
                 $q->where('mes', 'LIKE', "%{$search}%")
-                  ->orWhere('axo', 'LIKE', "%{$search}%")
-                  ->orWhere('descripcion', 'LIKE', "%{$search}%");
+                    ->orWhere('axo', 'LIKE', "%{$search}%")
+                    ->orWhere('descripcion', 'LIKE', "%{$search}%");
             });
         }
-        
-        // Ordenar por año descendente y luego por mes descendente
-        $query->orderBy('axo', 'desc')->orderBy('mes', 'desc');
-        
-        // Aplicar paginación
-        $periodos = $query->paginate(10);
-        
-        return view('periodos.registro', compact('periodos'));
+
+        $periodos = $query
+            ->orderBy('axo', 'desc')
+            ->orderBy('mes_numero', 'desc')
+            ->paginate(10);
+
+        return view('periodos.registro', [
+            'periodos' => $periodos,
+            'meses' => $this->meses,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'mes' => 'required|string|max:125',
-            'anio' => [
+            'mes_numero' => [
                 'required',
                 'integer',
-                Rule::unique('periodos', 'axo')->where(function ($query) use ($request) {
-                    return $query->where('mes', $request->mes);
-                })
+                'between:1,12',
+                Rule::unique('periodos', 'mes_numero')->where(function ($query) use ($request) {
+                    return $query->where('axo', $request->anio);
+                }),
             ],
+            'anio' => 'required|integer|min:2000|max:2100',
             'descripcion' => 'required|string',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             'activo' => 'nullable|boolean',
         ], [
-            'anio.unique' => 'Ya existe un período registrado para el mes y año seleccionados.',
-            'mes.required' => 'El campo mes es obligatorio.',
+            'mes_numero.required' => 'El campo mes es obligatorio.',
+            'mes_numero.unique' => 'Ya existe un período registrado para el mes y año seleccionados.',
             'anio.required' => 'El campo año es obligatorio.',
             'descripcion.required' => 'El campo descripción es obligatorio.',
             'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
@@ -78,29 +74,23 @@ class PeriodoController extends Controller
             'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
         ]);
 
-        $periodo = new Periodo();
-        $periodo->mes = $validatedData['mes'];
-        $periodo->axo = $validatedData['anio'];
-        $periodo->descripcion = $validatedData['descripcion'];
-        $periodo->fecha_inicio = $validatedData['fecha_inicio'];
-        $periodo->fecha_fin = $validatedData['fecha_fin'];
-        $periodo->is_active = (bool)($validatedData['activo'] ?? false);
-        $periodo->save();
+        $mesNumero = (int) $validatedData['mes_numero'];
 
-        return redirect()->route('periodos.registro.index')->with('success', 'Período registrado exitosamente.');
+        Periodo::create([
+            'mes_numero' => $mesNumero,
+            'mes' => $this->meses[$mesNumero],
+            'axo' => $validatedData['anio'],
+            'descripcion' => $validatedData['descripcion'],
+            'fecha_inicio' => $validatedData['fecha_inicio'],
+            'fecha_fin' => $validatedData['fecha_fin'],
+            'is_active' => (bool) ($validatedData['activo'] ?? false),
+        ]);
+
+        return redirect()
+            ->route('periodos.registro.index')
+            ->with('success', 'Período registrado exitosamente.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        
-    }
-
-    /**
-     * Toggle the active status of the specified resource.
-     */
     public function toggleStatus($id)
     {
         $periodo = Periodo::findOrFail($id);
@@ -110,13 +100,25 @@ class PeriodoController extends Controller
         return response()->json([
             'success' => true,
             'status' => $periodo->is_active,
-            'message' => 'Estado actualizado correctamente'
+            'message' => 'Estado actualizado correctamente',
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    public function edit($id)
+    {
+        //
+    }
+
+    public function create()
+    {
+        //
+    }
+
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
     public function destroy(Periodo $periodo)
     {
         //

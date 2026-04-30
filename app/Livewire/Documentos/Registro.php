@@ -144,7 +144,7 @@ class Registro extends Component
                 $existe = DocumentosRecibido::where([
                     'ente_id' => $enteId,
                     'periodo_id' => $periodoId,
-                    'documentos_id' => $documento->id,
+                    'documento_id' => $documento->id,
                 ])->exists();
 
                 // Si no cumple la regla, no se agrega el registro.
@@ -156,7 +156,7 @@ class Registro extends Component
                     DocumentosRecibido::create([
                         'ente_id' => $enteId,
                         'user_id' => auth()->id(),
-                        'documentos_id' => $documento->id,
+                        'documento_id' => $documento->id,
                         'periodo_id' => $periodoId,
                     ]);
                 }

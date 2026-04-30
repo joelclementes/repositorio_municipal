@@ -13,13 +13,18 @@ return new class extends Migration
     {
         Schema::create('periodos', function (Blueprint $table) {
             $table->id();
-            $table->string('mes');
-            $table->string('axo');
-            $table->unique(['mes', 'axo'], 'unique_mes_anio_periodos');
+
+            $table->unsignedTinyInteger('mes_numero');
+            $table->string('mes', 20);
+            $table->year('axo');
+
+            $table->unique(['mes_numero', 'axo'], 'unique_mes_anio_periodos');
+
             $table->text('descripcion')->nullable();
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
-            $table->boolean('is_active');
+            $table->boolean('is_active')->default(true);
+
             $table->timestamps();
         });
     }

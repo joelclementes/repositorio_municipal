@@ -13,7 +13,36 @@ class PeriodosSeeder extends Seeder
      */
     public function run(): void
     {
-        $periodos = [
+
+        $anio = 2026;
+
+        $meses = [
+/*             1 => 'enero',
+            2 => 'febrero', */
+            3 => 'marzo',
+            4 => 'abril',
+            5 => 'mayo',
+            /* 6 => 'junio',
+            7 => 'julio',
+            8 => 'agosto',
+            9 => 'septiembre',
+            10 => 'octubre',
+            11 => 'noviembre',
+            12 => 'diciembre', */
+        ];
+
+        foreach ($meses as $numero => $nombre) {
+            Periodo::create([
+                'mes_numero' => $numero,
+                'mes' => $nombre,
+                'axo' => $anio,
+                'descripcion' => ucfirst($nombre) . ' ' . $anio,
+                'fecha_inicio' => now()->setDate($anio, $numero, 1)->startOfMonth()->toDateString(),
+                'fecha_fin' => now()->setDate($anio, $numero, 1)->endOfMonth()->toDateString(),
+                'is_active' => true,
+            ]);
+        }
+        /* $periodos = [
             [
                 'periodo_data' => [
                     'mes' => 'MARZO',
@@ -48,6 +77,6 @@ class PeriodosSeeder extends Seeder
 
         foreach ($periodos as $periodo) {
             Periodo::create($periodo['periodo_data']);
-        }
+        } */
     }
 }

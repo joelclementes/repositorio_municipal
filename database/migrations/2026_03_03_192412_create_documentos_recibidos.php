@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('documentos_recibidos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('ente_id');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('documentos_id');
-            $table->unsignedBigInteger('periodo_id');
+
+            $table->foreignId('ente_id')->constrained('entes');
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('documento_id')->constrained('documentos');
+            $table->foreignId('periodo_id')->constrained('periodos');
+
             $table->timestamps();
-            
-            $table->foreign('ente_id')->references('id')->on('entes');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('documentos_id')->references('id')->on('documentos');
-            $table->foreign('periodo_id')->references('id')->on('periodos');
+
+            $table->unique(
+                ['ente_id', 'documento_id', 'periodo_id'],
+                'unique_ente_documento_periodo'
+            );
         });
     }
 
