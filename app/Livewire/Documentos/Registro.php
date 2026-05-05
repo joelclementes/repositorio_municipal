@@ -93,12 +93,13 @@ class Registro extends Component
      */
     public function updatedPeriodosSeleccionados($periodoId)
     {
-        if (!$periodoId) {
-            return;
-        }
+        if ($periodoId) {
+            // Guardar en sesión si hay período seleccionado
+            session(['periodo_acuse' => $periodoId]);
 
-        $enteId = auth()->user()->ente_id;
+            $enteId = auth()->user()->ente_id;
 
+<<<<<<< HEAD
         if (!$enteId) {
             $this->dispatch('notificacion', 'El usuario no tiene un ente asociado', 'error');
             return;
@@ -122,13 +123,16 @@ class Registro extends Component
         $categoriasPermitidas = CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
             foreach ($rolesUsuario as $rol) {
                 $query->orWhereRaw("FIND_IN_SET(?, roles_permitidos)", [$rol]);
+=======
+            if (!$enteId) {
+                $this->dispatch('notificacion', 'El usuario no tiene un ente asociado', 'error');
+                return;
+>>>>>>> origin/Gabriel
             }
-        })->pluck('id');
 
-        if ($categoriasPermitidas->isEmpty()) {
-            return;
-        }
+            $rolesUsuario = auth()->user()->roles->pluck('name')->toArray();
 
+<<<<<<< HEAD
         $subcategorias = SubcategoriasDocumento::whereIn('categoria_id', $categoriasPermitidas)->pluck('id');
 
         if ($subcategorias->isEmpty()) {
@@ -159,14 +163,53 @@ class Registro extends Component
                         'documento_id' => $documento->id,
                         'periodo_id' => $periodoId,
                     ]);
+=======
+            $categoriasPermitidas = CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
+                foreach ($rolesUsuario as $rol) {
+                    $query->orWhereRaw("FIND_IN_SET(?, roles_permitidos)", [$rol]);
+>>>>>>> origin/Gabriel
                 }
+            })->pluck('id');
+
+            if ($categoriasPermitidas->isEmpty()) {
+                return;
             }
 
-            DB::commit();
-            // $this->dispatch('notificacion', 'Registros generados correctamente', 'success');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->dispatch('notificacion', 'Error al generar registros: ' . $e->getMessage(), 'error');
+            $subcategorias = SubcategoriasDocumento::whereIn('categoria_id', $categoriasPermitidas)->pluck('id');
+
+            if ($subcategorias->isEmpty()) {
+                return;
+            }
+
+            $documentos = Documento::whereIn('subcategoria_id', $subcategorias)->get();
+
+            DB::beginTransaction();
+
+            try {
+                foreach ($documentos as $documento) {
+                    $existe = DocumentosRecibido::where([
+                        'ente_id' => $enteId,
+                        'periodo_id' => $periodoId,
+                        'documentos_id' => $documento->id,
+                    ])->exists();
+
+                    if (!$existe) {
+                        DocumentosRecibido::create([
+                            'ente_id' => $enteId,
+                            'user_id' => auth()->id(),
+                            'documentos_id' => $documento->id,
+                            'periodo_id' => $periodoId,
+                        ]);
+                    }
+                }
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $this->dispatch('notificacion', 'Error al generar registros: ' . $e->getMessage(), 'error');
+            }
+        } else {
+            session()->forget('periodo_acuse');
         }
     }
 
