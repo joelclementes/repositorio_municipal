@@ -99,7 +99,6 @@ class Registro extends Component
 
             $enteId = auth()->user()->ente_id;
 
-<<<<<<< HEAD
         if (!$enteId) {
             $this->dispatch('notificacion', 'El usuario no tiene un ente asociado', 'error');
             return;
@@ -123,16 +122,10 @@ class Registro extends Component
         $categoriasPermitidas = CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
             foreach ($rolesUsuario as $rol) {
                 $query->orWhereRaw("FIND_IN_SET(?, roles_permitidos)", [$rol]);
-=======
-            if (!$enteId) {
-                $this->dispatch('notificacion', 'El usuario no tiene un ente asociado', 'error');
-                return;
->>>>>>> origin/Gabriel
             }
 
             $rolesUsuario = auth()->user()->roles->pluck('name')->toArray();
 
-<<<<<<< HEAD
         $subcategorias = SubcategoriasDocumento::whereIn('categoria_id', $categoriasPermitidas)->pluck('id');
 
         if ($subcategorias->isEmpty()) {
@@ -163,11 +156,6 @@ class Registro extends Component
                         'documento_id' => $documento->id,
                         'periodo_id' => $periodoId,
                     ]);
-=======
-            $categoriasPermitidas = CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
-                foreach ($rolesUsuario as $rol) {
-                    $query->orWhereRaw("FIND_IN_SET(?, roles_permitidos)", [$rol]);
->>>>>>> origin/Gabriel
                 }
             })->pluck('id');
 

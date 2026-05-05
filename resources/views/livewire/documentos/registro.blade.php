@@ -290,12 +290,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">
                                 Archivo {{ $tipoSubida }} *
                             </label>
-<<<<<<< HEAD
                             <input type="file" wire:model="archivo" {{-- Esto fuerza que el input se reinicie --}}
-=======
-                            <input type="file" wire:model="archivo"
-                                {{-- Esto fuerza que el input se reinicie --}}
->>>>>>> origin/Gabriel
                                 accept="{{ $tipoSubida === 'PDF' ? '.pdf' : '.xlsx,.xls,.csv' }}"
                                 class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-vino-50 file:text-vino-900 hover:file:bg-vino-100">
                             {{-- <input type="file" wire:model="archivo"
