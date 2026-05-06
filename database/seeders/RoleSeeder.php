@@ -30,7 +30,7 @@ class RoleSeeder extends Seeder
 
         Permission::create(['name' => 'registrar'])->syncRoles([$rolTesorero,$rolTesoreroOrganoDescentralizado,$rolDirectorObrasPublicas,$rolContralor,$rolSuperUsusario]);
 
-        Permission::create(['name' => 'revisar-documentos'])->syncRoles([$rolRevisor,$rolSuperUsusario]);
+        Permission::create(['name' => 'revisar-documentos'])->syncRoles([$rolRevisor,$rolSuperUsusario, $rolAdmin]);
 
         Permission::create(['name' => 'generar-reportes'])->syncRoles([$rolAdmin,$rolSuperUsusario]);
     }

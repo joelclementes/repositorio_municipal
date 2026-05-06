@@ -43,9 +43,25 @@ class Revision extends Component
 
     #[Computed]
     public function entesAsignados()
-    {
+    {        
+        $user = auth()->user();
+    
+        // Si es administrador, mostrar todos los entes
+        if ($user->hasRole('Administrador')) {  // Ajusta el nombre del rol según tu configuración
+            return \App\Models\Ente::orderBy('nombre')->get();
+        }
+        
+        // Si no es administrador, verificar si tiene ente asignado
+        if (!$user->ente) {
+            return collect();
+        }
+
+        // Retornar solo los entes asignados al usuario
+        return $user->entesAsignados()->orderBy('nombre')->get();
+
         // Asegúrate de tener este método en el modelo User
-        return auth()->user()->entesAsignados()->orderBy('nombre')->get();
+        //return auth()->user()->entesAsignados()->orderBy('nombre')->get();
+
     }
 
     #[Computed]
@@ -179,6 +195,29 @@ class Revision extends Component
         $this->mostrarPanelRechazo = true;
         $this->causaRechazoId = '';
         $this->observacionesRevisor = '';
+    }
+
+    public function autorizarReenvio($archivoId)
+    {
+        try {
+            $archivo = ArchivoDocumentoRecibido::find($archivoId);
+            
+            if (!$archivo) {
+                $this->dispatch('notificacion', 'Archivo no encontrado', 'error');
+                return;
+            }
+
+            if ($archivo) {
+                $archivo->update([
+                    'autorizado_reenviar' => 1,
+                ]);
+
+                $this->dispatch('notificacion', 'Reenvío autorizado, el archivo puede reenviarse nuevamente', 'success');
+                
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('notificacion', 'Error al autorizar el reenvío del archivo', 'error');
+        }
     }
 
     // public function mostrarPanelRechazo($archivoId)
