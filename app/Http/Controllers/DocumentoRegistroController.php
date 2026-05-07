@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\DocumentosRecibido;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Periodo;
+use Illuminate\Support\Facades\Log;
 
 class DocumentoRegistroController extends Controller
 {
@@ -16,33 +17,42 @@ class DocumentoRegistroController extends Controller
 
     public function acuse(Request $request)
     {
+        Log::info('--- INICIO DEL MÉTODO ACUSE ---');
+        
         // Obtener periodo_id de la query o sesión
         $periodoId = $request->query('periodo_id') ?? session('periodo_acuse');
 
+        // 🛑 MODIFICACIÓN 1: Ver si llega el periodo_id
         if (!$periodoId) {
-            return redirect()->route('documento.registro.index')
-                ->withErrors(['periodo' => 'Debes seleccionar un período primero.']);
+            dd(
+                '❌ ERROR EN PANTALLA: Tu petición llegó sin "periodo_id".',
+                '¿Qué venía en la URL/Request?', $request->all(),
+                '¿Qué hay guardado en la Sesión?', session()->all()
+            );
         }
 
         $periodo = Periodo::find($periodoId);
 
         if (!$periodo) {
-            return redirect()->route('documento.registro.index')
-                ->withErrors(['periodo' => 'El período seleccionado no es válido.']);
+            dd(
+                "❌ ERROR EN PANTALLA: Sí llegó un periodo_id ({$periodoId}), pero no existe en la tabla de periodos.",
+                "ID Buscado: " . $periodoId
+            );
         }
 
         $enteId = auth()->user()->ente_id;
         $ente = auth()->user()->ente;
 
+        // 🛑 MODIFICACIÓN 3: Ver si el usuario tiene ente
         if (!$ente) {
-            return redirect()->route('documento.registro.index')
-                ->withErrors(['ente' => 'El usuario no tiene un ente asociado.']);
+            dd(
+                "❌ ERROR EN PANTALLA: El usuario autenticado no tiene un Ente asociado en la BD.",
+                "Datos de tu usuario actual:", auth()->user()->toArray()
+            );
         }
 
-        // Obtener el tipo de ente
-        $tipoEnte = $ente->tipoEnte;
-
         // Construir nombre completo en mayúsculas: HONORABLE + TIPO + DE + NOMBRE
+        $tipoEnte = $ente->tipoEnte;
         $tipo = $tipoEnte ? strtoupper($tipoEnte->nombre) : '';
         $nombreEnte = strtoupper($ente->nombre);
 
@@ -97,22 +107,25 @@ class DocumentoRegistroController extends Controller
         $now = now();
         $numeroRecibo = $now->format('YmdHis') . sprintf('%03d', $now->milli);
 
-        // Descripción del período
         $periodoDescripcion = $periodo->descripcion;
 
         // Fecha de recepción (rango)
         $fechaRecepcion = $periodo->fecha_inicio_dma . ' al ' . $periodo->fecha_fin_dma;
 
-        $pdf = Pdf::loadView('pdf.acuse', [
-            'data'            => $data,
-            'numero_recibo'   => $numeroRecibo,
-            'periodo'         => $periodoDescripcion,
-            'nombre_ente'     => $nombreCompletoEnte,
-            'fecha_recepcion' => $fechaRecepcion,
-        ]);
-
-        $nombre_archivo = 'acuse_' . $periodo->axomes . '_' . $now->format('Ymd_His') . '.pdf';
-
-        return $pdf->download($nombre_archivo);
+        try {
+            $pdf = Pdf::loadView('pdf.acuse', [
+                'data'            => $data,
+                'numero_recibo'   => $numeroRecibo,
+                'periodo'         => $periodoDescripcion,
+                'nombre_ente'     => $nombreCompletoEnte,
+                'fecha_recepcion' => $fechaRecepcion,
+            ]);
+            
+            return $pdf->download('acuse_' . $now->format('Ymd_His') . '.pdf');
+            
+        } catch (\Exception $e) {
+            // Si DomPDF falla, también lo mostramos en pantalla gigante
+            dd("❌ ERROR AL GENERAR EL PDF CON DOMPDF:", $e->getMessage(), $e->getLine());
+        }
     }
 }

@@ -93,9 +93,14 @@ class Registro extends Component
      */
     public function updatedPeriodosSeleccionados($periodoId)
     {
+        // Si el usuario deselecciona el periodo (selecciona la opción vacía), limpiamos la sesión
         if (!$periodoId) {
+            session()->forget('periodo_acuse');
             return;
         }
+
+        // 👇 LA MAGIA OCURRE AQUÍ: Guardamos el ID en la sesión silenciosamente
+        session(['periodo_acuse' => $periodoId]);
 
         $enteId = auth()->user()->ente_id;
 
