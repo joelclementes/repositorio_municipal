@@ -70,7 +70,7 @@ class ReglasDocumentoService
         };
     }
 
-/*     public function debeRegistrarDocumentoEnPeriodo(Documento $documento, Periodo $periodo): bool
+    /*     public function debeRegistrarDocumentoEnPeriodo(Documento $documento, Periodo $periodo): bool
     {
         $mesPeriodo = (int) $periodo->mes_numero;
         $regla = $documento->regla_presentacion ?? 'todo_el_anio';
@@ -88,54 +88,59 @@ class ReglasDocumentoService
         };
     } */
 
-        public function debeRegistrarDocumentoEnPeriodo(Documento $documento, Periodo $periodo): bool
-{
-    $mesPeriodo = (int) $periodo->mes_numero;
-    $anioPeriodo = (int) $periodo->axo;
+    public function debeRegistrarDocumentoEnPeriodo(Documento $documento, Periodo $periodo): bool
+    {
 
-    $hoy = now();
+        // Esta línea se debe eliminar o comentar si se quieren mostrar estrictamente los documentos que se deben
+        // subir según las reglas
+        return true;
 
-    $regla = $documento->regla_presentacion ?? 'todo_el_anio';
+        $mesPeriodo = (int) $periodo->mes_numero;
+        $anioPeriodo = (int) $periodo->axo;
 
-    return match ($regla) {
-        'trimestral_ene_abr_jul_oct' =>
+        $hoy = now();
+
+        $regla = $documento->regla_presentacion ?? 'todo_el_anio';
+
+        return match ($regla) {
+            'trimestral_ene_abr_jul_oct' =>
             in_array($mesPeriodo, [1, 4, 7, 10], true),
 
-        'dia_1_mes' =>
+            'dia_1_mes' =>
             $hoy->year === $anioPeriodo
-            && $hoy->month === $mesPeriodo
-            && $hoy->day === 1,
+                && $hoy->month === $mesPeriodo
+                && $hoy->day === 1,
 
-        'dias_16_25_mes' =>
+            'dias_16_25_mes' =>
             $hoy->year === $anioPeriodo
-            && $hoy->month === $mesPeriodo
-            && $hoy->day >= 16
-            && $hoy->day <= 25,
+                && $hoy->month === $mesPeriodo
+                && $hoy->day >= 16
+                && $hoy->day <= 25,
 
-        'enero_1_31' =>
+            'enero_1_31' =>
             $mesPeriodo === 1,
 
-        'marzo_1_31' =>
+            'marzo_1_31' =>
             $mesPeriodo === 3,
 
-        'abril_1_30' =>
+            'abril_1_30' =>
             $mesPeriodo === 4,
 
-        'enero_abril' =>
+            'enero_abril' =>
             $mesPeriodo >= 1 && $mesPeriodo <= 4,
 
-        'septiembre_15_30' =>
+            'septiembre_15_30' =>
             $mesPeriodo === 9,
 
-        'enero_1_a_marzo_31' =>
+            'enero_1_a_marzo_31' =>
             $mesPeriodo >= 1 && $mesPeriodo <= 3,
 
-        'todo_el_anio' =>
+            'todo_el_anio' =>
             true,
 
-        default => true,
-    };
-}
+            default => true,
+        };
+    }
 
     public function evaluarBloqueoPorReglaYSubidaPrevia(
         Documento $documento,
