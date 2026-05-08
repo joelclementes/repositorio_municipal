@@ -26,8 +26,30 @@ class Periodo extends Model
         'is_active' => 'boolean',
     ];
 
+    public function getFechaInicioDmaAttribute(): ?string
+    {
+        return $this->fecha_inicio
+            ? $this->fecha_inicio->format('d-m-Y')
+            : null;
+    }
+
+    public function getFechaFinDmaAttribute(): ?string
+    {
+        return $this->fecha_fin
+            ? $this->fecha_fin->format('d-m-Y')
+            : null;
+    }
+
     public function getMesNombreAttribute()
     {
         return $this->mes ?? 'Desconocido';
+    }
+    public function getAxoMesAttribute(): string
+    {
+        return sprintf(
+            '%02d%02d',
+            $this->axo,
+            $this->mes_numero
+        );
     }
 }

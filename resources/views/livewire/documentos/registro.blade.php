@@ -12,6 +12,13 @@
             @endforeach
         </select>
 
+        @if ($periodosSeleccionados)
+            <a href="{{ route('documento.registro.acuse', ['periodo_id' => $periodosSeleccionados]) }}"
+                class="inline-flex items-center px-4 py-2 mt-4 bg-vino-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-vino-800">
+                Descargar acuse
+            </a>
+        @endif
+
         {{-- Select de Categorías --}}
         <select
             class="w-full px-3 py-2 text-sm border border-vino-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 transition-colors mt-3"

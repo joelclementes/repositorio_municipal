@@ -9,72 +9,23 @@ use App\Models\Periodo;
 
 class DocumentoRegistroController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('documento.registro');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 
     public function acuse(Request $request)
     {
         // Obtener periodo_id de la query o sesión
         $periodoId = $request->query('periodo_id') ?? session('periodo_acuse');
+
         if (!$periodoId) {
             return redirect()->route('documento.registro.index')
-            ->withErrors(['periodo' => 'Debes seleccionar un período primero.']);
-            }
+                ->withErrors(['periodo' => 'Debes seleccionar un período primero.']);
+        }
 
-            $periodo = Periodo::find($periodoId);
+        $periodo = Periodo::find($periodoId);
+
         if (!$periodo) {
             return redirect()->route('documento.registro.index')
                 ->withErrors(['periodo' => 'El período seleccionado no es válido.']);
@@ -102,9 +53,9 @@ class DocumentoRegistroController extends Controller
 
         // Obtener documentos recibidos
         $documentosRecibidos = DocumentosRecibido::with(['documento', 'archivos'])
-                                ->where('ente_id', $enteId)
-                                ->where('periodo_id', $periodoId)
-                                ->get();
+            ->where('ente_id', $enteId)
+            ->where('periodo_id', $periodoId)
+            ->get();
 
         $data = [];
 
@@ -150,7 +101,7 @@ class DocumentoRegistroController extends Controller
         $periodoDescripcion = $periodo->descripcion;
 
         // Fecha de recepción (rango)
-        $fechaRecepcion = $periodo->fecha_inicio . ' al ' . $periodo->fecha_fin;
+        $fechaRecepcion = $periodo->fecha_inicio_dma . ' al ' . $periodo->fecha_fin_dma;
 
         $pdf = Pdf::loadView('pdf.acuse', [
             'data'            => $data,
@@ -160,7 +111,8 @@ class DocumentoRegistroController extends Controller
             'fecha_recepcion' => $fechaRecepcion,
         ]);
 
-        return $pdf->download('acuse_' . $now->format('Ymd_His') . '.pdf');
-    }
+        $nombre_archivo = 'acuse_' . $periodo->axomes . '_' . $now->format('Ymd_His') . '.pdf';
 
+        return $pdf->download($nombre_archivo);
+    }
 }
