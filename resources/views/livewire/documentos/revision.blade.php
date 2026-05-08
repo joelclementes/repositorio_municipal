@@ -132,9 +132,11 @@
                         </div>
 
                         {{-- Cards individuales por cada archivo --}}
-                        @foreach ($archivos as $archivo)
+                        {{-- @foreach ($archivos as $archivo) --}}
+                        @foreach ($archivos->where('autorizado_reenviar', '!=', 2) as $archivo)
                             @php
                                 $estado_archivo = $archivo->estado_nombre;
+                                $autorizado_reenviar = $archivo->autorizado_reenviar;
                                 $extension = pathinfo($archivo->nombre, PATHINFO_EXTENSION);
                                 // $esPendiente = $estado_archivo === 'Recibido';
                                 $esPendiente = in_array($estado_archivo, [
@@ -265,6 +267,28 @@
                                                 <span
                                                     class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                                                     Rechazar
+                                                </span>
+                                            </div>
+                                        @endif
+
+                                        {{-- Botón Autorizar reenvío (solo si está rechazado y el usuario es administrador) --}}
+                                        {{-- @if ($estado_archivo === 'Rechazado' && auth()->user()->hasRole('Administrador') && $autorizado_reenviar===0) --}}
+                                        @if ($estado_archivo === 'Rechazado' && $autorizado_reenviar!=2 && auth()->user()->hasRole('Administrador'))
+                                            <div class="relative group">
+                                                <button type="button"
+                                                    wire:click="autorizarReenvio({{ $archivo->id }})"
+                                                    class="w-9 h-9 rounded-full bg-gray-200 hover:bg-blue-600 text-gray-500 hover:text-white transition-all duration-200 flex items-center justify-center shadow-sm"
+                                                    title="Autorizar reenvío">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m0 0L14.5 3m0 0L11.5 6M14.5 3v12" />
+                                                    </svg>
+                                                </button>
+                                                <span
+                                                    class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                    Autorizar reenvío
                                                 </span>
                                             </div>
                                         @endif

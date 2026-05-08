@@ -275,7 +275,7 @@ class Registro extends Component
             // Si existe y tiene autorizado_reenviar = 1, actualizar a 0
             if ($archivoExistente && $archivoExistente->autorizado_reenviar == 1) {
                 $archivoExistente->update([
-                    'autorizado_reenviar' => 0
+                    'autorizado_reenviar' => 2
                 ]);
             }
 
@@ -371,7 +371,7 @@ class Registro extends Component
         ]);
     }
 
-    public function estadoSubidaPorRegla(\App\Models\DocumentosRecibido $documentoRecibido, string $tipoRecepcion): array
+    public function estadoSubidaPorRegla(DocumentosRecibido $documentoRecibido, string $tipoRecepcion): array
     {
         $periodo = \App\Models\Periodo::find($this->periodosSeleccionados);
 
