@@ -75,7 +75,6 @@ class DocumentoRegistroController extends Controller
             }
 
             $periodo = Periodo::find($periodoId);
-            dd($periodo);
         if (!$periodo) {
             return redirect()->route('documento.registro.index')
                 ->withErrors(['periodo' => 'El período seleccionado no es válido.']);
