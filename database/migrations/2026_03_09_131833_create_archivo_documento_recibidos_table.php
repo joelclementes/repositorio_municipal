@@ -26,7 +26,7 @@ return new class extends Migration
             $table->unsignedBigInteger('estado_id');
             $table->text('observaciones_revisor')->nullable();
             $table->unsignedBigInteger('causas_rechazo_id')->nullable();
-            $table->boolean('autorizado_reenviar')->default(false);
+            $table->boolean('autorizado_reenviar')->default(false)->comment('0=No autorizado, 1=Autoizado, 2=Autoizado y ya se reeinvió');
 
 
             $table->timestamps();
