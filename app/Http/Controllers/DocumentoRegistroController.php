@@ -69,13 +69,13 @@ class DocumentoRegistroController extends Controller
     {
         // Obtener periodo_id de la query o sesión
         $periodoId = $request->query('periodo_id') ?? session('periodo_acuse');
-
         if (!$periodoId) {
             return redirect()->route('documento.registro.index')
-                ->withErrors(['periodo' => 'Debes seleccionar un período primero.']);
-        }
+            ->withErrors(['periodo' => 'Debes seleccionar un período primero.']);
+            }
 
-        $periodo = Periodo::find($periodoId);
+            $periodo = Periodo::find($periodoId);
+            dd($periodo);
         if (!$periodo) {
             return redirect()->route('documento.registro.index')
                 ->withErrors(['periodo' => 'El período seleccionado no es válido.']);
@@ -95,9 +95,9 @@ class DocumentoRegistroController extends Controller
         // Construir nombre completo en mayúsculas: HONORABLE + TIPO + DE + NOMBRE
         $tipo = $tipoEnte ? strtoupper($tipoEnte->nombre) : '';
         $nombreEnte = strtoupper($ente->nombre);
-        
+
         // Si hay tipo, se incluye; si no, solo "HONORABLE DE NOMBRE"
-        $nombreCompletoEnte = $tipo 
+        $nombreCompletoEnte = $tipo
             ? "HONORABLE {$tipo} DE {$nombreEnte}"
             : "HONORABLE DE {$nombreEnte}";
 
