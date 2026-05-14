@@ -143,24 +143,26 @@
                 @can('generar-reportes')
                     <div
                         class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <div class="px-4 py-3" style="background-color: #b64747;">
-                            <h2 class="text-white font-bold text-lg flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                                    </path>
-                                </svg>
-                                Generar Reportes
-                            </h2>
-                        </div>
-                        <div class="p-4">
-                            <ul class="space-y-2">
-                                <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
-                                    <span class="w-2 h-2 rounded-full mr-2" style="background-color: #b64747;"></span>
-                                    Módulo para la elaboración de reportes personalizados a partir de los datos capturados en el sistema.
-                                </li>
-                            </ul>
-                        </div>
+                        <a href="{{ route('reportes.index') }}">
+                            <div class="px-4 py-3" style="background-color: #b64747;">
+                                <h2 class="text-white font-bold text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                        </path>
+                                    </svg>
+                                    Generar Reportes
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
+                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #b64747;"></span>
+                                        Módulo para la elaboración de reportes personalizados a partir de los datos capturados en el sistema.
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
                     </div>
                 @endcan
                 @can('administrar')
