@@ -14,11 +14,23 @@ class ReporteController extends Controller
 {
     public function index()
     {
-        return view('reportes.index');
+        // Obtener los años disponibles en los periodos
+        $anios = DB::table('periodos')
+            ->select('axo')
+            ->distinct()
+            ->orderBy('axo', 'desc')
+            ->pluck('axo');
+
+        return view('reportes.index', compact('anios'));
     }
 
-    public function export()
+    public function export(Request $request)
     {
+        $request->validate([
+            'anio' => 'required|integer'
+        ]);
+
+        $anioSeleccionado = $request->input('anio');
         // Obtener tipo de ente 'Municipio'
         $tipoMunicipio = DB::table('tipos_entes')->where('nombre', 'Municipio')->first();
         if (!$tipoMunicipio) {
@@ -31,8 +43,9 @@ class ReporteController extends Controller
             ->orderBy('id')
             ->get();
 
-        // Obtener Periodos
+        // Obtener Periodos del año seleccionado
         $periodos = DB::table('periodos')
+            ->where('axo', $anioSeleccionado)
             ->orderBy('id') // O ordenar por fecha_inicio
             ->get();
 
@@ -57,7 +70,7 @@ class ReporteController extends Controller
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Reporte General');
+        $sheet->setTitle('Reporte General ' . $anioSeleccionado);
 
         // Configurar las columnas iniciales
         $sheet->setCellValue('A1', 'No.');
@@ -257,7 +270,7 @@ class ReporteController extends Controller
 
         // Crear el archivo
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'Reporte_General_Municipios_' . date('Ymd_His') . '.xlsx';
+        $fileName = 'Reporte_General_Municipios_' . $anioSeleccionado . '_' . date('Ymd_His') . '.xlsx';
         $tempFile = tempnam(sys_get_temp_dir(), 'excel');
         $writer->save($tempFile);
 
