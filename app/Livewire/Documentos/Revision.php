@@ -30,6 +30,8 @@ class Revision extends Component
 
     public $causasRechazo = [];
 
+    public $mostrarPanelAprobacion = false;
+
     public function mount()
     {
         $this->causasRechazo = CausaRechazo::orderBy('descripcion')->get();
@@ -43,14 +45,14 @@ class Revision extends Component
 
     #[Computed]
     public function entesAsignados()
-    {        
+    {
         $user = auth()->user();
-    
+
         // Si es administrador, mostrar todos los entes
         if ($user->hasRole('Administrador')) {  // Ajusta el nombre del rol según tu configuración
             return \App\Models\Ente::orderBy('nombre')->get();
         }
-        
+
         // Si no es administrador, verificar si tiene ente asignado
         if (!$user->ente) {
             return collect();
@@ -157,29 +159,29 @@ class Revision extends Component
         $this->dispatch('actualizar-visorpdf');
     }
 
-    public function aprobarArchivo($archivoId)
-    {
-        try {
-            $archivo = ArchivoDocumentoRecibido::find($archivoId);
-            $estadoAprobado = Estado::where('nombre', 'Aprobado')->value('id');
+    // public function aprobarArchivo($archivoId)
+    // {
+    //     try {
+    //         $archivo = ArchivoDocumentoRecibido::find($archivoId);
+    //         $estadoAprobado = Estado::where('nombre', 'Aprobado')->value('id');
 
-            if ($archivo) {
-                $archivo->update([
-                    'usuario_revisor' => auth()->id(),
-                    'estado_id' => $estadoAprobado,
-                    'observaciones_revisor' => null,
-                    'causas_rechazo_id' => null,
-                    'fecha_cambio_estatus' => now(),
-                ]);
+    //         if ($archivo) {
+    //             $archivo->update([
+    //                 'usuario_revisor' => auth()->id(),
+    //                 'estado_id' => $estadoAprobado,
+    //                 'observaciones_revisor' => null,
+    //                 'causas_rechazo_id' => null,
+    //                 'fecha_cambio_estatus' => now(),
+    //             ]);
 
-                $this->dispatch('notificacion', 'Archivo aprobado correctamente', 'success');
-                $this->archivoEnRevision = null;
-                $this->reset(['mostrarPanelRechazo', 'archivoSeleccionado', 'causaRechazoId', 'observacionesRevisor']);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('notificacion', 'Error al aprobar el archivo', 'error');
-        }
-    }
+    //             $this->dispatch('notificacion', 'Archivo aprobado correctamente', 'success');
+    //             $this->archivoEnRevision = null;
+    //             $this->reset(['mostrarPanelRechazo', 'archivoSeleccionado', 'causaRechazoId', 'observacionesRevisor']);
+    //         }
+    //     } catch (\Exception $e) {
+    //         $this->dispatch('notificacion', 'Error al aprobar el archivo', 'error');
+    //     }
+    // }
 
     public function mostrarElPanelRechazo($archivoId)
     {
@@ -201,7 +203,7 @@ class Revision extends Component
     {
         try {
             $archivo = ArchivoDocumentoRecibido::find($archivoId);
-            
+
             if (!$archivo) {
                 $this->dispatch('notificacion', 'Archivo no encontrado', 'error');
                 return;
@@ -213,7 +215,7 @@ class Revision extends Component
                 ]);
 
                 $this->dispatch('notificacion', 'Reenvío autorizado, el archivo puede reenviarse nuevamente', 'success');
-                
+
             }
         } catch (\Exception $e) {
             $this->dispatch('notificacion', 'Error al autorizar el reenvío del archivo', 'error');
@@ -278,9 +280,66 @@ class Revision extends Component
         $this->reset(['mostrarPanelRechazo', 'archivoSeleccionado', 'causaRechazoId', 'observacionesRevisor']);
     }
 
+
+public function mostrarElPanelAprobacion($archivoId)
+{
+    $archivo = ArchivoDocumentoRecibido::find($archivoId);
+
+    if (!$archivo) {
+        $this->dispatch('notificacion', 'Archivo no encontrado', 'error');
+        return;
+    }
+
+    $this->archivoSeleccionado = $archivo;
+    $this->mostrarPanelAprobacion = true;
+    $this->observacionesRevisor = $archivo->observaciones_revisor ?? '';
+}
+
+public function aprobarArchivo()
+{
+    $this->validate([
+        'observacionesRevisor' => 'nullable|string|max:500',
+    ]);
+
+    try {
+        $estadoAprobado = Estado::where('nombre', 'Aprobado')->value('id');
+
+        if ($this->archivoSeleccionado) {
+            $this->archivoSeleccionado->update([
+                'usuario_revisor' => auth()->id(),
+                'estado_id' => $estadoAprobado,
+                'observaciones_revisor' => $this->observacionesRevisor,
+                'causas_rechazo_id' => null,
+                'fecha_cambio_estatus' => now(),
+            ]);
+
+            $this->dispatch('notificacion', 'Archivo aprobado correctamente', 'success');
+
+            $this->archivoEnRevision = null;
+
+            $this->reset([
+                'mostrarPanelAprobacion',
+                'archivoSeleccionado',
+                'observacionesRevisor',
+            ]);
+        }
+    } catch (\Exception $e) {
+        $this->dispatch('notificacion', 'Error al aprobar el archivo', 'error');
+    }
+}
+
+public function cancelarAprobacion()
+{
+    $this->reset([
+        'mostrarPanelAprobacion',
+        'archivoSeleccionado',
+        'observacionesRevisor',
+    ]);
+}
+
     public function render()
     {
-        return view('livewire.documentos.revision');
+    return view('livewire.documentos.revision');
     }
 
     public function debug($archivoId)
