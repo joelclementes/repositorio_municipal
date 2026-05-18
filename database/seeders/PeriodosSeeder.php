@@ -42,6 +42,20 @@ class PeriodosSeeder extends Seeder
                 'is_active' => true,
             ]);
         }
+
+        // Agregar periodo para 2025 para pruebas
+        $anio2025 = 2025;
+        foreach ($meses as $numero => $nombre) {
+            Periodo::create([
+                'mes_numero' => $numero,
+                'mes' => $nombre,
+                'axo' => $anio2025,
+                'descripcion' => ucfirst($nombre) . ' ' . $anio2025,
+                'fecha_inicio' => now()->setDate($anio2025, $numero, 1)->startOfMonth()->toDateString(),
+                'fecha_fin' => now()->setDate($anio2025, $numero, 1)->endOfMonth()->toDateString(),
+                'is_active' => true,
+            ]);
+        }
         /* $periodos = [
             [
                 'periodo_data' => [
