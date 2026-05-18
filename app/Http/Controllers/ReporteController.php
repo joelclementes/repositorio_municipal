@@ -26,8 +26,12 @@ class ReporteController extends Controller
 
     public function export(Request $request)
     {
+        if (!$request->filled('anio')) {
+            return redirect()->back()->with('error', 'Debes seleccionar un año válido. Si la lista está vacía, no hay periodos registrados para generar el reporte.');
+        }
+
         $request->validate([
-            'anio' => 'required|integer'
+            'anio' => 'integer'
         ]);
 
         $anioSeleccionado = $request->input('anio');
