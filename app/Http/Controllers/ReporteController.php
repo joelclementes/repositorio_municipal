@@ -49,15 +49,24 @@ class ReporteController extends Controller
             ->orderBy('id') // O ordenar por fecha_inicio
             ->get();
 
+        if ($periodos->isEmpty()) {
+            return redirect()->back()->with('error', 'No hay periodos registrados para el año seleccionado.');
+        }
+
         // Obtener Documentos (pueden venir con su categoría para colorear o agrupar)
         // Para coincidir con la solicitud, usaremos los documentos
         $documentos = DB::table('documentos')->orderBy('id')->get();
 
+        if ($municipios->isEmpty() || $documentos->isEmpty()) {
+            return redirect()->back()->with('error', 'No hay información para mostrar.');
+        }
+
         // Precargar documentos recibidos validados con archivo (relacionando las tablas)
-        // Solo traemos los que tienen un archivo asociado
+        // Solo traemos los que tienen un archivo asociado y que pertenecen a los periodos del año
         $entregas = DB::table('documentos_recibidos')
             ->join('archivo_documento_recibidos', 'documentos_recibidos.id', '=', 'archivo_documento_recibidos.documento_recibido_id')
             ->select('documentos_recibidos.ente_id', 'documentos_recibidos.documento_id', 'documentos_recibidos.periodo_id')
+            ->whereIn('documentos_recibidos.periodo_id', $periodos->pluck('id'))
             ->distinct()
             ->get();
 
