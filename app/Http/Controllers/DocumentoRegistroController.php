@@ -22,10 +22,10 @@ class DocumentoRegistroController extends Controller
         // Obtener periodo_id de la query o sesión
         $periodoId = $request->query('periodo_id') ?? session('periodo_acuse');
 
-        // 🛑 MODIFICACIÓN 1: Ver si llega el periodo_id
+        // MODIFICACIÓN 1: Ver si llega el periodo_id
         if (!$periodoId) {
             dd(
-                '❌ ERROR EN PANTALLA: Tu petición llegó sin "periodo_id".',
+                'ERROR EN PANTALLA: Tu petición llegó sin "periodo_id".',
                 '¿Qué venía en la URL/Request?', $request->all(),
                 '¿Qué hay guardado en la Sesión?', session()->all()
             );
@@ -35,7 +35,7 @@ class DocumentoRegistroController extends Controller
 
         if (!$periodo) {
             dd(
-                "❌ ERROR EN PANTALLA: Sí llegó un periodo_id ({$periodoId}), pero no existe en la tabla de periodos.",
+                "ERROR EN PANTALLA: Sí llegó un periodo_id ({$periodoId}), pero no existe en la tabla de periodos.",
                 "ID Buscado: " . $periodoId
             );
         }
@@ -43,10 +43,10 @@ class DocumentoRegistroController extends Controller
         $enteId = auth()->user()->ente_id;
         $ente = auth()->user()->ente;
 
-        // 🛑 MODIFICACIÓN 3: Ver si el usuario tiene ente
+        // MODIFICACIÓN 3: Ver si el usuario tiene ente
         if (!$ente) {
             dd(
-                "❌ ERROR EN PANTALLA: El usuario autenticado no tiene un Ente asociado en la BD.",
+                "ERROR EN PANTALLA: El usuario autenticado no tiene un Ente asociado en la BD.",
                 "Datos de tu usuario actual:", auth()->user()->toArray()
             );
         }
@@ -75,14 +75,7 @@ class DocumentoRegistroController extends Controller
 
             $archivos = $docRecibido->archivos;
 
-            if ($archivos->isEmpty()) {
-                $data[] = [
-                    'documento_validado' => $documento->clave . ' ' . $documento->nombre,
-                    'tipo_archivo'       => '-',
-                    'fecha'              => '-',
-                    'hora'               => '-',
-                ];
-            } else {
+            if ($archivos->isNotEmpty()) {
                 foreach ($archivos as $archivo) {
                     $data[] = [
                         'documento_validado' => $documento->clave . ' ' . $documento->nombre,
