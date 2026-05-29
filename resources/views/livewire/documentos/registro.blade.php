@@ -1,7 +1,7 @@
 <div>
     <div class="w-1/3 mx-auto mb-6">
         {{-- Select de Periodos --}}
-        <select dusk="periodosSeleccionados"
+        <select
             class="w-full px-3 py-2 text-sm border border-vino-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white"
             required wire:model.live="periodosSeleccionados">
             <option value="" class="text-gray-500">📅 Seleccione un periodo</option>
@@ -31,7 +31,7 @@
         @endif
 
         {{-- Select de Categorías --}}
-        <select dusk="categoriaSeleccionada"
+        <select
             class="w-full px-3 py-2 text-sm border border-vino-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 transition-colors mt-3"
             required wire:model.live="categoriaSeleccionada" {{ !$periodosSeleccionados ? 'disabled' : '' }}>
             @if (!$periodosSeleccionados)
@@ -47,7 +47,7 @@
         </select>
 
         {{-- Select de Subcategorías --}}
-        <select dusk="subcategoriaSeleccionada"
+        <select
             class="w-full px-3 py-2 text-sm border border-vino-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-vino-900 focus:border-vino-900 bg-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 transition-colors mt-3"
             name="subcategoria" wire:model.live="subcategoriaSeleccionada"
             {{ !$categoriaSeleccionada ? 'disabled' : '' }}>
@@ -244,7 +244,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">
                                 Archivo {{ $tipoSubida }} *
                             </label>
-                            <input type="file" wire:model="archivo" dusk="archivoInput"
+                            <input type="file" wire:model="archivo" 
                                 {{-- Esto fuerza que el input se reinicie --}}
                                 accept="{{ $tipoSubida === 'PDF' ? '.pdf' : '.xlsx,.xls,.csv' }}"
                                 class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-vino-50 file:text-vino-900 hover:file:bg-vino-100">
