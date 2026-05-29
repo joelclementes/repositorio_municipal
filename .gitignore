@@ -37,3 +37,7 @@ auth.json
 docker-compose.yml
 docker/
 database/migrations/2026_03_11_125501_add_unique_mes_anio_to_periodos_table.php
+
+# Dusk environments
+.env.dusk.local
+
