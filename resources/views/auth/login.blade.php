@@ -45,7 +45,7 @@
 
     <x-authentication-card>
         <x-slot name="logo">
-            {{-- <x-authentication-card-logo /> --}}
+            <img src="{{ env('APP_LOGO_LEGISLATURA') }}" alt="Logo" class="w-48 h-auto object-contain mx-auto">
         </x-slot>
 
         {{-- SOLUCIÓN: Mostrar solo UN componente de errores --}}
@@ -73,9 +73,6 @@
                 </p>
             </div>
         @endif
-
-
-        <img src="{{ env('APP_LOGO_LEGISLATURA') }}" alt="Logo" class="w-45 h-45">
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
