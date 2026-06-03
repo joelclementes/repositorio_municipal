@@ -118,7 +118,7 @@ class DocumentoRegistroController extends Controller
             
         } catch (\Exception $e) {
             // Si DomPDF falla, también lo mostramos en pantalla gigante
-            dd("❌ ERROR AL GENERAR EL PDF CON DOMPDF:", $e->getMessage(), $e->getLine());
+            dd("ERROR AL GENERAR EL PDF CON DOMPDF:", $e->getMessage(), $e->getLine());
         }
     }
 }
