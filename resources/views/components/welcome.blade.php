@@ -131,7 +131,7 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#5eb2c6] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #5eb2c6;"></span>
-                                        Módulo que permite consultar y validar la documentación enviada por los entes obligados, facilitando 
+                                        Módulo que permite consultar y validar la documentación enviada por los entes obligados, facilitando
                                         la supervisión del cumplimiento normativo y la calidad de la información recibida.
                                     </li>
                                 </ul>
@@ -143,7 +143,7 @@
                 @can('generar-reportes')
                     <div
                         class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <a href="{{ route('reportes.index') }}">
+                        <a href="{{ route('reportes.obligaciones.index') }}">
                             <div class="px-4 py-3" style="background-color: #b64747;">
                                 <h2 class="text-white font-bold text-lg flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,7 +184,7 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #8974bf;"></span>
-                                        Módulo que permite crear y enviar comunicados oficiales, notificaciones o recordatorios a los entes obligados, 
+                                        Módulo que permite crear y enviar comunicados oficiales, notificaciones o recordatorios a los entes obligados,
                                         agilizando la comunicación institucional y el cumplimiento de plazos establecidos.
                                     </li>
                                 </ul>
@@ -198,7 +198,7 @@
                             <div class="px-4 py-3" style="background-color: #74c26e;">
                                 <h2 class="text-white font-bold text-lg flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     Administrar Períodos
@@ -208,7 +208,7 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #74c26e;"></span>
-                                        Módulo para la configuración y gestión de los períodos de reporte, asegurando que la información se 
+                                        Módulo para la configuración y gestión de los períodos de reporte, asegurando que la información se
                                         registre conforme a los calendarios establecidos por el Congreso.
                                     </li>
                                 </ul>
@@ -222,7 +222,7 @@
                             <div class="px-4 py-3" style="background-color: #d5b55d;">
                                 <h2 class="text-white font-bold text-lg flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                     </svg>
                                     Asigación de Entes
@@ -232,7 +232,7 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #d5b55d;"></span>
-                                        Módulo para la administración de los entes obligados, permitiendo asociar 
+                                        Módulo para la administración de los entes obligados, permitiendo asociar
                                         responsabilidades a usuarios según corresponda a cada uno.
                                     </li>
                                 </ul>
@@ -246,7 +246,7 @@
                             <div class="px-4 py-3" style="background-color: #e84a4a;">
                                 <h2 class="text-white font-bold text-lg flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     Avances Revisores
