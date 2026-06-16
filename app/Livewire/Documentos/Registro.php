@@ -83,6 +83,24 @@ class Registro extends Component
             ->get();
     }
 
+    #[Computed]
+    public function tieneEntregasEnPeriodo()
+    {
+        if (!$this->periodosSeleccionados) {
+            return false;
+        }
+
+        $enteId = auth()->user()->ente_id;
+        if (!$enteId) {
+            return false;
+        }
+
+        return DocumentosRecibido::where('ente_id', $enteId)
+            ->where('periodo_id', $this->periodosSeleccionados)
+            ->has('archivos')
+            ->exists();
+    }
+
     public function updatedCategoriaSeleccionada()
     {
         $this->subcategoriaSeleccionada = '';

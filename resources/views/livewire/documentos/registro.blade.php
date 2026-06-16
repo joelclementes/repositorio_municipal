@@ -13,10 +13,21 @@
         </select>
 
         @if ($periodosSeleccionados)
-            <a href="{{ route('documento.registro.acuse', ['periodo_id' => $periodosSeleccionados]) }}"
-                class="inline-flex items-center px-4 py-2 mt-4 bg-vino-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-vino-800">
-                Descargar acuse
-            </a>
+            @if ($this->tieneEntregasEnPeriodo)
+                <a href="{{ route('documento.registro.acuse', ['periodo_id' => $periodosSeleccionados]) }}"
+                    class="inline-flex items-center px-4 py-2 mt-4 bg-vino-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-vino-800">
+                    Descargar acuse
+                </a>
+            @else
+                <button disabled
+                    class="inline-flex items-center px-4 py-2 mt-4 bg-vino-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest opacity-50 cursor-not-allowed">
+                    Descargar acuse
+                </button>
+                <div x-data="{ show: true }" x-show="show" class="mt-3 relative px-4 py-3 text-yellow-800 bg-yellow-100 border border-yellow-400 rounded-md shadow-sm" role="alert">
+                    <strong class="font-bold">Aviso: </strong>
+                    <span class="block sm:inline text-yellow-900">No hay documentos entregados en este periodo para generar el acuse.</span>
+                </div>
+            @endif
         @endif
 
         {{-- Select de Categorías --}}
