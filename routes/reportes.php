@@ -2,8 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReporteObligacionesController;
+use App\Http\Controllers\ReporteController;
 
 Route::middleware('can:generar-reportes')->group(function () {
+
+    Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    Route::get('/reportes/exportar', [ReporteController::class, 'export'])->name('reportes.export');
 
     Route::get('/reportes/obligaciones', function () {
         return view('reportes.reporte');
