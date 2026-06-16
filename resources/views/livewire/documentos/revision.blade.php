@@ -1,4 +1,3 @@
-
 <div>
     <div class="w-1/3 mx-auto mb-6">
         {{-- Select de Periodos --}}
@@ -577,4 +576,4 @@ Confirmar aprobación
                 animation: fade-in-down 0.3s ease-out;
                 }
                 </style>
-                </div>)
+                </div>
