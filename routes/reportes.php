@@ -6,7 +6,17 @@ use App\Http\Controllers\ReporteController;
 
 Route::middleware('can:generar-reportes')->group(function () {
 
-    Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    // Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    Route::get('/reportes', function () {
+        return view('reportes.index-cards');
+    })->name('reportes.index');
+
+    //  Route::get('/reportes/general', function () {
+    //     return view('reportes.index');
+    // })->name('reportes.general');
+
+    Route::get('/reportes/general', [ReporteController::class, 'index'])->name('reportes.general');
+
     Route::get('/reportes/exportar', [ReporteController::class, 'export'])->name('reportes.export');
 
     Route::get('/reportes/obligaciones', function () {
