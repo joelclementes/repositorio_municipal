@@ -132,20 +132,23 @@
 
     <div class="titulo-documento">
         <div class="titulo1">ACUSE DE ACEPTACIÓN DE DOCUMENTOS</div>
-        <div class="titulo2">INTEGRACIÓN DEL ESTADO FINANCIERO MENSUAL</div>
+        <div class="titulo2">{{ mb_strtoupper($nombre_categoria ?? 'DOCUMENTOS DEL PERIODO') }}</div>
         <div class="detalle"><strong>PERIODO:</strong> {{ $periodo ?? 'XXXX' }}</div>
         <div class="detalle"><strong>FECHA DE RECEPCIÓN:</strong> {{ $fecha_recepcion ?? 'XXXX' }}</div>
     </div>
 
-    @if(count($data) > 0 && !empty($data[0]['documento_validado']))
+    @if(count($data) > 0 && !empty($data[0]['documento']))
         <table>
             <thead>
                 <tr>
-                    <th rowspan="2">Documento validado</th>
+                    <th rowspan="2">Documento</th>
                     <th rowspan="2">Tipo de archivo</th>
+                    <th colspan="2">RECEPCIÓN</th>
                     <th colspan="2">ACEPTACIÓN</th>
                 </tr>
                 <tr>
+                    <th>FECHA</th>
+                    <th>HORA</th>
                     <th>FECHA</th>
                     <th>HORA</th>
                 </tr>
@@ -153,10 +156,16 @@
             <tbody>
                 @foreach($data as $row)
                 <tr>
-                    <td>{{ $row['documento_validado'] }}</td>
+                    <td>{{ $row['documento'] }}</td>
                     <td>{{ $row['tipo_archivo'] }}</td>
-                    <td>{{ $row['fecha'] }}</td>
-                    <td>{{ $row['hora'] }}</td>
+                    <td>{{ $row['fecha_recepcion'] }}</td>
+                    <td>{{ $row['hora_recepcion'] }}</td>
+                    @if($row['es_aprobado'] ?? false)
+                        <td>{{ $row['fecha_aceptacion'] }}</td>
+                        <td>{{ $row['hora_aceptacion'] }}</td>
+                    @else
+                        <td colspan="2" style="text-align: center; color: #555;">-</td>
+                    @endif
                 </tr>
                 @endforeach
             </tbody>
