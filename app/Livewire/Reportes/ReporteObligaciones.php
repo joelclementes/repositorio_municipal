@@ -17,6 +17,17 @@ class ReporteObligaciones extends Component
     public $enteSeleccionado = '';
     public $axoSeleccionado = '';
 
+    // --- Estado de filtros ---
+    public array $categoriasSeleccionadas    = [];
+    public array $subcategoriasSeleccionadas = [];
+    public array $documentosSeleccionados    = [];
+    public bool  $mostrarFiltros             = false;
+    public bool  $tieneFiltrosActivos        = false;
+
+    // -------------------------------------------------------------------------
+    // Datos básicos del formulario
+    // -------------------------------------------------------------------------
+
     #[Computed]
     public function entes()
     {
@@ -38,21 +49,275 @@ class ReporteObligaciones extends Component
         if (!$this->axoSeleccionado) {
             return collect();
         }
-
         return Periodo::where('axo', $this->axoSeleccionado)
             ->orderBy('mes_numero')
             ->get();
     }
 
-    public function updatedEnteSeleccionado()
+    // -------------------------------------------------------------------------
+    // Datos para el panel de filtros
+    // -------------------------------------------------------------------------
+
+    #[Computed]
+    public function todasLasCategorias()
     {
-        // Reset when ente changes
+        return CategoriasDocumento::orderBy('nombre')->get();
     }
 
-    public function updatedAxoSeleccionado()
+    /** Subcategorías disponibles según categorías actualmente seleccionadas */
+    #[Computed]
+    public function subcategoriasDisponibles()
     {
-        // Reset when year changes
+        $q = SubcategoriasDocumento::orderBy('nombre');
+        if (!empty($this->categoriasSeleccionadas)) {
+            $q->whereIn('categoria_id', $this->categoriasSeleccionadas);
+        }
+        return $q->get();
     }
+
+    /** Documentos disponibles según subcategorías actualmente seleccionadas */
+    #[Computed]
+    public function documentosDisponibles()
+    {
+        $q = Documento::orderBy('nombre');
+        if (!empty($this->subcategoriasSeleccionadas)) {
+            $q->whereIn('subcategoria_id', $this->subcategoriasSeleccionadas);
+        } elseif (!empty($this->categoriasSeleccionadas)) {
+            // Si hay categorías pero ninguna subcategoría seleccionada, no hay documentos
+            return collect();
+        }
+        return $q->get();
+    }
+
+    // -------------------------------------------------------------------------
+    // URLs de exportación con filtros
+    // -------------------------------------------------------------------------
+
+    #[Computed]
+    public function urlPdf(): string
+    {
+        $params = ['ente' => $this->enteSeleccionado, 'axo' => $this->axoSeleccionado];
+        if ($this->tieneFiltrosActivos) {
+            $params['categorias']    = $this->categoriasSeleccionadas;
+            $params['subcategorias'] = $this->subcategoriasSeleccionadas;
+            $params['documentos']    = $this->documentosSeleccionados;
+        }
+        return route('reportes.obligaciones.pdf') . '?' . http_build_query($params);
+    }
+
+    #[Computed]
+    public function urlExcel(): string
+    {
+        $params = ['ente' => $this->enteSeleccionado, 'axo' => $this->axoSeleccionado];
+        if ($this->tieneFiltrosActivos) {
+            $params['categorias']    = $this->categoriasSeleccionadas;
+            $params['subcategorias'] = $this->subcategoriasSeleccionadas;
+            $params['documentos']    = $this->documentosSeleccionados;
+        }
+        return route('reportes.obligaciones.excel') . '?' . http_build_query($params);
+    }
+
+    // -------------------------------------------------------------------------
+    // Contadores para el panel
+    // -------------------------------------------------------------------------
+
+    #[Computed]
+    public function totalCategorias(): int
+    {
+        return CategoriasDocumento::count();
+    }
+
+    #[Computed]
+    public function totalSubcategorias(): int
+    {
+        if (!empty($this->categoriasSeleccionadas)) {
+            return SubcategoriasDocumento::whereIn('categoria_id', $this->categoriasSeleccionadas)->count();
+        }
+        return SubcategoriasDocumento::count();
+    }
+
+    #[Computed]
+    public function totalDocumentos(): int
+    {
+        if (!empty($this->subcategoriasSeleccionadas)) {
+            return Documento::whereIn('subcategoria_id', $this->subcategoriasSeleccionadas)->count();
+        }
+        return Documento::count();
+    }
+
+    // -------------------------------------------------------------------------
+    // Lifecycle hooks
+    // -------------------------------------------------------------------------
+
+    public function updatedEnteSeleccionado(): void
+    {
+        $this->inicializarFiltros();
+    }
+
+    public function updatedAxoSeleccionado(): void
+    {
+        $this->inicializarFiltros();
+    }
+
+    private function inicializarFiltros(): void
+    {
+        $this->categoriasSeleccionadas    = CategoriasDocumento::pluck('id')->map(fn($id) => (int) $id)->toArray();
+        $this->subcategoriasSeleccionadas = SubcategoriasDocumento::pluck('id')->map(fn($id) => (int) $id)->toArray();
+        $this->documentosSeleccionados    = Documento::pluck('id')->map(fn($id) => (int) $id)->toArray();
+        $this->tieneFiltrosActivos        = false;
+        $this->mostrarFiltros             = false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Acciones del panel de filtros
+    // -------------------------------------------------------------------------
+
+    public function toggleFiltros(): void
+    {
+        $this->mostrarFiltros = !$this->mostrarFiltros;
+    }
+
+    // --- Categorías ---
+
+    public function toggleCategoria(int $id): void
+    {
+        if (in_array($id, $this->categoriasSeleccionadas)) {
+            // Desmarcar + cascada hacia abajo
+            $this->categoriasSeleccionadas = array_values(
+                array_filter($this->categoriasSeleccionadas, fn($c) => $c !== $id)
+            );
+            $subs = SubcategoriasDocumento::where('categoria_id', $id)
+                ->pluck('id')->map(fn($i) => (int) $i)->toArray();
+            $this->subcategoriasSeleccionadas = array_values(
+                array_filter($this->subcategoriasSeleccionadas, fn($s) => !in_array($s, $subs))
+            );
+            if (!empty($subs)) {
+                $docs = Documento::whereIn('subcategoria_id', $subs)
+                    ->pluck('id')->map(fn($i) => (int) $i)->toArray();
+                $this->documentosSeleccionados = array_values(
+                    array_filter($this->documentosSeleccionados, fn($d) => !in_array($d, $docs))
+                );
+            }
+        } else {
+            // Marcar + cascada hacia abajo (agrega sus hijos)
+            $this->categoriasSeleccionadas[] = $id;
+            $subs = SubcategoriasDocumento::where('categoria_id', $id)
+                ->pluck('id')->map(fn($i) => (int) $i)->toArray();
+            $this->subcategoriasSeleccionadas = array_values(
+                array_unique(array_merge($this->subcategoriasSeleccionadas, $subs))
+            );
+            if (!empty($subs)) {
+                $docs = Documento::whereIn('subcategoria_id', $subs)
+                    ->pluck('id')->map(fn($i) => (int) $i)->toArray();
+                $this->documentosSeleccionados = array_values(
+                    array_unique(array_merge($this->documentosSeleccionados, $docs))
+                );
+            }
+        }
+        $this->tieneFiltrosActivos = true;
+    }
+
+    public function seleccionarTodasCategorias(): void
+    {
+        $this->inicializarFiltros();
+        $this->tieneFiltrosActivos = false;
+    }
+
+    public function limpiarCategorias(): void
+    {
+        $this->categoriasSeleccionadas    = [];
+        $this->subcategoriasSeleccionadas = [];
+        $this->documentosSeleccionados    = [];
+        $this->tieneFiltrosActivos        = true;
+    }
+
+    // --- Subcategorías ---
+
+    public function toggleSubcategoria(int $id): void
+    {
+        if (in_array($id, $this->subcategoriasSeleccionadas)) {
+            $this->subcategoriasSeleccionadas = array_values(
+                array_filter($this->subcategoriasSeleccionadas, fn($s) => $s !== $id)
+            );
+            $docs = Documento::where('subcategoria_id', $id)
+                ->pluck('id')->map(fn($i) => (int) $i)->toArray();
+            $this->documentosSeleccionados = array_values(
+                array_filter($this->documentosSeleccionados, fn($d) => !in_array($d, $docs))
+            );
+        } else {
+            $this->subcategoriasSeleccionadas[] = $id;
+            $docs = Documento::where('subcategoria_id', $id)
+                ->pluck('id')->map(fn($i) => (int) $i)->toArray();
+            $this->documentosSeleccionados = array_values(
+                array_unique(array_merge($this->documentosSeleccionados, $docs))
+            );
+        }
+        $this->tieneFiltrosActivos = true;
+    }
+
+    public function seleccionarTodasSubcategorias(): void
+    {
+        $q = SubcategoriasDocumento::query();
+        if (!empty($this->categoriasSeleccionadas)) {
+            $q->whereIn('categoria_id', $this->categoriasSeleccionadas);
+        }
+        $subs = $q->pluck('id')->map(fn($i) => (int) $i)->toArray();
+        $this->subcategoriasSeleccionadas = $subs;
+
+        $docs = empty($subs)
+            ? []
+            : Documento::whereIn('subcategoria_id', $subs)->pluck('id')->map(fn($i) => (int) $i)->toArray();
+        $this->documentosSeleccionados = $docs;
+        $this->tieneFiltrosActivos     = true;
+    }
+
+    public function limpiarSubcategorias(): void
+    {
+        $this->subcategoriasSeleccionadas = [];
+        $this->documentosSeleccionados    = [];
+        $this->tieneFiltrosActivos        = true;
+    }
+
+    // --- Documentos ---
+
+    public function toggleDocumento(int $id): void
+    {
+        if (in_array($id, $this->documentosSeleccionados)) {
+            $this->documentosSeleccionados = array_values(
+                array_filter($this->documentosSeleccionados, fn($d) => $d !== $id)
+            );
+        } else {
+            $this->documentosSeleccionados[] = $id;
+        }
+        $this->tieneFiltrosActivos = true;
+    }
+
+    public function seleccionarTodosDocumentos(): void
+    {
+        $q = Documento::query();
+        if (!empty($this->subcategoriasSeleccionadas)) {
+            $q->whereIn('subcategoria_id', $this->subcategoriasSeleccionadas);
+        }
+        $this->documentosSeleccionados = $q->pluck('id')->map(fn($i) => (int) $i)->toArray();
+        $this->tieneFiltrosActivos     = true;
+    }
+
+    public function limpiarDocumentos(): void
+    {
+        $this->documentosSeleccionados = [];
+        $this->tieneFiltrosActivos     = true;
+    }
+
+    // --- Reset global ---
+
+    public function limpiarTodosFiltros(): void
+    {
+        $this->inicializarFiltros();
+    }
+
+    // -------------------------------------------------------------------------
+    // Lógica de cálculo (sin cambios respecto al original)
+    // -------------------------------------------------------------------------
 
     /**
      * Determina si un documento aplica en un mes dado según su regla_presentacion
@@ -62,27 +327,25 @@ class ReporteObligaciones extends Component
         $regla = $documento->regla_presentacion ?? 'todo_el_anio';
 
         return match ($regla) {
-            'todo_el_anio' => true,
+            'todo_el_anio'               => true,
             'trimestral_ene_abr_jul_oct' => in_array($mesNumero, [1, 4, 7, 10]),
-            'dia_1_mes' => true, // Aplica todos los meses, pero solo el día 1
-            'dias_16_25_mes' => true, // Aplica todos los meses, pero solo días 16-25
-            'enero_abril' => $mesNumero >= 1 && $mesNumero <= 4,
-            'septiembre_15_30' => $mesNumero === 9,
-            'enero_1_a_marzo_31' => $mesNumero >= 1 && $mesNumero <= 3,
-            'enero_1_31' => $mesNumero === 1,
-            'marzo_1_31' => $mesNumero === 3,
-            'abril_1_30' => $mesNumero === 4,
-            default => true,
+            'dia_1_mes'                  => true,
+            'dias_16_25_mes'             => true,
+            'enero_abril'                => $mesNumero >= 1 && $mesNumero <= 4,
+            'septiembre_15_30'           => $mesNumero === 9,
+            'enero_1_a_marzo_31'         => $mesNumero >= 1 && $mesNumero <= 3,
+            'enero_1_31'                 => $mesNumero === 1,
+            'marzo_1_31'                 => $mesNumero === 3,
+            'abril_1_30'                 => $mesNumero === 4,
+            default                      => true,
         };
     }
 
     /**
      * Determina el tipo de periodo para mostrar encabezados apropiados
-     * 'mensual' = ene-dic, 'trimestral' = 1er-4to trim, etc.
      */
     private function getTipoPeriodoSubcategoria(int $subcategoriaId, $documentos): string
     {
-        // Verificar si todos los documentos de la subcategoría son trimestrales
         $reglas = $documentos->pluck('regla_presentacion')->unique();
 
         if ($reglas->count() === 1 && $reglas->first() === 'trimestral_ene_abr_jul_oct') {
@@ -97,60 +360,38 @@ class ReporteObligaciones extends Component
      */
     private function calcularEstadoDocumento(int $enteId, int $documentoId, ?int $periodoId, Documento $documento, int $mesNumero): array
     {
-        // Si el documento no aplica en este mes, marcar como gris
         if (!$this->documentoAplicaEnMes($documento, $mesNumero)) {
-            return [
-                'estado' => '',
-                'clase' => 'no-aplica',
-            ];
+            return ['estado' => '', 'clase' => 'no-aplica'];
         }
 
         if (!$periodoId) {
-            return [
-                'estado' => '',
-                'clase' => 'no-aplica',
-            ];
+            return ['estado' => '', 'clase' => 'no-aplica'];
         }
 
-        // Buscar el documento_recibido
         $documentoRecibido = DocumentosRecibido::where('ente_id', $enteId)
             ->where('documento_id', $documentoId)
             ->where('periodo_id', $periodoId)
             ->first();
 
         if (!$documentoRecibido) {
-            return [
-                'estado' => 'NP',
-                'clase' => 'no-presentado',
-            ];
+            return ['estado' => 'NP', 'clase' => 'no-presentado'];
         }
 
-        // Contar archivos totales y aprobados
-        $archivos = ArchivoDocumentoRecibido::where('documento_recibido_id', $documentoRecibido->id)->get();
+        $archivos      = ArchivoDocumentoRecibido::where('documento_recibido_id', $documentoRecibido->id)->get();
         $totalArchivos = $archivos->count();
 
         if ($totalArchivos === 0) {
-            return [
-                'estado' => 'NP',
-                'clase' => 'no-presentado',
-            ];
+            return ['estado' => 'NP', 'clase' => 'no-presentado'];
         }
 
-        // estado_id = 3 es "Aprobado" según el seeder
-        $aprobados = $archivos->where('estado_id', 3)->count();
+        $aprobados  = $archivos->where('estado_id', 3)->count();
         $porcentaje = ($aprobados / $totalArchivos) * 100;
 
         if ($porcentaje >= 80) {
-            return [
-                'estado' => 'P',
-                'clase' => 'presentado',
-            ];
+            return ['estado' => 'P', 'clase' => 'presentado'];
         }
 
-        return [
-            'estado' => 'NP',
-            'clase' => 'no-presentado',
-        ];
+        return ['estado' => 'NP', 'clase' => 'no-presentado'];
     }
 
     /**
@@ -170,15 +411,14 @@ class ReporteObligaciones extends Component
                 continue;
             }
 
-            // Obtener archivos rechazados con sus causas
             $archivosRechazados = ArchivoDocumentoRecibido::where('documento_recibido_id', $documentoRecibido->id)
-                ->where('estado_id', 4) // Rechazado
+                ->where('estado_id', 4)
                 ->with('causaRechazo')
                 ->orderBy('created_at', 'asc')
                 ->get();
 
             foreach ($archivosRechazados as $archivo) {
-                $texto = '';
+                $texto     = '';
                 $mesNombre = $periodo->mes ?? 'Mes ' . $periodo->mes_numero;
 
                 if ($archivo->causaRechazo) {
@@ -193,19 +433,20 @@ class ReporteObligaciones extends Component
                     $observaciones[] = [
                         'texto' => $texto,
                         'fecha' => $archivo->created_at,
-                        'mes' => $mesNombre,
+                        'mes'   => $mesNombre,
                     ];
                 }
             }
         }
 
-        // Ordenar por fecha
-        usort($observaciones, function ($a, $b) {
-            return $a['fecha'] <=> $b['fecha'];
-        });
+        usort($observaciones, fn($a, $b) => $a['fecha'] <=> $b['fecha']);
 
         return $observaciones;
     }
+
+    // -------------------------------------------------------------------------
+    // Computed: Datos del reporte (con filtros aplicados)
+    // -------------------------------------------------------------------------
 
     #[Computed]
     public function datosReporte()
@@ -214,116 +455,121 @@ class ReporteObligaciones extends Component
             return null;
         }
 
-        $ente = Ente::find($this->enteSeleccionado);
+        $ente    = Ente::find($this->enteSeleccionado);
         $periodos = $this->periodosDelAxo;
 
         if (!$ente || $periodos->isEmpty()) {
             return null;
         }
 
-        // Mapear periodos por mes_numero para acceso rápido
         $periodosPorMes = $periodos->keyBy('mes_numero');
 
-        // Obtener todas las categorías con sus subcategorías y documentos
-        $categorias = CategoriasDocumento::with([
+        // --- Categorías (con filtro) ---
+        $categoriasQuery = CategoriasDocumento::with([
             'subcategorias' => function ($query) {
                 $query->orderBy('id');
             },
-            'subcategorias.categoria'
-        ])->orderBy('id')->get();
+            'subcategorias.categoria',
+        ])->orderBy('id');
 
-        $resultado = [];
+        if ($this->tieneFiltrosActivos) {
+            if (empty($this->categoriasSeleccionadas)) {
+                return ['ente' => $ente, 'axo' => $this->axoSeleccionado, 'categorias' => []];
+            }
+            $categoriasQuery->whereIn('id', $this->categoriasSeleccionadas);
+        }
+
+        $categorias = $categoriasQuery->get();
+        $resultado  = [];
 
         foreach ($categorias as $categoria) {
             $subcategoriasData = [];
+            $subcategorias     = $categoria->subcategorias;
 
-            foreach ($categoria->subcategorias as $subcategoria) {
-                $documentos = Documento::where('subcategoria_id', $subcategoria->id)
-                    ->orderBy('id')
-                    ->get();
+            // Filtro de subcategorías
+            if ($this->tieneFiltrosActivos) {
+                if (empty($this->subcategoriasSeleccionadas)) {
+                    continue;
+                }
+                $subcategorias = $subcategorias->whereIn('id', $this->subcategoriasSeleccionadas);
+            }
+
+            foreach ($subcategorias as $subcategoria) {
+                $documentosQuery = Documento::where('subcategoria_id', $subcategoria->id)->orderBy('id');
+
+                // Filtro de documentos
+                if ($this->tieneFiltrosActivos) {
+                    if (empty($this->documentosSeleccionados)) {
+                        continue;
+                    }
+                    $documentosQuery->whereIn('id', $this->documentosSeleccionados);
+                }
+
+                $documentos = $documentosQuery->get();
 
                 if ($documentos->isEmpty()) {
                     continue;
                 }
 
-                $tipoPeriodo = $this->getTipoPeriodoSubcategoria($subcategoria->id, $documentos);
+                $tipoPeriodo  = $this->getTipoPeriodoSubcategoria($subcategoria->id, $documentos);
                 $documentosData = [];
 
                 foreach ($documentos as $documento) {
                     $meses = [];
 
                     if ($tipoPeriodo === 'trimestral') {
-                        // Para documentos trimestrales, mostrar 4 trimestres
-                        $trimestres = [
-                            1 => [1],    // 1er Trimestre -> enero
-                            2 => [4],    // 2do Trimestre -> abril
-                            3 => [7],    // 3er Trimestre -> julio
-                            4 => [10],   // 4to Trimestre -> octubre
-                        ];
-
+                        $trimestres = [1 => [1], 2 => [4], 3 => [7], 4 => [10]];
                         foreach ($trimestres as $numTrim => $mesesTrim) {
-                            $mesRef = $mesesTrim[0];
+                            $mesRef    = $mesesTrim[0];
                             $periodoId = $periodosPorMes->get($mesRef)?->id;
-
                             $meses[$numTrim] = $this->calcularEstadoDocumento(
-                                $ente->id,
-                                $documento->id,
-                                $periodoId,
-                                $documento,
-                                $mesRef
+                                $ente->id, $documento->id, $periodoId, $documento, $mesRef
                             );
                         }
                     } else {
-                        // Para documentos mensuales, mostrar 12 meses
                         for ($mes = 1; $mes <= 12; $mes++) {
                             $periodoId = $periodosPorMes->get($mes)?->id;
-
                             $meses[$mes] = $this->calcularEstadoDocumento(
-                                $ente->id,
-                                $documento->id,
-                                $periodoId,
-                                $documento,
-                                $mes
+                                $ente->id, $documento->id, $periodoId, $documento, $mes
                             );
                         }
                     }
 
-                    // Obtener observaciones acumuladas
                     $observaciones = $this->obtenerObservaciones($ente->id, $documento->id, $periodos);
 
                     $documentosData[] = [
-                        'id' => $documento->id,
-                        'clave' => $documento->clave,
-                        'nombre' => $documento->nombre,
-                        'regla' => $documento->regla_presentacion,
-                        'meses' => $meses,
-                        'observaciones' => $observaciones,
+                        'id'           => $documento->id,
+                        'clave'        => $documento->clave,
+                        'nombre'       => $documento->nombre,
+                        'regla'        => $documento->regla_presentacion,
+                        'meses'        => $meses,
+                        'observaciones'=> $observaciones,
                     ];
                 }
 
                 if (!empty($documentosData)) {
                     $subcategoriasData[] = [
-                        'id' => $subcategoria->id,
-                        'nombre' => $subcategoria->nombre,
-                        'tipo_periodo' => $tipoPeriodo,
-                        'documentos' => $documentosData,
+                        'id'          => $subcategoria->id,
+                        'nombre'      => $subcategoria->nombre,
+                        'tipo_periodo'=> $tipoPeriodo,
+                        'documentos'  => $documentosData,
                     ];
                 }
             }
 
             if (!empty($subcategoriasData)) {
                 $resultado[] = [
-                    'id' => $categoria->id,
-                    'nombre' => $categoria->nombre,
-                    'clave' => $categoria->clave,
-                    'subcategorias' => $subcategoriasData,
+                    'id'           => $categoria->id,
+                    'nombre'       => $categoria->nombre,
+                    'clave'        => $categoria->clave,
+                    'subcategorias'=> $subcategoriasData,
                 ];
             }
         }
 
         return [
-            'ente' => $ente,
-            'axo' => $this->axoSeleccionado,
+            'ente'       => $ente,
+            'axo'        => $this->axoSeleccionado,
             'categorias' => $resultado,
         ];
     }
@@ -337,7 +583,6 @@ class ReporteObligaciones extends Component
         if (!$this->enteSeleccionado) {
             return '';
         }
-
         return Ente::find($this->enteSeleccionado)?->nombre ?? '';
     }
 

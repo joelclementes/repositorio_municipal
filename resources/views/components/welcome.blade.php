@@ -143,7 +143,8 @@
                 @can('generar-reportes')
                     <div
                         class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <a href="{{ route('reportes.obligaciones.index') }}">
+                        {{-- <a href="{{ route('reportes.obligaciones.index') }}"> --}}
+                        <a href="{{ route('reportes.index') }}">
                             <div class="px-4 py-3" style="background-color: #b64747;">
                                 <h2 class="text-white font-bold text-lg flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
