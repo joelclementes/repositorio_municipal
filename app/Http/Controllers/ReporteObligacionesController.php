@@ -20,11 +20,21 @@ use PhpOffice\PhpSpreadsheet\Style\Font;
 class ReporteObligacionesController extends Controller
 {
     /**
-     * Genera los datos del reporte para un ente y año dados
+     * Genera los datos del reporte para un ente y año dados.
+     * Acepta filtros opcionales de categorías, subcategorías y documentos.
+     *
+     * @param array $categoriaIds    IDs de categorías a incluir (vacío = todas)
+     * @param array $subcategoriaIds IDs de subcategorías a incluir (vacío = todas)
+     * @param array $documentoIds    IDs de documentos a incluir (vacío = todos)
      */
-    private function generarDatosReporte(int $enteId, int $axo): ?array
-    {
-        $ente = Ente::find($enteId);
+    private function generarDatosReporte(
+        int $enteId,
+        int $axo,
+        array $categoriaIds    = [],
+        array $subcategoriaIds = [],
+        array $documentoIds    = []
+    ): ?array {
+        $ente    = Ente::find($enteId);
         $periodos = Periodo::where('axo', $axo)->orderBy('mes_numero')->get();
 
         if (!$ente || $periodos->isEmpty()) {
@@ -33,25 +43,43 @@ class ReporteObligacionesController extends Controller
 
         $periodosPorMes = $periodos->keyBy('mes_numero');
 
-        $categorias = CategoriasDocumento::with([
+        // --- Categorías (con filtro opcional) ---
+        $categoriasQuery = CategoriasDocumento::with([
             'subcategorias' => function ($query) {
                 $query->orderBy('id');
             }
-        ])->orderBy('id')->get();
+        ])->orderBy('id');
 
-        $resultado = [];
+        if (!empty($categoriaIds)) {
+            $categoriasQuery->whereIn('id', $categoriaIds);
+        }
+
+        $categorias = $categoriasQuery->get();
+        $resultado  = [];
 
         foreach ($categorias as $categoria) {
             $subcategoriasData = [];
+            $subcategorias     = $categoria->subcategorias;
 
-            foreach ($categoria->subcategorias as $subcategoria) {
-                $documentos = Documento::where('subcategoria_id', $subcategoria->id)
-                    ->orderBy('id')
-                    ->get();
+            // Filtro de subcategorías
+            if (!empty($subcategoriaIds)) {
+                $subcategorias = $subcategorias->whereIn('id', $subcategoriaIds);
+            }
+
+            foreach ($subcategorias as $subcategoria) {
+                // Filtro de documentos
+                $documentosQuery = Documento::where('subcategoria_id', $subcategoria->id)
+                    ->orderBy('id');
+
+                if (!empty($documentoIds)) {
+                    $documentosQuery->whereIn('id', $documentoIds);
+                }
+
+                $documentos = $documentosQuery->get();
 
                 if ($documentos->isEmpty()) continue;
 
-                $tipoPeriodo = $this->getTipoPeriodoSubcategoria($documentos);
+                $tipoPeriodo    = $this->getTipoPeriodoSubcategoria($documentos);
                 $documentosData = [];
 
                 foreach ($documentos as $documento) {
@@ -60,7 +88,7 @@ class ReporteObligacionesController extends Controller
                     if ($tipoPeriodo === 'trimestral') {
                         $trimestres = [1 => [1], 2 => [4], 3 => [7], 4 => [10]];
                         foreach ($trimestres as $numTrim => $mesesTrim) {
-                            $mesRef = $mesesTrim[0];
+                            $mesRef    = $mesesTrim[0];
                             $periodoId = $periodosPorMes->get($mesRef)?->id;
                             $meses[$numTrim] = $this->calcularEstadoDocumento($ente->id, $documento->id, $periodoId, $documento, $mesRef);
                         }
@@ -74,38 +102,38 @@ class ReporteObligacionesController extends Controller
                     $observaciones = $this->obtenerObservaciones($ente->id, $documento->id, $periodos);
 
                     $documentosData[] = [
-                        'id' => $documento->id,
-                        'clave' => $documento->clave,
-                        'nombre' => $documento->nombre,
-                        'regla' => $documento->regla_presentacion,
-                        'meses' => $meses,
+                        'id'            => $documento->id,
+                        'clave'         => $documento->clave,
+                        'nombre'        => $documento->nombre,
+                        'regla'         => $documento->regla_presentacion,
+                        'meses'         => $meses,
                         'observaciones' => $observaciones,
                     ];
                 }
 
                 if (!empty($documentosData)) {
                     $subcategoriasData[] = [
-                        'id' => $subcategoria->id,
-                        'nombre' => $subcategoria->nombre,
+                        'id'           => $subcategoria->id,
+                        'nombre'       => $subcategoria->nombre,
                         'tipo_periodo' => $tipoPeriodo,
-                        'documentos' => $documentosData,
+                        'documentos'   => $documentosData,
                     ];
                 }
             }
 
             if (!empty($subcategoriasData)) {
                 $resultado[] = [
-                    'id' => $categoria->id,
-                    'nombre' => $categoria->nombre,
-                    'clave' => $categoria->clave,
-                    'subcategorias' => $subcategoriasData,
+                    'id'           => $categoria->id,
+                    'nombre'       => $categoria->nombre,
+                    'clave'        => $categoria->clave,
+                    'subcategorias'=> $subcategoriasData,
                 ];
             }
         }
 
         return [
-            'ente' => $ente,
-            'axo' => $axo,
+            'ente'       => $ente,
+            'axo'        => $axo,
             'categorias' => $resultado,
         ];
     }
@@ -219,11 +247,17 @@ class ReporteObligacionesController extends Controller
     }
 
     /**
-     * Exportar a PDF
+     * Exportar a PDF (respeta filtros opcionales: categorias[], subcategorias[], documentos[])
      */
     public function exportarPdf(Request $request)
     {
-        $datos = $this->generarDatosReporte((int) $request->ente, (int) $request->axo);
+        $datos = $this->generarDatosReporte(
+            (int) $request->ente,
+            (int) $request->axo,
+            array_map('intval', $request->input('categorias', [])),
+            array_map('intval', $request->input('subcategorias', [])),
+            array_map('intval', $request->input('documentos', []))
+        );
 
         if (!$datos) {
             return back()->with('error', 'No se encontraron datos para generar el reporte.');
@@ -242,11 +276,17 @@ class ReporteObligacionesController extends Controller
     }
 
     /**
-     * Exportar a Excel
+     * Exportar a Excel (respeta filtros opcionales: categorias[], subcategorias[], documentos[])
      */
     public function exportarExcel(Request $request)
     {
-        $datos = $this->generarDatosReporte((int) $request->ente, (int) $request->axo);
+        $datos = $this->generarDatosReporte(
+            (int) $request->ente,
+            (int) $request->axo,
+            array_map('intval', $request->input('categorias', [])),
+            array_map('intval', $request->input('subcategorias', [])),
+            array_map('intval', $request->input('documentos', []))
+        );
 
         if (!$datos) {
             return back()->with('error', 'No se encontraron datos para generar el reporte.');
