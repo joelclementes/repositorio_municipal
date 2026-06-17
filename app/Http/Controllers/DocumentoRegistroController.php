@@ -61,10 +61,27 @@ class DocumentoRegistroController extends Controller
             ? "HONORABLE {$tipo} DE {$nombreEnte}"
             : "HONORABLE DE {$nombreEnte}";
 
-        // Obtener documentos recibidos
-        $documentosRecibidos = DocumentosRecibido::with(['documento', 'archivos'])
+        // Obtener roles y categorías permitidas
+        $rolesUsuario = auth()->user()->roles->pluck('name')->toArray();
+
+        $categoriasPermitidas = \App\Models\CategoriasDocumento::where(function ($query) use ($rolesUsuario) {
+            foreach ($rolesUsuario as $rol) {
+                $query->orWhereRaw("FIND_IN_SET(?, roles_permitidos)", [$rol]);
+            }
+        })->get();
+
+        $nombresCategorias = $categoriasPermitidas->pluck('nombre')->implode(', ');
+        $subcategoriasIds = \App\Models\SubcategoriasDocumento::whereIn('categoria_id', $categoriasPermitidas->pluck('id'))->pluck('id');
+
+        $estadoAprobadoId = \App\Models\Estado::where('nombre', 'Aprobado')->value('id');
+
+        // Obtener documentos recibidos filtrados por subcategorías permitidas
+        $documentosRecibidos = DocumentosRecibido::with(['documento', 'archivos.estado'])
             ->where('ente_id', $enteId)
             ->where('periodo_id', $periodoId)
+            ->whereHas('documento', function($query) use ($subcategoriasIds) {
+                 $query->whereIn('subcategoria_id', $subcategoriasIds);
+            })
             ->get();
 
         $data = [];
@@ -77,11 +94,26 @@ class DocumentoRegistroController extends Controller
 
             if ($archivos->isNotEmpty()) {
                 foreach ($archivos as $archivo) {
+                    $fechaAceptacion = '';
+                    $horaAceptacion = '';
+                    $esAprobado = false;
+                    $nombreEstado = $archivo->estado ? $archivo->estado->nombre : 'Sin estado';
+
+                    if ($archivo->estado_id == $estadoAprobadoId) {
+                        $fechaAceptacion = $archivo->fecha_cambio_estatus ? $archivo->fecha_cambio_estatus->format('d/m/Y') : ($archivo->updated_at ? $archivo->updated_at->format('d/m/Y') : '');
+                        $horaAceptacion = $archivo->updated_at ? $archivo->updated_at->format('H:i:s') : '';
+                        $esAprobado = true;
+                    }
+
                     $data[] = [
-                        'documento_validado' => $documento->clave . ' ' . $documento->nombre,
+                        'documento'          => $documento->clave . ' ' . $documento->nombre,
                         'tipo_archivo'       => $archivo->tipo_recepcion,
-                        'fecha'              => $archivo->created_at->format('d/m/Y'),
-                        'hora'               => $archivo->created_at->format('H:i:s'),
+                        'fecha_recepcion'    => $archivo->created_at->format('d/m/Y'),
+                        'hora_recepcion'     => $archivo->created_at->format('H:i:s'),
+                        'fecha_aceptacion'   => $fechaAceptacion,
+                        'hora_aceptacion'    => $horaAceptacion,
+                        'es_aprobado'        => $esAprobado,
+                        'nombre_estado'      => $nombreEstado,
                     ];
                 }
             }
@@ -89,10 +121,14 @@ class DocumentoRegistroController extends Controller
 
         if (empty($data)) {
             $data[] = [
-                'documento_validado' => 'No hay documentos para el período seleccionado.',
+                'documento' => 'No hay documentos para el período seleccionado.',
                 'tipo_archivo' => '',
-                'fecha' => '',
-                'hora' => ''
+                'fecha_recepcion' => '',
+                'hora_recepcion' => '',
+                'fecha_aceptacion' => '',
+                'hora_aceptacion' => '',
+                'es_aprobado' => false,
+                'nombre_estado' => ''
             ];
         }
 
@@ -112,6 +148,7 @@ class DocumentoRegistroController extends Controller
                 'periodo'         => $periodoDescripcion,
                 'nombre_ente'     => $nombreCompletoEnte,
                 'fecha_recepcion' => $fechaRecepcion,
+                'nombre_categoria' => $nombresCategorias ?: 'DOCUMENTOS DEL PERIODO',
             ]);
             
             return $pdf->download('acuse_' . $now->format('Ymd_His') . '.pdf');
