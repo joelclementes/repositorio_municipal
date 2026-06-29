@@ -17,18 +17,18 @@ class PeriodosSeeder extends Seeder
         $anio = 2026;
 
         $meses = [
-/*             1 => 'enero',
-            2 => 'febrero', */
-            3 => 'marzo',
-            4 => 'abril',
-            5 => 'mayo',
-            /* 6 => 'junio',
+            // 1 => 'enero',
+            // 2 => 'febrero',
+            // 3 => 'marzo',
+            // 4 => 'abril',
+            // 5 => 'mayo',
+            // 6 => 'junio',
             7 => 'julio',
-            8 => 'agosto',
-            9 => 'septiembre',
-            10 => 'octubre',
-            11 => 'noviembre',
-            12 => 'diciembre', */
+            // 8 => 'agosto',
+            // 9 => 'septiembre',
+            // 10 => 'octubre',
+            // 11 => 'noviembre',
+            // 12 => 'diciembre',
         ];
 
         foreach ($meses as $numero => $nombre) {
@@ -42,7 +42,7 @@ class PeriodosSeeder extends Seeder
                 'is_active' => true,
             ]);
         }
-
+        return;
         // Agregar periodo para 2025 para pruebas
         $anio2025 = 2025;
         foreach ($meses as $numero => $nombre) {
