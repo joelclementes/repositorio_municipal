@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             CausaRechazoSeeder::class,
             // AvisoSeeder::class,
             // AvisosEntesSeeder::class,
-            // PeriodosSeeder::class,
+            PeriodosSeeder::class,
             EntesRevisorSeeder::class,
 
         ]);

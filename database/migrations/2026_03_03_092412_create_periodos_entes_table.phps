@@ -11,20 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('periodos', function (Blueprint $table) {
+        Schema::create('periodos_entes', function (Blueprint $table) {
             $table->id();
-
-            $table->unsignedTinyInteger('mes_numero');
-            $table->string('mes', 20);
-            $table->year('axo');
-
-            $table->unique(['mes_numero', 'axo'], 'unique_mes_anio_periodos');
-
-            $table->string('descripcion')->nullable();
+            $table->foreignId('ente_id')->constrained('entes');
+            $table->foreignId('periodo_id')->constrained('periodos');
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
             $table->boolean('is_active')->default(true);
-
             $table->timestamps();
         });
     }
@@ -34,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('periodos');
+        Schema::dropIfExists('periodos_entes');
     }
 };
