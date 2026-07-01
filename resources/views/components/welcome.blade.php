@@ -164,6 +164,30 @@
                             </div>
                         </a>
                     </div>
+
+                    <div
+                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
+                        <a href="{{ route('reportes.actividad.index') }}">
+                            <div class="px-4 py-3" style="background-color: #475569;">
+                                <h2 class="text-white font-bold text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                        </path>
+                                    </svg>
+                                    Reporte de Actividad
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-center text-gray-700 hover:text-[#475569] cursor-pointer">
+                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #475569;"></span>
+                                        Módulo de bitácora y auditoría para supervisar accesos, registros y acciones de los usuarios.
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
+                    </div>
                 @endcan
                 @can('administrar')
                     <div
