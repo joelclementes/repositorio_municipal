@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use App\Models\TiposEnte;
+use App\Models\PeriodoEnte;
+
 
 class Ente extends Model
 {
@@ -63,5 +65,10 @@ class Ente extends Model
     public function getTipoEnteNombreAttribute()
     {
         return $this->tipoEnte ? $this->tipoEnte->nombre : 'Sin tipo';
+    }
+
+    public function periodosEntes()
+    {
+        return $this->hasMany(sPeriodoEnte::class, 'ente_id');
     }
 }

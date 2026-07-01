@@ -24,8 +24,8 @@ class UserSeeder extends Seeder
             ],
             [
                 'user_data' => [
-                    'name' => 'Lic. Juan Carlos Patiño',
-                    'email' => 'jpatino',
+                    'name' => 'Mtro. Aurelio Rivera Galindo',
+                    'email' => 'arivera',
                     'password' => bcrypt('123456789'),
                 ],
                 'role' => 'Administrador'

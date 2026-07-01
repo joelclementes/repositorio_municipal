@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use \App\Models\PeriodoEnte;
 
 class Periodo extends Model
 {
@@ -51,5 +52,10 @@ class Periodo extends Model
             $this->axo,
             $this->mes_numero
         );
+    }
+
+    public function periodosEntes()
+    {
+        return $this->hasMany(PeriodoEnte::class, 'periodo_id');
     }
 }
