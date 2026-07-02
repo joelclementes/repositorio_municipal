@@ -15,6 +15,16 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Inicio') }}
                     </x-nav-link>
+                    @can('generar-reportes')
+                        @if(request()->routeIs('reportes.*'))
+                            <x-nav-link href="{{ route('reportes.obligaciones.index') }}" :active="request()->routeIs('reportes.obligaciones.index')">
+                                {{ __('Reporte Obligaciones') }}
+                            </x-nav-link>
+                            <x-nav-link href="{{ route('reportes.actividad.index') }}" :active="request()->routeIs('reportes.actividad.index')">
+                                {{ __('Reporte Actividad') }}
+                            </x-nav-link>
+                        @endif
+                    @endcan
                     @can('administrar')
                         <x-nav-link href="{{ url('/admin') }}"
                         target="_blank" rel="noopener noreferrer">
@@ -137,6 +147,16 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @can('generar-reportes')
+                @if(request()->routeIs('reportes.*'))
+                    <x-responsive-nav-link href="{{ route('reportes.obligaciones.index') }}" :active="request()->routeIs('reportes.obligaciones.index')">
+                        {{ __('Reporte Obligaciones') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('reportes.actividad.index') }}" :active="request()->routeIs('reportes.actividad.index')">
+                        {{ __('Reporte Actividad') }}
+                    </x-responsive-nav-link>
+                @endif
+            @endcan
         </div>
 
         <!-- Responsive Settings Options (sin la campanita porque ya está arriba) -->
