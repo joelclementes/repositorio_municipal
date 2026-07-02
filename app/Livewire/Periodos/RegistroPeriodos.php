@@ -52,9 +52,6 @@ class RegistroPeriodos extends Component
 
         $periodo = Periodo::findOrFail($value);
 
-        // $this->descripcion = $periodo->descripcion;
-        // $this->mes_numero = $periodo->mes_numero;
-        // $this->axo = $periodo->axo;
         $this->descripcion = $periodo->descripcion;
         $this->mes_numero = $periodo->mes_numero;
         $this->axo = $periodo->axo;
@@ -64,29 +61,6 @@ class RegistroPeriodos extends Component
 
     public function guardarPeriodo(): void
     {
-        // $validated = $this->validate([
-        //     'descripcion' => ['required', 'string', 'max:255'],
-        //     'mes_numero' => [
-        //         'required',
-        //         'integer',
-        //         'between:1,12',
-        //         Rule::unique('periodos', 'mes_numero')
-        //             ->where(fn ($query) => $query->where('axo', $this->axo))
-        //             ->ignore($this->periodo_id),
-        //     ],
-        //     'axo' => ['required', 'integer', 'min:2000', 'max:2100'],
-        //     'fecha_inicio' => ['required', 'date'],
-        //     'fecha_fin' => ['required', 'date', 'after_or_equal:fecha_inicio'],
-        // ], [
-        //     'descripcion.required' => 'El nombre del periodo es obligatorio.',
-        //     'mes_numero.required' => 'El mes es obligatorio.',
-        //     'mes_numero.unique' => 'Ya existe un periodo registrado para ese mes y año.',
-        //     'axo.required' => 'El año es obligatorio.',
-        //     'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
-        //     'fecha_fin.required' => 'La fecha de fin es obligatoria.',
-        //     'fecha_fin.after_or_equal' => 'La fecha fin debe ser igual o posterior a la fecha inicio.',
-        // ]);
-
         $validated = $this->validate([
             'descripcion' => ['required', 'string', 'max:255'],
             'mes_numero' => [
@@ -94,7 +68,7 @@ class RegistroPeriodos extends Component
                 'integer',
                 'between:1,12',
                 Rule::unique('periodos', 'mes_numero')
-                    ->where(fn ($query) => $query->where('axo', $this->axo))
+                    ->where(fn($query) => $query->where('axo', $this->axo))
                     ->ignore($this->periodo_id ?: null),
             ],
             'axo' => ['required', 'integer', 'min:2000', 'max:2100'],
@@ -142,10 +116,10 @@ class RegistroPeriodos extends Component
             );
 
             if ($this->periodo_id) {
-                PeriodoEnte::where('periodo_id', $periodo->id)->update([
-                    'fecha_inicio' => $validated['fecha_inicio'],
-                    'fecha_fin' => $validated['fecha_fin'],
-                ]);
+                // PeriodoEnte::where('periodo_id', $periodo->id)->update([
+                //     'fecha_inicio' => $validated['fecha_inicio'],
+                //     'fecha_fin' => $validated['fecha_fin'],
+                // ]);
             } else {
                 Ente::query()->select('id')->chunkById(100, function ($entes) use ($periodo, $validated) {
                     foreach ($entes as $ente) {
@@ -203,70 +177,47 @@ class RegistroPeriodos extends Component
         $this->ente_fecha_fin = optional($periodoEnte->fecha_fin)->format('Y-m-d');
     }
 
-    // public function actualizarPeriodoEnte(): void
-    // {
-    //     $this->validate([
-    //         'periodo_ente_id' => ['required', 'exists:periodos_entes,id'],
-    //         'ente_fecha_inicio' => ['required', 'date'],
-    //         'ente_fecha_fin' => ['required', 'date', 'after_or_equal:ente_fecha_inicio'],
-    //     ], [
-    //         'periodo_ente_id.required' => 'Seleccione un organismo.',
-    //         'ente_fecha_inicio.required' => 'La fecha inicio del organismo es obligatoria.',
-    //         'ente_fecha_fin.required' => 'La fecha fin del organismo es obligatoria.',
-    //         'ente_fecha_fin.after_or_equal' => 'La fecha fin debe ser igual o posterior a la fecha inicio.',
-    //     ]);
+    public function actualizarPeriodoEnte(): void
+    {
+        $validated = $this->validate([
+            'periodo_ente_id' => ['required', 'exists:periodos_entes,id'],
+            'ente_fecha_inicio' => ['required', 'date'],
+            'ente_fecha_fin' => ['required', 'date', 'after_or_equal:ente_fecha_inicio'],
+        ], [
+            'periodo_ente_id.required' => 'Seleccione un organismo.',
+            'ente_fecha_inicio.required' => 'La fecha de inicio del organismo es obligatoria.',
+            'ente_fecha_fin.required' => 'La fecha de fin del organismo es obligatoria.',
+            'ente_fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
+        ]);
 
-    //     PeriodoEnte::where('id', $this->periodo_ente_id)->update([
-    //         'fecha_inicio' => $this->ente_fecha_inicio,
-    //         'fecha_fin' => $this->ente_fecha_fin,
-    //     ]);
+        $periodo = Periodo::findOrFail($this->periodo_id);
 
-    //     session()->flash('success', 'Fechas del organismo actualizadas correctamente.');
+        $inicio = Carbon::parse($validated['ente_fecha_inicio']);
+        $fin = Carbon::parse($validated['ente_fecha_fin']);
 
-    //     $this->limpiarEnte();
-    // }
+        if (
+            $inicio->month != $periodo->mes_numero ||
+            $fin->month != $periodo->mes_numero ||
+            $inicio->year != $periodo->axo ||
+            $fin->year != $periodo->axo
+        ) {
+            $mensaje = 'Las fechas del organismo deben pertenecer al mes y año del periodo seleccionado.';
 
-public function actualizarPeriodoEnte(): void
-{
-    $validated = $this->validate([
-        'periodo_ente_id' => ['required', 'exists:periodos_entes,id'],
-        'ente_fecha_inicio' => ['required', 'date'],
-        'ente_fecha_fin' => ['required', 'date', 'after_or_equal:ente_fecha_inicio'],
-    ], [
-        'periodo_ente_id.required' => 'Seleccione un organismo.',
-        'ente_fecha_inicio.required' => 'La fecha de inicio del organismo es obligatoria.',
-        'ente_fecha_fin.required' => 'La fecha de fin del organismo es obligatoria.',
-        'ente_fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
-    ]);
+            $this->addError('ente_fecha_inicio', $mensaje);
+            $this->addError('ente_fecha_fin', $mensaje);
 
-    $periodo = Periodo::findOrFail($this->periodo_id);
+            return;
+        }
 
-    $inicio = Carbon::parse($validated['ente_fecha_inicio']);
-    $fin = Carbon::parse($validated['ente_fecha_fin']);
+        PeriodoEnte::where('id', $this->periodo_ente_id)->update([
+            'fecha_inicio' => $validated['ente_fecha_inicio'],
+            'fecha_fin' => $validated['ente_fecha_fin'],
+        ]);
 
-    if (
-        $inicio->month != $periodo->mes_numero ||
-        $fin->month != $periodo->mes_numero ||
-        $inicio->year != $periodo->axo ||
-        $fin->year != $periodo->axo
-    ) {
-        $mensaje = 'Las fechas del organismo deben pertenecer al mes y año del periodo seleccionado.';
+        session()->flash('success', 'Fechas del organismo actualizadas correctamente.');
 
-        $this->addError('ente_fecha_inicio', $mensaje);
-        $this->addError('ente_fecha_fin', $mensaje);
-
-        return;
+        $this->limpiarEnte();
     }
-
-    PeriodoEnte::where('id', $this->periodo_ente_id)->update([
-        'fecha_inicio' => $validated['ente_fecha_inicio'],
-        'fecha_fin' => $validated['ente_fecha_fin'],
-    ]);
-
-    session()->flash('success', 'Fechas del organismo actualizadas correctamente.');
-
-    $this->limpiarEnte();
-}
 
     public function limpiarPeriodo(): void
     {
