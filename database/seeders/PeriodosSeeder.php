@@ -17,18 +17,18 @@ class PeriodosSeeder extends Seeder
         $anio = 2026;
 
         $meses = [
-/*             1 => 'enero',
-            2 => 'febrero', */
-            3 => 'marzo',
-            4 => 'abril',
-            5 => 'mayo',
-            /* 6 => 'junio',
+            // 1 => 'enero',
+            // 2 => 'febrero',
+            // 3 => 'marzo',
+            // 4 => 'abril',
+            // 5 => 'mayo',
+            6 => 'junio',
             7 => 'julio',
             8 => 'agosto',
-            9 => 'septiembre',
-            10 => 'octubre',
-            11 => 'noviembre',
-            12 => 'diciembre', */
+            // 9 => 'septiembre',
+            // 10 => 'octubre',
+            // 11 => 'noviembre',
+            // 12 => 'diciembre',
         ];
 
         foreach ($meses as $numero => $nombre) {
@@ -36,12 +36,15 @@ class PeriodosSeeder extends Seeder
                 'mes_numero' => $numero,
                 'mes' => $nombre,
                 'axo' => $anio,
-                'descripcion' => ucfirst($nombre) . ' ' . $anio,
+                'descripcion' => ucfirst($nombre) . ' ' . $anio . '(Correspondiente a...)',
                 'fecha_inicio' => now()->setDate($anio, $numero, 1)->startOfMonth()->toDateString(),
                 'fecha_fin' => now()->setDate($anio, $numero, 1)->endOfMonth()->toDateString(),
                 'is_active' => true,
             ]);
         }
+        return;
+
+
 
         // Agregar periodo para 2025 para pruebas
         $anio2025 = 2025;

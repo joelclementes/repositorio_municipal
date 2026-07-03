@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->unique(['mes_numero', 'axo'], 'unique_mes_anio_periodos');
 
-            $table->text('descripcion')->nullable();
+            $table->string('descripcion')->nullable();
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
             $table->boolean('is_active')->default(true);
