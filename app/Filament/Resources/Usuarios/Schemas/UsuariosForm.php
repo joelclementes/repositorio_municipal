@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Validation\Rules\Password;
 use Filament\Schemas\Schema;
+use Spatie\Permission\Models\Role;
 
 class UsuariosForm
 {
