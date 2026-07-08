@@ -15,6 +15,22 @@ use App\Services\ActivityLogger;
 
 class AppServiceProvider extends ServiceProvider
 {
+    // Caché estático de atributos originales para evitar que Eloquent intente guardarlos en la base de datos
+    protected static array $originalAttributesCache = [];
+
+    public static function storeOriginal($model): void
+    {
+        self::$originalAttributesCache[spl_object_hash($model)] = $model->getOriginal();
+    }
+
+    public static function getOriginalAndClear($model): array
+    {
+        $hash = spl_object_hash($model);
+        $original = self::$originalAttributesCache[$hash] ?? $model->getOriginal();
+        unset(self::$originalAttributesCache[$hash]);
+        return $original;
+    }
+
     /**
      * Register any application services.
      */
@@ -91,14 +107,19 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // ─────────────────────────────────────────────
-        // 2b. USUARIOS — Actualización
+        // 2b. USUARIOS — Actualización (Captura de estado anterior y nuevo)
         // ─────────────────────────────────────────────
+        User::updating(function (User $user) {
+            self::storeOriginal($user);
+        });
+
         User::updated(function (User $user) {
             $changes = $user->getChanges();
             // Ignorar cambios internos (timestamps, tokens)
             $ignorar = ['updated_at', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'current_team_id', 'profile_photo_path'];
             $cambiosRelevantes = array_diff_key($changes, array_flip($ignorar));
             if (empty($cambiosRelevantes)) {
+                self::getOriginalAndClear($user); // Limpiar caché de memoria
                 return;
             }
 
@@ -107,7 +128,7 @@ class AppServiceProvider extends ServiceProvider
 
             // Construir lista legible de cambios
             $detalleCambios = [];
-            $original = $user->getOriginal();
+            $original = self::getOriginalAndClear($user);
             foreach ($cambiosRelevantes as $campo => $nuevoValor) {
                 if ($campo === 'password') {
                     $detalleCambios[] = "Contraseña: (actualizada)";
@@ -132,7 +153,7 @@ class AppServiceProvider extends ServiceProvider
                       . " Acción realizada por: {$modificadoPorNombre}.";
             } else {
                 $desc = "Se modificaron los datos del usuario \"{$user->name}\" (cuenta: {$user->email})."
-                      . " Campos actualizados → {$listaCambios}."
+                      . " Cambios realizados: {$listaCambios}."
                       . " Modificado por: {$modificadoPorNombre}.";
             }
 
@@ -190,7 +211,6 @@ class AppServiceProvider extends ServiceProvider
             // Información del período y documento
             $docRecibido = $archivo->documentoRecibido;
             $periodoInfo = '';
-            $categoriaInfo = '';
             if ($docRecibido) {
                 $periodo = $docRecibido->periodo ?? null;
                 if ($periodo) {
@@ -222,11 +242,16 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // ─────────────────────────────────────────────
-        // 3b. DOCUMENTOS — Cambio de Estado (Revisión/Aprobación/Rechazo)
+        // 3b. DOCUMENTOS — Cambio de Estado (Revisión/Aprobación/Rechazo con captura de estado anterior)
         // ─────────────────────────────────────────────
+        ArchivoDocumentoRecibido::updating(function (ArchivoDocumentoRecibido $archivo) {
+            self::storeOriginal($archivo);
+        });
+
         ArchivoDocumentoRecibido::updated(function (ArchivoDocumentoRecibido $archivo) {
             $changes = $archivo->getChanges();
             if (!isset($changes['estado_id'])) {
+                self::getOriginalAndClear($archivo); // Limpiar caché de memoria
                 return;
             }
 
@@ -246,14 +271,15 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
 
-            $estadoAnterior = $archivo->getOriginal('estado_id');
+            $original = self::getOriginalAndClear($archivo);
+            $estadoAnterior = $original['estado_id'] ?? $archivo->getOriginal('estado_id');
             $estadoAnteriorNombre = \App\Models\Estado::find($estadoAnterior)?->nombre ?? 'Sin estado';
 
             if ($archivo->estado_id == 3) {
                 // APROBACIÓN
                 $desc = "Se APROBÓ el documento \"{$archivo->nombre}\"."
                       . " Ente obligado: {$enteNombre}.{$periodoInfo}"
-                      . " Estado anterior: {$estadoAnteriorNombre} → Nuevo estado: {$estadoNombre}."
+                      . " Estado anterior: \"{$estadoAnteriorNombre}\" → Nuevo estado: \"{$estadoNombre}\"."
                       . " Revisado y aprobado por: {$revisadoPorNombre} (rol: {$rolRevisor}).";
 
                 if ($archivo->observaciones_revisor) {
@@ -279,7 +305,7 @@ class AppServiceProvider extends ServiceProvider
 
                 $desc = "Se RECHAZÓ el documento \"{$archivo->nombre}\"."
                       . " Ente obligado: {$enteNombre}.{$periodoInfo}"
-                      . " Estado anterior: {$estadoAnteriorNombre} → Nuevo estado: {$estadoNombre}."
+                      . " Estado anterior: \"{$estadoAnteriorNombre}\" → Nuevo estado: \"{$estadoNombre}\"."
                       . " Causa del rechazo: \"{$causa}\"."
                       . " Reenvío autorizado: {$reenvio}."
                       . " Revisado por: {$revisadoPorNombre} (rol: {$rolRevisor}).{$observaciones}";
@@ -301,7 +327,7 @@ class AppServiceProvider extends ServiceProvider
                 // OTRO CAMBIO DE ESTADO
                 $desc = "Se cambió el estado del documento \"{$archivo->nombre}\"."
                       . " Ente obligado: {$enteNombre}.{$periodoInfo}"
-                      . " Estado anterior: {$estadoAnteriorNombre} → Nuevo estado: {$estadoNombre}."
+                      . " Estado anterior: \"{$estadoAnteriorNombre}\" → Nuevo estado: \"{$estadoNombre}\"."
                       . " Actualizado por: {$revisadoPorNombre}.";
 
                 ActivityLogger::log('Actualización de documento', $desc, $archivo, [
@@ -347,11 +373,16 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
+        Aviso::updating(function (Aviso $aviso) {
+            self::storeOriginal($aviso);
+        });
+
         Aviso::updated(function (Aviso $aviso) {
             $changes = $aviso->getChanges();
             $ignorar = ['updated_at'];
             $cambiosRelevantes = array_diff_key($changes, array_flip($ignorar));
             if (empty($cambiosRelevantes)) {
+                self::getOriginalAndClear($aviso); // Limpiar caché de memoria
                 return;
             }
 
@@ -359,7 +390,7 @@ class AppServiceProvider extends ServiceProvider
             $modificadoPorNombre = $modificadoPor ? "\"{$modificadoPor->name}\" ({$modificadoPor->email})" : 'el sistema';
 
             $detalleCambios = [];
-            $original = $aviso->getOriginal();
+            $original = self::getOriginalAndClear($aviso);
             foreach ($cambiosRelevantes as $campo => $nuevoValor) {
                 $valorAnterior = $original[$campo] ?? 'vacío';
                 if ($campo === 'activo') {
@@ -370,8 +401,10 @@ class AppServiceProvider extends ServiceProvider
             }
             $listaCambios = implode('; ', $detalleCambios);
 
-            $desc = "Se actualizó el aviso institucional: \"{$aviso->titulo}\"."
-                  . " Cambios realizados → {$listaCambios}."
+            $tituloOriginal = $original['titulo'] ?? $aviso->titulo;
+
+            $desc = "Se actualizó el aviso institucional \"{$tituloOriginal}\"."
+                  . " Cambios realizados: {$listaCambios}."
                   . " Modificado por: {$modificadoPorNombre}.";
 
             ActivityLogger::log(
@@ -379,15 +412,16 @@ class AppServiceProvider extends ServiceProvider
                 $desc,
                 $aviso,
                 [
-                    'aviso_titulo'    => $aviso->titulo,
-                    'cambios_detalle' => $detalleCambios,
-                    'modificado_por'  => $modificadoPor?->name ?? 'Sistema',
+                    'aviso_titulo_anterior' => $tituloOriginal,
+                    'aviso_titulo_nuevo'    => $aviso->titulo,
+                    'cambios_detalle'       => $detalleCambios,
+                    'modificado_por'        => $modificadoPor?->name ?? 'Sistema',
                 ]
             );
         });
 
         // ─────────────────────────────────────────────
-        // 5. PERÍODOS DE ENTREGA
+        // 5. PERÍODOS DE ENTREGA (Captura de estado anterior y nuevo)
         // ─────────────────────────────────────────────
         Periodo::created(function (Periodo $periodo) {
             $creadoPor = Auth::user();
@@ -416,11 +450,16 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
+        Periodo::updating(function (Periodo $periodo) {
+            self::storeOriginal($periodo);
+        });
+
         Periodo::updated(function (Periodo $periodo) {
             $changes = $periodo->getChanges();
             $ignorar = ['updated_at'];
             $cambiosRelevantes = array_diff_key($changes, array_flip($ignorar));
             if (empty($cambiosRelevantes)) {
+                self::getOriginalAndClear($periodo); // Limpiar caché de memoria
                 return;
             }
 
@@ -428,7 +467,7 @@ class AppServiceProvider extends ServiceProvider
             $modificadoPorNombre = $modificadoPor ? "\"{$modificadoPor->name}\" ({$modificadoPor->email})" : 'el sistema';
 
             $detalleCambios = [];
-            $original = $periodo->getOriginal();
+            $original = self::getOriginalAndClear($periodo);
             foreach ($cambiosRelevantes as $campo => $nuevoValor) {
                 $valorAnterior = $original[$campo] ?? 'vacío';
                 if ($campo === 'is_active') {
@@ -439,8 +478,11 @@ class AppServiceProvider extends ServiceProvider
             }
             $listaCambios = implode('; ', $detalleCambios);
 
-            $desc = "Se modificó el período {$periodo->mes} {$periodo->axo}."
-                  . " Cambios realizados → {$listaCambios}."
+            $nombreOriginal = ($original['mes'] ?? 'Sin mes') . ' ' . ($original['axo'] ?? 'Sin año');
+            $nombreNuevo = $periodo->mes . ' ' . $periodo->axo;
+
+            $desc = "Se modificó el período \"{$nombreOriginal}\" (ahora llamado \"{$nombreNuevo}\")."
+                  . " Cambios realizados: {$listaCambios}."
                   . " Modificado por: {$modificadoPorNombre}.";
 
             ActivityLogger::log(
@@ -448,9 +490,10 @@ class AppServiceProvider extends ServiceProvider
                 $desc,
                 $periodo,
                 [
-                    'periodo'         => "{$periodo->mes} {$periodo->axo}",
-                    'cambios_detalle' => $detalleCambios,
-                    'modificado_por'  => $modificadoPor?->name ?? 'Sistema',
+                    'periodo_anterior' => $nombreOriginal,
+                    'periodo_nuevo'    => $nombreNuevo,
+                    'cambios_detalle'  => $detalleCambios,
+                    'modificado_por'   => $modificadoPor?->name ?? 'Sistema',
                 ]
             );
         });
