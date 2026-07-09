@@ -16,7 +16,7 @@
                         {{ __('Inicio') }}
                     </x-nav-link>
                     @can('generar-reportes')
-                        @if(request()->routeIs('reportes.*'))
+                        @if (request()->routeIs('reportes.*'))
                             <x-nav-link href="{{ route('reportes.obligaciones.index') }}" :active="request()->routeIs('reportes.obligaciones.index')">
                                 {{ __('Reporte Obligaciones') }}
                             </x-nav-link>
@@ -25,9 +25,13 @@
                             </x-nav-link>
                         @endif
                     @endcan
+                    @can('usar-mensajeria')
+                        <x-nav-link href="{{ route('mensajeria.index') }}" :active="request()->routeIs('mensajeria.*')">
+                            {{ __('Mensajería') }}
+                        </x-nav-link>
+                    @endcan
                     @can('administrar')
-                        <x-nav-link href="{{ url('/admin') }}"
-                        target="_blank" rel="noopener noreferrer">
+                        <x-nav-link href="{{ url('/admin') }}" target="_blank" rel="noopener noreferrer">
                             {{ __('Administración') }}
                         </x-nav-link>
                     @endcan
@@ -147,8 +151,13 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @can('usar-mensajeria')
+                <x-responsive-nav-link href="{{ route('mensajeria.index') }}" :active="request()->routeIs('mensajeria.*')">
+                    {{ __('Mensajería') }}
+                </x-responsive-nav-link>
+            @endcan
             @can('generar-reportes')
-                @if(request()->routeIs('reportes.*'))
+                @if (request()->routeIs('reportes.*'))
                     <x-responsive-nav-link href="{{ route('reportes.obligaciones.index') }}" :active="request()->routeIs('reportes.obligaciones.index')">
                         {{ __('Reporte Obligaciones') }}
                     </x-responsive-nav-link>
