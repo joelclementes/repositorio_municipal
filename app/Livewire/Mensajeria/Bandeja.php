@@ -48,11 +48,17 @@ class Bandeja extends Component
 
     public array $respuestaArchivos = [];
 
+    public string $buscarDestinatario = '';
+
+    public array $destinatariosSeleccionados = [];
+
+    public array $gruposDestinatariosSeleccionados = [];
+
     protected function rules(): array
     {
         return [
-            'destinatarios' => ['required', 'array', 'min:1'],
-            'destinatarios.*' => ['integer', 'exists:users,id'],
+            'destinatariosSeleccionados' => ['required', 'array', 'min:1'],
+            'destinatariosSeleccionados.*' => ['integer', 'exists:users,id'],
             'asunto' => ['required', 'string', 'max:255'],
             'cuerpo' => ['required', 'string'],
             'archivos.*' => ['nullable', 'file', 'mimes:pdf,xlsx', 'max:10240'],
@@ -79,9 +85,29 @@ class Bandeja extends Component
         $this->resetPage();
     }
 
+    // public function abrirRedactar(): void
+    // {
+    //     $this->reset([
+    //         'buscarDestinatario',
+    //         'destinatariosSeleccionados',
+    //         'asunto',
+    //         'cuerpo',
+    //         'archivos',
+    //     ]);
+    //     $this->modalRedactar = true;
+    // }
+
     public function abrirRedactar(): void
     {
-        $this->reset(['destinatarios', 'asunto', 'cuerpo', 'archivos']);
+        $this->reset([
+            'buscarDestinatario',
+            'destinatariosSeleccionados',
+            'gruposDestinatariosSeleccionados',
+            'asunto',
+            'cuerpo',
+            'archivos',
+        ]);
+
         $this->modalRedactar = true;
     }
 
@@ -106,7 +132,7 @@ class Bandeja extends Component
                 'mensaje_raiz_id' => $mensaje->id,
             ]);
 
-            foreach ($this->destinatarios as $destinatarioId) {
+            foreach ($this->destinatariosSeleccionados as $destinatarioId) {
                 MensajeDestinatario::create([
                     'mensaje_id' => $mensaje->id,
                     'destinatario_id' => $destinatarioId,
@@ -218,30 +244,47 @@ class Bandeja extends Component
         }
     }
 
+    // public function getUsuariosDestinoProperty()
+    // {
+    //     $user = auth()->user();
+
+    //     $rolesAdministrativos = [
+    //         // 'SuperUsuario',
+    //         'Administrador',
+    //     ];
+
+    //     $rolesEnte = [
+    //         'Tesorero',
+    //         'Tesorero Organo Descentralizado',
+    //         'Director Obras Publicas',
+    //         'Contralor',
+    //     ];
+
+    //     if ($user->hasAnyRole($rolesAdministrativos)) {
+    //         return User::role($rolesEnte)
+    //             ->where('id', '!=', $user->id)
+    //             ->orderBy('name')
+    //             ->get();
+    //     }
+
+    //     return User::role($rolesAdministrativos)
+    //         ->where('id', '!=', $user->id)
+    //         ->orderBy('name')
+    //         ->get();
+    // }
+
     public function getUsuariosDestinoProperty()
     {
         $user = auth()->user();
 
-        $rolesAdministrativos = [
-            'SuperUsuario',
-            'Administrador',
-        ];
-
-        $rolesEnte = [
-            'Tesorero',
-            'Tesorero Organo Descentralizado',
-            'Director Obras Publicas',
-            'Contralor',
-        ];
-
-        if ($user->hasAnyRole($rolesAdministrativos)) {
-            return User::role($rolesEnte)
+        if ($user->hasAnyRole($this->rolesAdministrativos)) {
+            return User::role($this->rolesEnte)
                 ->where('id', '!=', $user->id)
                 ->orderBy('name')
                 ->get();
         }
 
-        return User::role($rolesAdministrativos)
+        return User::role($this->rolesAdministrativos)
             ->where('id', '!=', $user->id)
             ->orderBy('name')
             ->get();
@@ -269,6 +312,143 @@ class Bandeja extends Component
             ->where('mensaje_raiz_id', $raizId)
             ->orderBy('created_at')
             ->get();
+    }
+
+    public function seleccionarDestinatario(int $usuarioId): void
+    {
+        if (! in_array($usuarioId, $this->destinatariosSeleccionados)) {
+            $this->destinatariosSeleccionados[] = $usuarioId;
+        }
+
+        $this->buscarDestinatario = '';
+    }
+
+    public function quitarDestinatario(int $usuarioId): void
+    {
+        $this->destinatariosSeleccionados = collect($this->destinatariosSeleccionados)
+            ->reject(fn ($id) => (int) $id === (int) $usuarioId)
+            ->values()
+            ->toArray();
+    }
+
+    public function getUsuariosFiltradosProperty()
+    {
+        if (strlen(trim($this->buscarDestinatario)) < 2) {
+            return collect();
+        }
+
+        return $this->usuariosDestino
+            ->filter(function ($usuario) {
+                return str_contains(
+                    mb_strtolower($usuario->name),
+                    mb_strtolower($this->buscarDestinatario)
+                );
+            })
+            ->whereNotIn('id', $this->destinatariosSeleccionados)
+            // ->take(8)
+            ->values();
+    }
+
+    public function getDestinatariosSeleccionadosModelProperty()
+    {
+        return User::whereIn('id', $this->destinatariosSeleccionados)
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function getRolesEnteProperty(): array
+    {
+        return [
+            'Tesorero',
+            'Tesorero Organo Descentralizado',
+            'Director Obras Publicas',
+            'Contralor',
+        ];
+    }
+
+    public function getRolesAdministrativosProperty(): array
+    {
+        return [
+            // 'SuperUsuario',
+            'Administrador',
+        ];
+    }
+
+    public function getPuedeSeleccionarGruposProperty(): bool
+    {
+        return auth()->user()->hasAnyRole($this->rolesAdministrativos);
+    }
+
+    public function seleccionarGrupoDestinatarios(string $grupo): void
+    {
+        if (! $this->puedeSeleccionarGrupos) {
+            return;
+        }
+
+        if ($grupo === 'todos_roles_ente') {
+            $usuarios = User::role($this->rolesEnte)
+                ->where('id', '!=', auth()->id())
+                ->pluck('id')
+                ->toArray();
+
+            $this->destinatariosSeleccionados = collect($this->destinatariosSeleccionados)
+                ->merge($usuarios)
+                ->unique()
+                ->values()
+                ->toArray();
+
+            $this->gruposDestinatariosSeleccionados['todos_roles_ente'] = 'Todos los roles Ente';
+
+            return;
+        }
+
+        if (in_array($grupo, $this->rolesEnte, true)) {
+            $usuarios = User::role($grupo)
+                ->where('id', '!=', auth()->id())
+                ->pluck('id')
+                ->toArray();
+
+            $this->destinatariosSeleccionados = collect($this->destinatariosSeleccionados)
+                ->merge($usuarios)
+                ->unique()
+                ->values()
+                ->toArray();
+
+            $this->gruposDestinatariosSeleccionados[$grupo] = $grupo;
+        }
+    }
+
+    public function quitarGrupoDestinatarios(string $grupo): void
+    {
+        if (! $this->puedeSeleccionarGrupos) {
+            return;
+        }
+
+        if ($grupo === 'todos_roles_ente') {
+            $usuarios = User::role($this->rolesEnte)
+                ->pluck('id')
+                ->toArray();
+        } else {
+            $usuarios = User::role($grupo)
+                ->pluck('id')
+                ->toArray();
+        }
+
+        $this->destinatariosSeleccionados = collect($this->destinatariosSeleccionados)
+            ->reject(fn ($id) => in_array((int) $id, array_map('intval', $usuarios), true))
+            ->values()
+            ->toArray();
+
+        unset($this->gruposDestinatariosSeleccionados[$grupo]);
+    }
+
+    public function getResumenDestinatariosProperty(): array
+    {
+        return [
+            'total' => count($this->destinatariosSeleccionados),
+            'grupos' => $this->gruposDestinatariosSeleccionados,
+            'individuales' => $this->destinatariosSeleccionadosModel,
+        ];
     }
 
     public function render()

@@ -101,14 +101,111 @@
                 <h2 class="mb-4 text-xl font-bold">Redactar mensaje</h2>
 
                 <div class="space-y-4">
-                    <div>
+                    <div class="relative">
                         <label class="block text-sm font-medium">Destinatario(s)</label>
-                        <select multiple wire:model="destinatarios" class="mt-1 w-full rounded border-gray-300">
-                            @foreach ($this->usuariosDestino as $usuario)
-                                <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('destinatarios')
+
+                        @if ($this->puedeSeleccionarGrupos)
+                            <div class="rounded border border-gray-200 bg-gray-50 p-4">
+                                <p class="mb-3 text-sm font-semibold text-gray-700">
+                                    Selección rápida de destinatarios
+                                </p>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button"
+                                        wire:click="seleccionarGrupoDestinatarios('todos_roles_ente')"
+                                        class="rounded-full bg-gray-800 px-3 py-1 text-sm text-white hover:bg-gray-700">
+                                        Todos los roles Ente
+                                    </button>
+
+                                    @foreach ($this->rolesEnte as $rol)
+                                        <button type="button"
+                                            wire:click="seleccionarGrupoDestinatarios('{{ $rol }}')"
+                                            class="rounded-full bg-vino-900 px-3 py-1 text-sm text-white hover:bg-vino-800">
+                                            {{ $rol }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        <input type="text" wire:model.live.debounce.300ms="buscarDestinatario"
+                            placeholder="Escribe el nombre del destinatario..."
+                            class="mt-1 w-full rounded border-gray-300" autocomplete="off">
+
+                        @if ($this->usuariosFiltrados->isNotEmpty())
+                            <div
+                                class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded border border-gray-200 bg-white shadow-lg">
+                                @foreach ($this->usuariosFiltrados as $usuario)
+                                    <button type="button" wire:click="seleccionarDestinatario({{ $usuario->id }})"
+                                        class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
+                                        {{ $usuario->name }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        {{-- @if ($this->destinatariosSeleccionadosModel->isNotEmpty())
+                            <div class="mt-3 rounded border border-gray-200 bg-gray-50 p-3">
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach ($this->destinatariosSeleccionadosModel as $usuario)
+                                        <span
+                                            class="inline-flex items-center gap-2 rounded-full bg-vino-900 px-3 py-1 text-sm text-white">
+                                            {{ $usuario->name }}
+
+                                            <button type="button" wire:click="quitarDestinatario({{ $usuario->id }})"
+                                                class="font-bold text-white hover:text-gray-200">
+                                                ×
+                                            </button>
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif --}}
+
+                        @if ($this->resumenDestinatarios['total'] > 0)
+                            <div class="mt-3 rounded border border-gray-200 bg-gray-50 p-3">
+                                <div class="mb-2 text-sm font-semibold text-gray-700">
+                                    Destinatarios seleccionados:
+                                    {{ $this->resumenDestinatarios['total'] }}
+                                </div>
+
+                                @if (count($this->resumenDestinatarios['grupos']))
+                                    <div class="mb-3 flex flex-wrap gap-2">
+                                        @foreach ($this->resumenDestinatarios['grupos'] as $clave => $nombreGrupo)
+                                            <span
+                                                class="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-900">
+                                                {{ $nombreGrupo }}
+
+                                                <button type="button"
+                                                    wire:click="quitarGrupoDestinatarios('{{ $clave }}')"
+                                                    class="font-bold text-blue-900 hover:text-blue-700">
+                                                    ×
+                                                </button>
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                @if ($this->resumenDestinatarios['individuales']->isNotEmpty())
+                                    <div class="flex max-h-24 flex-wrap gap-2 overflow-y-auto">
+                                        @foreach ($this->resumenDestinatarios['individuales'] as $usuario)
+                                            <span
+                                                class="inline-flex items-center gap-2 rounded-full bg-vino-900 px-3 py-1 text-sm text-white">
+                                                {{ $usuario->name }}
+
+                                                <button type="button"
+                                                    wire:click="quitarDestinatario({{ $usuario->id }})"
+                                                    class="font-bold text-white hover:text-gray-200">
+                                                    ×
+                                                </button>
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+                        @error('destinatariosSeleccionados')
                             <p class="text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
