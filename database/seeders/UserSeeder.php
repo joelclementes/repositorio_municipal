@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Ente;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {
@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
                     'email' => 'jclemente',
                     'password' => bcrypt('123456789'),
                 ],
-                'role' => 'SuperUsuario'
+                'role' => 'SuperUsuario',
             ],
             [
                 'user_data' => [
@@ -28,30 +28,28 @@ class UserSeeder extends Seeder
                     'email' => 'arivera',
                     'password' => bcrypt('123456789'),
                 ],
-                'role' => 'Administrador'
+                'role' => 'Administrador',
             ],
             [
                 'user_data' => [
                     'name' => 'Mtra. Lorena Rivera Ruiz',
                     'email' => 'lrivera',
                     'password' => bcrypt('123456789'),
-                    'ente_id' => 1,
                 ],
-                'role' => 'Revisor'
+                'role' => 'Revisor',
             ],
             [
                 'user_data' => [
                     'name' => 'Mtra. Leticia Sedas Vargas',
                     'email' => 'lsedas',
                     'password' => bcrypt('123456789'),
-                    'ente_id' => 1,
                 ],
-                'role' => 'Revisor'
+                'role' => 'Revisor',
             ],
         ];
 
         // Generar usuarios para todos los municipios (tipos_entes_id = 1)
-        $municipios = \App\Models\Ente::where('tipos_entes_id', 1)->get();
+        $municipios = Ente::where('tipos_entes_id', 1)->get();
 
         foreach ($municipios as $municipio) {
             // Limpiar el nombre: minúsculas, sin acentos ni espacios
@@ -65,34 +63,34 @@ class UserSeeder extends Seeder
             // Tesorero
             $usuarios[] = [
                 'user_data' => [
-                    'name' => 'Tesorero - ' . $municipio->nombre,
-                    'email' => 't' . $cleanName,
+                    'name' => 'Tesorero - '.$municipio->nombre,
+                    'email' => 't'.$cleanName,
                     'password' => bcrypt('123456789'),
                     'ente_id' => $municipio->id,
                 ],
-                'role' => 'Tesorero'
+                'role' => 'Tesorero',
             ];
 
             // Contralor
             $usuarios[] = [
                 'user_data' => [
-                    'name' => 'Contralor - ' . $municipio->nombre,
-                    'email' => 'c' . $cleanName,
+                    'name' => 'Contralor - '.$municipio->nombre,
+                    'email' => 'c'.$cleanName,
                     'password' => bcrypt('123456789'),
                     'ente_id' => $municipio->id,
                 ],
-                'role' => 'Contralor'
+                'role' => 'Contralor',
             ];
 
             // Director Obras Publicas
             $usuarios[] = [
                 'user_data' => [
-                    'name' => 'Director de Obras - ' . $municipio->nombre,
-                    'email' => 'd' . $cleanName,
+                    'name' => 'Director de Obras - '.$municipio->nombre,
+                    'email' => 'd'.$cleanName,
                     'password' => bcrypt('123456789'),
                     'ente_id' => $municipio->id,
                 ],
-                'role' => 'Director Obras Publicas'
+                'role' => 'Director Obras Publicas',
             ];
         }
 
