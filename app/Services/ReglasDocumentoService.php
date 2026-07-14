@@ -4,14 +4,36 @@ namespace App\Services;
 
 use App\Models\Documento;
 use App\Models\Periodo;
+use App\Models\PeriodoEnte;
 use App\Models\ArchivoDocumentoRecibido;
 use Carbon\Carbon;
 
 class ReglasDocumentoService
 {
-    public function esOportuno(Documento $documento, Periodo $periodo, ?Carbon $fechaRecepcion = null): bool
+    public function esOportuno(Documento $documento, Periodo|PeriodoEnte $periodoReferencia, ?Carbon $fechaRecepcion = null): bool
     {
         $fechaRecepcion = $fechaRecepcion ? $fechaRecepcion->copy() : now();
+
+        if ($periodoReferencia instanceof PeriodoEnte) {
+            $periodo = $periodoReferencia->periodo;
+            $fechaInicio = $periodoReferencia->fecha_inicio;
+            $fechaFin = $periodoReferencia->fecha_fin;
+        } else {
+            $periodo = $periodoReferencia;
+            $fechaInicio = $periodoReferencia->fecha_inicio;
+            $fechaFin = $periodoReferencia->fecha_fin;
+        }
+
+        if (!$periodo) {
+            return false;
+        }
+
+        if ($fechaInicio && $fechaFin) {
+            return $fechaRecepcion->betweenIncluded(
+                Carbon::parse($fechaInicio)->startOfDay(),
+                Carbon::parse($fechaFin)->endOfDay()
+            );
+        }
 
         $anioActual = $fechaRecepcion->year;
         $anioPeriodo = (int) $periodo->axo;

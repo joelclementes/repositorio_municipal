@@ -1,6 +1,4 @@
 <?php
-// app/Livewire/Documentos/Registro.php
-
 namespace App\Livewire\Documentos;
 
 use App\Models\CategoriasDocumento;
@@ -8,6 +6,7 @@ use App\Models\SubcategoriasDocumento;
 use App\Models\DocumentosRecibido;
 use App\Models\ArchivoDocumentoRecibido;
 use App\Models\Periodo;
+use App\Models\PeriodoEnte;
 use App\Models\Documento;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -35,7 +34,18 @@ class Registro extends Component
     #[Computed]
     public function periodos()
     {
-        return Periodo::orderBy('id', 'desc')->get();
+        $enteId = auth()->user()?->ente_id;
+
+        if (!$enteId) {
+            return collect();
+        }
+
+        return Periodo::whereHas('periodosEntes', function ($query) use ($enteId) {
+            $query->where('ente_id', $enteId)
+                ->where('is_active', true);
+        })
+            ->orderBy('id', 'desc')
+            ->get();
     }
 
     #[Computed]
@@ -139,6 +149,16 @@ class Registro extends Component
         // Fin validación
 
 
+        $periodoEnte = PeriodoEnte::where('ente_id', $enteId)
+            ->where('periodo_id', $periodoId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$periodoEnte) {
+            $this->dispatch('notificacion', 'El período seleccionado no está habilitado para el ente asociado al usuario', 'error');
+            return;
+        }
+
         $reglasDocumentoService = app(ReglasDocumentoService::class);
         $rolesUsuario = auth()->user()->roles->pluck('name')->toArray();
 
@@ -195,18 +215,28 @@ class Registro extends Component
 
     public function abrirModalSubida($documentoRecibidoId, $tipo)
     {
-        // Asegurar que no hay datos previos
         $this->archivo = null;
         $this->descripcion = '';
 
         $documentoRecibido = DocumentosRecibido::with('documento')->find($documentoRecibidoId);
 
-        if ($documentoRecibido) {
-            $this->documentoRecibidoSeleccionado = $documentoRecibido;
-            $this->documentoSeleccionado = $documentoRecibido->documento;
-            $this->tipoSubida = $tipo;
-            $this->mostrarModal = true;
+        if (!$documentoRecibido) {
+            $this->dispatch('notificacion', 'No se encontró el registro del documento.', 'error');
+            return;
         }
+
+        $periodoEnte = $this->obtenerPeriodoEnteSeleccionado();
+        $vigencia = $this->evaluarVigenciaPeriodoEnte($periodoEnte);
+
+        if (!$vigencia['habilitado']) {
+            $this->dispatch('notificacion', $vigencia['mensaje'], 'error');
+            return;
+        }
+
+        $this->documentoRecibidoSeleccionado = $documentoRecibido;
+        $this->documentoSeleccionado = $documentoRecibido->documento;
+        $this->tipoSubida = $tipo;
+        $this->mostrarModal = true;
     }
 
     public function cerrarModal()
@@ -237,40 +267,45 @@ class Registro extends Component
 
         try {
             if (!auth()->user()->ente_id) {
-                throw new \Exception('El usuario no tiene un ente asociado');
+                throw new \Exception('El usuario no tiene un ente asociado.');
             }
 
             if (!$this->documentoRecibidoSeleccionado) {
-                throw new \Exception('No se encontró el registro base del documento');
+                throw new \Exception('No se encontró el registro base del documento.');
             }
 
-            // Obtener datos necesarios para el nombre del archivo
             $ente = auth()->user()->ente;
             $documento = $this->documentoSeleccionado;
-            $periodo = Periodo::find($this->periodosSeleccionados);
 
-            if (!$ente || !$documento || !$periodo) {
-                throw new \Exception('No se pudieron obtener los datos necesarios');
+            if (!$ente || !$documento) {
+                throw new \Exception('No se pudieron obtener los datos necesarios.');
             }
 
-            // Extraer los 10 primeros caracteres del nombre del ente
+            $periodoEnte = $this->obtenerPeriodoEnteSeleccionado();
+            $vigencia = $this->evaluarVigenciaPeriodoEnte($periodoEnte);
+
+            if (!$vigencia['habilitado']) {
+                throw new \Exception($vigencia['mensaje']);
+            }
+
+            $periodo = $periodoEnte->periodo;
+
+            if (!$periodo) {
+                throw new \Exception('No se pudo obtener el periodo relacionado.');
+            }
+
             $nombreEnte = substr($ente->nombre, 0, 10);
             $nombreEnte = preg_replace('/[^a-zA-Z0-9]/', '', $nombreEnte);
 
-            // Obtener clave del documento
             $claveDocumento = $documento->clave;
 
-            // Obtener año y mes del periodo
             $anio = $periodo->axo;
             $mes = str_pad($periodo->mes, 2, '0', STR_PAD_LEFT);
 
-            // Fecha del sistema
             $fechaSistema = now()->format('Ymd_His');
 
-            // Extensión del archivo
             $extension = $this->archivo->getClientOriginalExtension();
 
-            // Construir el nombre del archivo
             $nombreArchivo = sprintf(
                 '%s_%s_%s_%s_%s.%s',
                 $nombreEnte,
@@ -283,22 +318,17 @@ class Registro extends Component
 
             $nombreArchivo = preg_replace('/[^a-zA-Z0-9_.-]/', '', $nombreArchivo);
 
-
-            // Obtenemos el nombre base (hasta el cuarto guión bajo)
-            // El formato es: ente_clave_anio_mes_fecha.extension
             $partes = explode('_', $nombreArchivo);
             $nombreBase = implode('_', array_slice($partes, 0, 4));
 
-            // Buscamos archivo existente con el mismo nombre base y tipo_recepcion
             $archivoExistente = ArchivoDocumentoRecibido::where('nombre', 'like', $nombreBase . '_%')
                 ->where('tipo_recepcion', $this->tipoSubida)
                 ->where('documento_recibido_id', $this->documentoRecibidoSeleccionado->id)
                 ->first();
 
-            // Si existe y tiene autorizado_reenviar = 1, actualizar a 0
             if ($archivoExistente && $archivoExistente->autorizado_reenviar == 1) {
                 $archivoExistente->update([
-                    'autorizado_reenviar' => 2
+                    'autorizado_reenviar' => 2,
                 ]);
             }
 
@@ -306,35 +336,11 @@ class Registro extends Component
 
             $this->archivo->storeAs($rutaBase, $nombreArchivo, 'public');
 
-
-            // Reglas para el estado del documento (Recibido o Recibido extemporáneo ----------
-
-            $reglasDocumentoService = app(ReglasDocumentoService::class);
-
             $estadoRecibidoId = Estado::where('nombre', 'Recibido')->value('id');
-            $estadoExtemporaneoId = Estado::where('nombre', 'Recibido extemporáneo')->value('id');
 
-            if (!$estadoRecibidoId || !$estadoExtemporaneoId) {
-                throw new \Exception('No se encontraron estados "Recibido" y/o "Recibido extemporáneo".');
+            if (!$estadoRecibidoId) {
+                throw new \Exception('No se encontró el estado "Recibido".');
             }
-            $esOportuno = $reglasDocumentoService->esOportuno(
-                $documento,
-                $periodo,
-                now()
-            );
-
-
-            $estadoId = $esOportuno ? $estadoRecibidoId : $estadoExtemporaneoId;
-
-            /*dd([
-                'Regla del documento ' => $documento->regla_presentacion,
-                'Inicio del periodo  ' => $periodo->fecha_inicio,
-                'Fin del periodo     ' => $periodo->fecha_fin,
-                'Fecha de hoy        ' => now()->toDateString(),
-                'esOportuno          ' => $esOportuno,
-                'estadoId            ' => $estadoId,
-            ]); */
-            // Fin Reglas ---------------------------------------------------------------------
 
             ArchivoDocumentoRecibido::create([
                 'nombre' => $nombreArchivo,
@@ -345,22 +351,22 @@ class Registro extends Component
                 'tipo_recepcion' => $this->tipoSubida,
                 'fecha_cambio_estatus' => null,
                 'usuario_revisor' => null,
-                'estado_id' => $estadoId,
+                'estado_id' => $estadoRecibidoId,
                 'observaciones_revisor' => null,
                 'causas_rechazo_id' => null,
             ]);
 
-            // IMPORTANTE: Resetear todas las propiedades del formulario
             $this->reset([
                 'mostrarModal',
                 'documentoRecibidoSeleccionado',
                 'documentoSeleccionado',
                 'tipoSubida',
-                'descripcion'
+                'descripcion',
             ]);
-            $this->archivo = null; // Limpiar el archivo
 
-            $this->dispatch('archivo-subido', 'Archivo subido correctamente', 'success');
+            $this->archivo = null;
+
+            $this->dispatch('archivo-subido', 'Archivo subido correctamente.', 'success');
 
             $this->limpiarFormulario();
         } catch (\Exception $e) {
@@ -396,18 +402,28 @@ class Registro extends Component
 
     public function estadoSubidaPorRegla(DocumentosRecibido $documentoRecibido, string $tipoRecepcion): array
     {
-        $periodo = \App\Models\Periodo::find($this->periodosSeleccionados);
+        $periodoEnte = $this->obtenerPeriodoEnteSeleccionado();
+        $vigencia = $this->evaluarVigenciaPeriodoEnte($periodoEnte);
 
-        if (!$periodo || !$documentoRecibido->documento || !auth()->user()?->ente_id) {
+        if (!$vigencia['habilitado']) {
             return [
-                'habilitado' => true,
+                'habilitado' => false,
                 'ya_subido' => false,
-                'leyenda' => null,
+                'leyenda' => $vigencia['mensaje'],
             ];
         }
 
-        /** @var \App\Services\ReglasDocumentoService $reglas */
-        $reglas = app(\App\Services\ReglasDocumentoService::class);
+        $periodo = $periodoEnte->periodo;
+
+        if (!$periodo || !$documentoRecibido->documento || !auth()->user()?->ente_id) {
+            return [
+                'habilitado' => false,
+                'ya_subido' => false,
+                'leyenda' => 'No se pudo validar la vigencia del periodo.',
+            ];
+        }
+
+        $reglas = app(ReglasDocumentoService::class);
 
         return $reglas->evaluarBloqueoPorReglaYSubidaPrevia(
             $documentoRecibido->documento,
@@ -421,4 +437,59 @@ class Registro extends Component
     {
         return view('livewire.documentos.registro');
     }
+
+private function obtenerPeriodoEnteSeleccionado(): ?PeriodoEnte
+{
+    $enteId = auth()->user()?->ente_id;
+
+    if (!$enteId || !$this->periodosSeleccionados) {
+        return null;
+    }
+
+    return PeriodoEnte::with('periodo')
+        ->where('ente_id', $enteId)
+        ->where('periodo_id', $this->periodosSeleccionados)
+        ->where('is_active', true)
+        ->first();
+}
+
+private function evaluarVigenciaPeriodoEnte(?PeriodoEnte $periodoEnte): array
+{
+    if (!$periodoEnte) {
+        return [
+            'habilitado' => false,
+            'mensaje' => 'El periodo seleccionado no está habilitado para este ente.',
+        ];
+    }
+
+    if (!$periodoEnte->fecha_inicio || !$periodoEnte->fecha_fin) {
+        return [
+            'habilitado' => false,
+            'mensaje' => 'El periodo no tiene fechas configuradas para este ente.',
+        ];
+    }
+
+    $hoy = now()->startOfDay();
+    $fechaInicio = $periodoEnte->fecha_inicio->copy()->startOfDay();
+    $fechaFin = $periodoEnte->fecha_fin->copy()->startOfDay();
+
+    if ($hoy->lt($fechaInicio)) {
+        return [
+            'habilitado' => false,
+            'mensaje' => 'El periodo todavía no inicia. Podrá subir archivos a partir del ' . $fechaInicio->format('d/m/Y') . '.',
+        ];
+    }
+
+    if ($hoy->gt($fechaFin)) {
+        return [
+            'habilitado' => false,
+            'mensaje' => 'El periodo ya cerró. La fecha límite fue ' . $fechaFin->format('d/m/Y') . '. No se permiten entregas extemporáneas.',
+        ];
+    }
+
+    return [
+        'habilitado' => true,
+        'mensaje' => null,
+    ];
+}
 }

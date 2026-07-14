@@ -30,7 +30,9 @@ class UsuariosForm
                     ->rule(Password::default())
                     ->same('password_confirmation')
                     ->maxLength(255)
-                    ->revealable(),
+                    ->revealable()
+                    ->dehydrateStateUsing(fn ($state) => filled($state) ? $state : null)
+                    ->dehydrated(fn ($state) => filled($state)),
                 TextInput::make('password_confirmation')
                     ->label('Confirmar Contraseña')
                     ->password()
