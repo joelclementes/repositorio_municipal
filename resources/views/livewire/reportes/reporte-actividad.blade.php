@@ -220,7 +220,7 @@
                                         $badgeClass = 'bg-red-100 text-red-800';
                                     } elseif (str_contains($action, 'Carga')) {
                                         $badgeClass = 'bg-teal-100 text-teal-800';
-                                    } elseif (str_contains($action, 'Actualización')) {
+                                    } elseif (str_contains($action, 'Actualización') || str_contains($action, 'Activación') || str_contains($action, 'Desactivación')) {
                                         $badgeClass = 'bg-amber-100 text-amber-800';
                                     }
                                 @endphp
@@ -229,16 +229,134 @@
                                 </span>
                             </td>
 
-                            <!-- Descripción -->
-                            <td class="px-6 py-4 text-sm text-gray-700 max-w-xs break-words font-sans">
-                                {{ $actividad->description }}
+                            <!-- Descripción + Cambios old→new -->
+                            <td class="px-6 py-4 text-sm text-gray-700 max-w-md font-sans">
+                                {{-- Descripción textual --}}
+                                <p class="text-sm text-gray-700 leading-relaxed">{{ $actividad->description }}</p>
+
+                                {{-- Tabla visual de cambios old→new (si existen) --}}
+                                @php
+                                    $props = $actividad->properties;
+                                    $hasOldNew = $props && $props->has('old') && $props->has('attributes');
+                                    $old = $hasOldNew ? $props['old'] : [];
+                                    $attributes = $hasOldNew ? $props['attributes'] : [];
+
+                                    // Labels en español para los campos
+                                    $fieldLabels = [
+                                        'mes_numero'            => 'Mes número',
+                                        'mes'                   => 'Mes',
+                                        'axo'                   => 'Año',
+                                        'descripcion'           => 'Descripción',
+                                        'fecha_inicio'          => 'Fecha inicio',
+                                        'fecha_fin'             => 'Fecha fin',
+                                        'is_active'             => 'Estado',
+                                        'name'                  => 'Nombre',
+                                        'email'                 => 'Correo electrónico',
+                                        'ente_id'               => 'Ente asignado',
+                                        'nombre'                => 'Nombre del archivo',
+                                        'estado_id'             => 'Estado del documento',
+                                        'observaciones_ente'    => 'Observaciones del ente',
+                                        'observaciones_revisor' => 'Observaciones del revisor',
+                                        'causas_rechazo_id'     => 'Causa de rechazo',
+                                        'autorizado_reenviar'   => 'Autorizado reenviar',
+                                        'tipo_recepcion'        => 'Tipo de recepción',
+                                        'titulo'                => 'Título',
+                                        'tipo_aviso'            => 'Tipo de aviso',
+                                        'activo'                => 'Estado',
+                                        'fecha_publicacion'     => 'Fecha publicación',
+                                        'fecha_expiracion'      => 'Fecha expiración',
+                                        'url'                   => 'URL',
+                                        'archivo'               => 'Archivo',
+                                    ];
+                                @endphp
+
+                                @if($hasOldNew && count($old) > 0)
+                                    <div class="mt-2 border border-gray-200 rounded-lg overflow-hidden">
+                                        <div class="bg-gray-50 px-3 py-1.5 border-b border-gray-200">
+                                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Detalle de cambios</span>
+                                        </div>
+                                        <table class="min-w-full text-xs">
+                                            <thead>
+                                                <tr class="bg-gray-50/50">
+                                                    <th class="px-3 py-1.5 text-left font-semibold text-gray-500 uppercase tracking-wider" style="font-size: 10px;">Campo</th>
+                                                    <th class="px-3 py-1.5 text-left font-semibold text-red-500 uppercase tracking-wider" style="font-size: 10px;">Anterior</th>
+                                                    <th class="px-3 py-1.5 text-left font-semibold text-green-600 uppercase tracking-wider" style="font-size: 10px;">Nuevo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-100">
+                                                @foreach($old as $campo => $valorAnterior)
+                                                    @php
+                                                        $nuevoValor = $attributes[$campo] ?? '—';
+                                                        $label = $fieldLabels[$campo] ?? ucfirst(str_replace('_', ' ', $campo));
+
+                                                        // Formatear booleans
+                                                        if ($campo === 'is_active' || $campo === 'activo') {
+                                                            $valorAnterior = $valorAnterior ? 'Activo' : 'Inactivo';
+                                                            $nuevoValor = $nuevoValor ? 'Activo' : 'Inactivo';
+                                                        }
+
+                                                        // Formatear autorizado_reenviar
+                                                        if ($campo === 'autorizado_reenviar') {
+                                                            $valorAnterior = $valorAnterior ? 'Sí' : 'No';
+                                                            $nuevoValor = $nuevoValor ? 'Sí' : 'No';
+                                                        }
+                                                    @endphp
+                                                    <tr>
+                                                        <td class="px-3 py-1.5 font-semibold text-gray-600">{{ $label }}</td>
+                                                        <td class="px-3 py-1.5">
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-red-50 text-red-700 font-mono" style="font-size: 11px;">
+                                                                {{ is_null($valorAnterior) || $valorAnterior === '' ? '(vacío)' : $valorAnterior }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="px-3 py-1.5">
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-green-50 text-green-700 font-mono" style="font-size: 11px;">
+                                                                {{ is_null($nuevoValor) || $nuevoValor === '' ? '(vacío)' : $nuevoValor }}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+
+                                {{-- Mostrar atributos de creación si solo hay 'attributes' --}}
+                                @if($props && $props->has('attributes') && !$props->has('old') && is_array($props['attributes']))
+                                    @php
+                                        $attribs = $props['attributes'];
+                                        // Excluir campos técnicos
+                                        $excluir = ['ip', 'user_agent', 'realizado_por'];
+                                        $attribs = array_diff_key($attribs, array_flip($excluir));
+                                    @endphp
+                                    @if(count($attribs) > 0)
+                                        <div class="mt-2 border border-gray-200 rounded-lg overflow-hidden">
+                                            <div class="bg-blue-50 px-3 py-1.5 border-b border-gray-200">
+                                                <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Datos registrados</span>
+                                            </div>
+                                            <div class="px-3 py-2 space-y-1">
+                                                @foreach($attribs as $campo => $valor)
+                                                    @php
+                                                        $label = $fieldLabels[$campo] ?? ucfirst(str_replace('_', ' ', $campo));
+                                                        if (($campo === 'is_active' || $campo === 'activo') && !is_null($valor)) {
+                                                            $valor = $valor ? 'Activo' : 'Inactivo';
+                                                        }
+                                                    @endphp
+                                                    <div class="flex items-baseline gap-2 text-xs">
+                                                        <span class="font-semibold text-gray-600 min-w-[100px]">{{ $label }}:</span>
+                                                        <span class="text-gray-800 font-mono" style="font-size: 11px;">{{ is_null($valor) || $valor === '' ? '(vacío)' : $valor }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endif
                             </td>
 
                             <!-- IP / Dispositivo (extraído del json properties) -->
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-sans">
                                 @php
-                                    $ip = $actividad->properties ? $actividad->getExtraProperty('ip') : null;
-                                    $userAgent = $actividad->properties ? $actividad->getExtraProperty('user_agent') : null;
+                                    $ip = $actividad->properties ? ($actividad->properties['ip'] ?? null) : null;
+                                    $userAgent = $actividad->properties ? ($actividad->properties['user_agent'] ?? null) : null;
                                 @endphp
                                 <span class="font-mono text-xs bg-gray-50 px-2 py-1 rounded border border-gray-150">
                                     {{ $ip ?? 'N/A' }}
