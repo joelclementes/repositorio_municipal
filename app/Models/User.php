@@ -10,11 +10,16 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
     use HasRoles;
     use HasApiTokens;
+    use LogsActivity;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
@@ -66,6 +71,107 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // ── Activity Log Configuration ───────────────────────────
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email', 'is_active', 'ente_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $ejecutor = Auth::user();
+        $ejecutorNombre = $ejecutor ? "\"{$ejecutor->name}\" ({$ejecutor->email})" : 'el sistema';
+
+        // Agregar IP, user_agent y contexto
+        $props = $activity->properties->toArray();
+        $props['ip'] = request()->ip();
+        $props['user_agent'] = request()->userAgent();
+        $props['realizado_por'] = $ejecutor?->name ?? 'Sistema';
+        $activity->properties = collect($props);
+
+        $rolNombre = $this->roles->first()?->name ?? 'Sin rol asignado';
+        $enteNombre = $this->ente?->nombre ?? 'Sin ente';
+
+        switch ($eventName) {
+            case 'created':
+                $activity->log_name = 'Creación de usuario';
+                $activity->description = "Se registró un nuevo usuario en el sistema."
+                    . " Nombre: \"{$this->name}\". Cuenta de acceso: {$this->email}."
+                    . " Rol asignado: {$rolNombre}. Ente/Dependencia: {$enteNombre}."
+                    . " Creado por: {$ejecutorNombre}.";
+                break;
+
+            case 'updated':
+                $original = $this->getOriginal();
+                $cambiosTexto = $this->buildUserCambiosTexto($activity, $original);
+
+                // Detectar activación/desactivación
+                $dirty = $this->getDirty();
+                if (isset($dirty['is_active'])) {
+                    $status = $this->is_active ? 'ACTIVÓ' : 'DESACTIVÓ';
+                    $activity->log_name = $this->is_active ? 'Activación de usuario' : 'Desactivación de usuario';
+                    $activity->description = "Se {$status} la cuenta del usuario \"{$this->name}\" (cuenta: {$this->email})."
+                        . " Ente: {$enteNombre}."
+                        . " Acción realizada por: {$ejecutorNombre}.";
+                } else {
+                    $activity->log_name = 'Actualización de usuario';
+                    $activity->description = "Se modificaron los datos del usuario \"{$this->name}\" (cuenta: {$this->email})."
+                        . " Cambios: {$cambiosTexto}."
+                        . " Modificado por: {$ejecutorNombre}.";
+                }
+                break;
+
+            case 'deleted':
+                $activity->log_name = 'Eliminación de usuario';
+                $activity->description = "Se eliminó permanentemente el usuario \"{$this->name}\" (cuenta: {$this->email})."
+                    . " Rol: {$rolNombre}. Ente: {$enteNombre}."
+                    . " Eliminado por: {$ejecutorNombre}.";
+                break;
+        }
+    }
+
+    /**
+     * Construye texto legible de los cambios del usuario
+     */
+    private function buildUserCambiosTexto(Activity $activity, array $original): string
+    {
+        $old = $activity->properties['old'] ?? [];
+        $attributes = $activity->properties['attributes'] ?? [];
+
+        $labels = [
+            'name'      => 'Nombre',
+            'email'     => 'Correo electrónico',
+            'is_active' => 'Estado',
+            'ente_id'   => 'Ente asignado',
+        ];
+
+        $cambios = [];
+        foreach ($attributes as $campo => $nuevoValor) {
+            $valorAnterior = $old[$campo] ?? 'vacío';
+            $label = $labels[$campo] ?? ucfirst(str_replace('_', ' ', $campo));
+
+            if ($campo === 'is_active') {
+                $valorAnterior = $valorAnterior ? 'Activo' : 'Inactivo';
+                $nuevoValor = $nuevoValor ? 'Activo' : 'Inactivo';
+            }
+
+            if ($campo === 'ente_id') {
+                $valorAnterior = Ente::find($valorAnterior)?->nombre ?? 'Sin ente';
+                $nuevoValor = Ente::find($nuevoValor)?->nombre ?? 'Sin ente';
+            }
+
+            $cambios[] = "{$label}: \"{$valorAnterior}\" → \"{$nuevoValor}\"";
+        }
+
+        return implode('; ', $cambios) ?: 'Sin cambios relevantes';
+    }
+
+    // ── Relationships ────────────────────────────────────────
 
     /**
      * Relación: Un usuario (EnteObligado) pertenece a un Ente
