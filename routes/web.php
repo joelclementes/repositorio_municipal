@@ -26,4 +26,5 @@ Route::middleware([
     require __DIR__.'/revisor.php';
     require __DIR__.'/reportes.php';
     require __DIR__.'/mensajeria.php';
+    require __DIR__.'/roles-permisos.php';
 });
