@@ -25,66 +25,108 @@
 
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                {{-- @can('configurar')
+                @can('administrar')
                     <div
                         class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <div class="px-4 py-3" style="background-color:#ffa933 ">
-                            <h2 class="text-white font-bold text-lg flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                    </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                Configurar
-                            </h2>
-                        </div>
-                        <div class="p-4">
-                            <ul class="space-y-2">
-                                <li class="flex items-center text-gray-700 hover:text-[#ffa933] cursor-pointer">
-                                    <span class="w-2 h-2 rounded-full mr-2" style="background-color: #ffa933;"></span>
-                                    Gestión de usuarios
-                                </li>
-                            </ul>
-                        </div>
+                        <a href="{{ route('periodos.registro.index') }}">
+                            <div class="px-4 py-3" style="background-color: #74c26e;">
+                                <h2 class="text-white font-bold text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Administrar Períodos
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
+                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #74c26e;"></span>
+                                        Módulo para la configuración y gestión de los períodos de reporte, asegurando que la
+                                        información se
+                                        registre conforme a los calendarios establecidos por el Congreso.
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
                     </div>
-                @endcan --}}
 
-                {{-- @can('administrar')
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                    <div class="px-4 py-3" style="background-color: #2C5A8C;">
-                        <h2 class="text-white font-bold text-lg flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
-                            </svg>
-                            Administrar
-                        </h2>
+                    <div
+                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
+                        <a href="{{ route('revisor.asignar.index') }}">
+                            <div class="px-4 py-3" style="background-color: #d5b55d;">
+                                <h2 class="text-white font-bold text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    Asigación de Entes
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
+                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #d5b55d;"></span>
+                                        Módulo para la administración de los entes obligados, permitiendo asociar
+                                        responsabilidades a usuarios según corresponda a cada uno.
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
                     </div>
-                    <div class="p-4">
-                        <p class="text-sm text-gray-600 mb-3">Administración de catálogos y supervisión</p>
-                        <ul class="space-y-2">
-                            <li class="flex items-center text-gray-700 hover:text-[#2C5A8C] cursor-pointer">
-                                <span class="w-2 h-2 rounded-full mr-2" style="background-color: #2C5A8C;"></span>
-                                Catálogos
-                            </li>
-                            <li class="flex items-center text-gray-700 hover:text-[#2C5A8C] cursor-pointer">
-                                <span class="w-2 h-2 rounded-full mr-2" style="background-color: #2C5A8C;"></span>
-                                Asignación de entes
-                            </li>
-                            <li class="flex items-center text-gray-700 hover:text-[#2C5A8C] cursor-pointer">
-                                <span class="w-2 h-2 rounded-full mr-2" style="background-color: #2C5A8C;"></span>
-                                Supervisar revisores
-                            </li>
-                            <li class="flex items-center text-gray-700 hover:text-[#2C5A8C] cursor-pointer">
-                                <span class="w-2 h-2 rounded-full mr-2" style="background-color: #2C5A8C;"></span>
-                                Crear avisos
-                            </li>
-                        </ul>
+
+                    {{-- <div
+                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
+                        <a href="{{ route('avisos.index') }}">
+                            <div class="px-4 py-3" style="background-color: #8974bf;">
+                                <h2 class="text-white font-bold text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 8h2m0 0h2m-2 0V6m0 2v2" />
+                                    </svg>
+                                    Generar Avisos
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
+                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #8974bf;"></span>
+                                        Módulo que permite crear y enviar comunicados oficiales, notificaciones o
+                                        recordatorios a los entes obligados,
+                                        agilizando la comunicación institucional y el cumplimiento de plazos establecidos.
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
+                    </div> --}}
+
+                    <div
+                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
+                        <a href="{{ route('revisores.avances.index') }}">
+                            <div class="px-4 py-3" style="background-color: #e84a4a;">
+                                <h2 class="text-white font-bold text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Avances Revisores
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
+                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #d5b55d;"></span>
+                                        Módulo que permite monitorear el progreso de los revisores en la validación de
+                                        documentos y cumplimiento de plazos, ofreciendo una vista clara del estado de cada
+                                        proceso, el volumen de revisiones completadas y pendientes.
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
                     </div>
-                </div>
-                @endcan --}}
+                @endcan
 
                 @can('registrar')
                     <div
@@ -104,8 +146,10 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b24280] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #b24280;"></span>
-                                        Módulo que permite el alta de nuevos registros dentro del sistema, ya sea para incorporar información financiera,
-                                        documentación de obras municipales o cualquier otro informe requerido por los entes obligados.
+                                        Módulo que permite el alta de nuevos registros dentro del sistema, ya sea para
+                                        incorporar información financiera,
+                                        documentación de obras municipales o cualquier otro informe requerido por los entes
+                                        obligados.
                                     </li>
                                 </ul>
                             </div>
@@ -131,7 +175,8 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#5eb2c6] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #5eb2c6;"></span>
-                                        Módulo que permite consultar y validar la documentación enviada por los entes obligados, facilitando
+                                        Módulo que permite consultar y validar la documentación enviada por los entes
+                                        obligados, facilitando
                                         la supervisión del cumplimiento normativo y la calidad de la información recibida.
                                     </li>
                                 </ul>
@@ -159,111 +204,15 @@
                                 <ul class="space-y-2">
                                     <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
                                         <span class="w-2 h-2 rounded-full mr-2" style="background-color: #b64747;"></span>
-                                        Módulo para la elaboración de reportes personalizados a partir de los datos capturados en el sistema.
+                                        Módulo para la elaboración de reportes personalizados a partir de los datos
+                                        capturados en el sistema.
                                     </li>
                                 </ul>
                             </div>
                         </a>
                     </div>
                 @endcan
-                @can('administrar')
-                    <div
-                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <a href="{{ route('avisos.index') }}">
-                            <div class="px-4 py-3" style="background-color: #8974bf;">
-                                <h2 class="text-white font-bold text-lg flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 8h2m0 0h2m-2 0V6m0 2v2" />
-                                    </svg>
-                                    Generar Avisos
-                                </h2>
-                            </div>
-                            <div class="p-4">
-                                <ul class="space-y-2">
-                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
-                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #8974bf;"></span>
-                                        Módulo que permite crear y enviar comunicados oficiales, notificaciones o recordatorios a los entes obligados,
-                                        agilizando la comunicación institucional y el cumplimiento de plazos establecidos.
-                                    </li>
-                                </ul>
-                            </div>
-                        </a>
-                    </div>
 
-                    <div
-                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <a href="{{ route('periodos.registro.index') }}">
-                            <div class="px-4 py-3" style="background-color: #74c26e;">
-                                <h2 class="text-white font-bold text-lg flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    Administrar Períodos
-                                </h2>
-                            </div>
-                            <div class="p-4">
-                                <ul class="space-y-2">
-                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
-                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #74c26e;"></span>
-                                        Módulo para la configuración y gestión de los períodos de reporte, asegurando que la información se
-                                        registre conforme a los calendarios establecidos por el Congreso.
-                                    </li>
-                                </ul>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div
-                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <a href="{{ route('revisor.asignar.index') }}">
-                            <div class="px-4 py-3" style="background-color: #d5b55d;">
-                                <h2 class="text-white font-bold text-lg flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                    </svg>
-                                    Asigación de Entes
-                                </h2>
-                            </div>
-                            <div class="p-4">
-                                <ul class="space-y-2">
-                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
-                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #d5b55d;"></span>
-                                        Módulo para la administración de los entes obligados, permitiendo asociar
-                                        responsabilidades a usuarios según corresponda a cada uno.
-                                    </li>
-                                </ul>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div
-                        class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 transform hover:scale-105 transition-transform duration-200">
-                        <a href="{{ route('revisores.avances.index') }}">
-                            <div class="px-4 py-3" style="background-color: #e84a4a;">
-                                <h2 class="text-white font-bold text-lg flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    Avances Revisores
-                                </h2>
-                            </div>
-                            <div class="p-4">
-                                <ul class="space-y-2">
-                                    <li class="flex items-center text-gray-700 hover:text-[#b64747] cursor-pointer">
-                                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: #e84a4a;"></span>
-                                        Avances Revisores
-                                    </li>
-                                </ul>
-                            </div>
-                        </a>
-                    </div>
-                @endcan
 
             </div>
         </div>
