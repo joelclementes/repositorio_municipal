@@ -209,7 +209,8 @@ class RegistroPeriodos extends Component
             return;
         }
 
-        PeriodoEnte::where('id', $this->periodo_ente_id)->update([
+        $periodoEnte = PeriodoEnte::findOrFail($this->periodo_ente_id);
+        $periodoEnte->update([
             'fecha_inicio' => $validated['ente_fecha_inicio'],
             'fecha_fin' => $validated['ente_fecha_fin'],
         ]);
