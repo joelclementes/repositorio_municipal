@@ -147,6 +147,7 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <<<<<<< HEAD=======>>>>>>> johan
         </div>
 
         <!-- Responsive Settings Options (sin la campanita porque ya está arriba) -->
