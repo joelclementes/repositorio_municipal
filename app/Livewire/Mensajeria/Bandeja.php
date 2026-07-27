@@ -54,6 +54,8 @@ class Bandeja extends Component
 
     public array $gruposDestinatariosSeleccionados = [];
 
+    private array $cacheIdsGruposPorRemitente = [];
+
     protected function rules(): array
     {
         return [
@@ -451,12 +453,96 @@ class Bandeja extends Component
         ];
     }
 
+    public function formatearDestinatariosParaBandeja(Mensaje $mensaje): string
+    {
+        $destinatarios = $mensaje->destinatarios
+            ->pluck('destinatario_id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($destinatarios->isEmpty()) {
+            return 'Sin destinatarios';
+        }
+
+        $destinatarioIds = $destinatarios->all();
+        $grupos = $this->obtenerIdsGruposPorRemitente((int) $mensaje->remitente_id);
+        $todosRolesEnte = $grupos['todos_roles_ente'] ?? [];
+
+        if (! empty($todosRolesEnte)
+            && empty(array_diff($todosRolesEnte, $destinatarioIds))
+            && empty(array_diff($destinatarioIds, $todosRolesEnte))) {
+            return 'Grupo: Todos los roles Ente';
+        }
+
+        $etiquetasGrupos = [];
+        $idsAgrupados = [];
+
+        foreach ($this->rolesEnte as $rol) {
+            $idsRol = $grupos[$rol] ?? [];
+
+            if (empty($idsRol)) {
+                continue;
+            }
+
+            if (empty(array_diff($idsRol, $destinatarioIds))) {
+                $etiquetasGrupos[] = 'Grupo: '.$rol;
+                $idsAgrupados = array_merge($idsAgrupados, $idsRol);
+            }
+        }
+
+        $idsAgrupados = array_values(array_unique($idsAgrupados));
+
+        $restantes = array_values(array_diff($destinatarioIds, $idsAgrupados));
+
+        $nombresRestantes = $mensaje->destinatarios
+            ->filter(fn ($destinatario) => in_array((int) $destinatario->destinatario_id, $restantes, true))
+            ->map(fn ($destinatario) => $destinatario->destinatario?->name)
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $partes = array_merge($etiquetasGrupos, $nombresRestantes);
+
+        return empty($partes) ? 'Sin destinatarios' : implode(', ', $partes);
+    }
+
+    private function obtenerIdsGruposPorRemitente(int $remitenteId): array
+    {
+        if (isset($this->cacheIdsGruposPorRemitente[$remitenteId])) {
+            return $this->cacheIdsGruposPorRemitente[$remitenteId];
+        }
+
+        $grupos = [];
+        $todosRolesEnte = [];
+
+        foreach ($this->rolesEnte as $rol) {
+            $idsRol = User::role($rol)
+                ->where('id', '!=', $remitenteId)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->unique()
+                ->values()
+                ->all();
+
+            $grupos[$rol] = $idsRol;
+            $todosRolesEnte = array_merge($todosRolesEnte, $idsRol);
+        }
+
+        $grupos['todos_roles_ente'] = array_values(array_unique($todosRolesEnte));
+
+        $this->cacheIdsGruposPorRemitente[$remitenteId] = $grupos;
+
+        return $grupos;
+    }
+
     public function render()
     {
         $userId = auth()->id();
 
         $mensajes = Mensaje::query()
-            ->with(['remitente', 'archivos', 'destinatarios'])
+            ->with(['remitente', 'archivos', 'destinatarios.destinatario'])
             ->when($this->tipo === 'recibidos', function ($query) use ($userId) {
                 $query->whereHas('destinatarios', function ($q) use ($userId) {
                     $q->where('destinatario_id', $userId);

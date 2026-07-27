@@ -1,4 +1,8 @@
 <div class="p-6">
+    @php
+        $puedeVerColumnaLeido = auth()->user()?->hasAnyRole(['Administrador', 'SuperUsuario']) ?? false;
+    @endphp
+
     @if (session('success'))
         <div class="mb-4 rounded bg-green-100 px-4 py-3 text-green-800">
             {{ session('success') }}
@@ -42,9 +46,15 @@
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Quién envía</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Asunto</th>
+                    @if ($puedeVerColumnaLeido)
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Destinatario(s)</th>
+                    @endif
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Cuerpo</th>
                     <th class="px-4 py-3 text-center text-xs font-semibold uppercase text-gray-500">Adj.</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Fecha</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Enviado</th>
+                    @if ($puedeVerColumnaLeido)
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Leído</th>
+                    @endif
                 </tr>
             </thead>
 
@@ -53,6 +63,10 @@
                     @php
                         $destinatarioActual = $mensaje->destinatarios->firstWhere('destinatario_id', auth()->id());
                         $noLeido = $tipo === 'recibidos' && $destinatarioActual?->estado === 'no_leido';
+                        $lecturas = $mensaje->destinatarios
+                            ->where('estado', 'leido')
+                            ->sortByDesc('leido_at')
+                            ->filter(fn ($destinatario) => $destinatario->leido_at);
                     @endphp
 
                     <tr wire:click="abrirMensaje({{ $mensaje->id }})"
@@ -65,6 +79,12 @@
                             {{ $mensaje->asunto }}
                         </td>
 
+                        @if ($puedeVerColumnaLeido)
+                            <td class="px-4 py-3">
+                                {{ $this->formatearDestinatariosParaBandeja($mensaje) }}
+                            </td>
+                        @endif
+
                         <td class="px-4 py-3">
                             {{ \Illuminate\Support\Str::limit($mensaje->cuerpo, 120) }}
                         </td>
@@ -72,16 +92,29 @@
                         <td class="px-4 py-3 text-center">
                             @if ($mensaje->archivos->count())
                                 📎
+                            @else
+                                📭
                             @endif
                         </td>
 
                         <td class="px-4 py-3">
                             {{ $mensaje->created_at->format('d/m/y') }}
                         </td>
+                        @if ($puedeVerColumnaLeido)
+                            <td class="px-4 py-3">
+                                @forelse ($lecturas as $lectura)
+                                    <div>
+                                        {{ ($lectura->destinatario?->name ?? 'Usuario').' - '.$lectura->leido_at->format('d/m/y H:i') }}
+                                    </div>
+                                @empty
+                                    No leído
+                                @endforelse
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                        <td colspan="{{ $puedeVerColumnaLeido ? 7 : 5 }}" class="px-4 py-8 text-center text-gray-500">
                             No hay mensajes para mostrar.
                         </td>
                     </tr>
