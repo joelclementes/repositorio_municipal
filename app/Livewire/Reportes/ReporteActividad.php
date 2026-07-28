@@ -69,6 +69,100 @@ class ReporteActividad extends Component
         $this->resetPage();
     }
 
+
+
+    /**
+     * Respalda toda la bitácora en PDF, guarda registro en BD, y purga la tabla activity_log
+     */
+    public function limpiarBitacora()
+    {
+        $user = auth()->user();
+
+        if (!$user || !$user->hasAnyRole(['SuperUsuario', 'Administrador'])) {
+            return;
+        }
+
+        // 1. Obtener TODOS los registros actuales (sin filtros)
+        $actividades = Activity::with(['causer', 'causer.ente', 'causer.roles'])
+            ->latest('created_at')
+            ->get();
+
+        $totalRegistros = $actividades->count();
+
+        if ($totalRegistros === 0) {
+            session()->flash('warning', 'No hay registros en la bitácora para respaldar.');
+            return;
+        }
+
+        // 2. Generar el PDF de respaldo con el mismo formato del reporte
+        $fechaLimpieza = now();
+        $nombreArchivo = 'Respaldo_Bitacora_' . $fechaLimpieza->format('Y-m-d_His') . '.pdf';
+        $rutaRelativa = 'respaldos_bitacora/' . $nombreArchivo;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.reporte-actividad', [
+            'actividades' => $actividades,
+            'fechaGeneracion' => $fechaLimpieza->format('d/m/Y H:i'),
+        ]);
+        $pdf->setPaper('legal', 'landscape');
+
+        // 3. Guardar el PDF en storage
+        \Illuminate\Support\Facades\Storage::put($rutaRelativa, $pdf->output());
+
+        // 4. Registrar el respaldo en la base de datos
+        \App\Models\BitacoraRespaldo::create([
+            'nombre_archivo' => $nombreArchivo,
+            'ruta' => $rutaRelativa,
+            'fecha_limpieza' => $fechaLimpieza,
+            'registros_afectados' => $totalRegistros,
+            'usuario_id' => $user->id,
+        ]);
+
+        // 5. Purgar TODOS los registros de activity_log
+        Activity::truncate();
+
+        // 6. Eliminar el archivo de limpieza visual si existe (ya no es necesario)
+        if (\Illuminate\Support\Facades\Storage::exists('bitacora_clear.txt')) {
+            \Illuminate\Support\Facades\Storage::delete('bitacora_clear.txt');
+        }
+
+        $this->resetPage();
+        session()->flash('success', "Se respaldaron {$totalRegistros} registros en \"{$nombreArchivo}\" y se limpió la bitácora.");
+    }
+
+    /**
+     * Descarga un respaldo específico por su ID
+     */
+    public function descargarRespaldo(int $respaldoId)
+    {
+        $user = auth()->user();
+        if (!$user || !$user->hasAnyRole(['SuperUsuario', 'Administrador'])) {
+            return;
+        }
+
+        $respaldo = \App\Models\BitacoraRespaldo::findOrFail($respaldoId);
+
+        if (\Illuminate\Support\Facades\Storage::exists($respaldo->ruta)) {
+            return response()->streamDownload(function () use ($respaldo) {
+                echo \Illuminate\Support\Facades\Storage::get($respaldo->ruta);
+            }, $respaldo->nombre_archivo, [
+                'Content-Type' => 'application/pdf',
+            ]);
+        }
+
+        session()->flash('error', 'El archivo de respaldo no fue encontrado en el servidor.');
+    }
+
+    /**
+     * Lista de respaldos para mostrar en la interfaz
+     */
+    #[Computed]
+    public function respaldos()
+    {
+        return \App\Models\BitacoraRespaldo::with('usuario')
+            ->latest('fecha_limpieza')
+            ->get();
+    }
+
     /**
      * Resetea todos los filtros de búsqueda
      */
