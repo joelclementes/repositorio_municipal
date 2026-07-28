@@ -92,13 +92,13 @@
                         <td class="px-4 py-3 text-center">
                             @if ($mensaje->archivos->count())
                                 📎
-                            @else
-                                📭
+                            {{-- @else
+                                📭 --}}
                             @endif
                         </td>
 
                         <td class="px-4 py-3">
-                            {{ $mensaje->created_at->format('d/m/y') }}
+                            {{ $mensaje->created_at->format('d/m/y H:i') }}
                         </td>
                         @if ($puedeVerColumnaLeido)
                             <td class="px-4 py-3">
