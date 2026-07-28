@@ -155,13 +155,17 @@ class Bandeja extends Component
         $this->respuestaCuerpo = '';
         $this->respuestaArchivos = [];
 
-        MensajeDestinatario::where('mensaje_id', $mensajeId)
+        $destinatarioRel = MensajeDestinatario::where('mensaje_id', $mensajeId)
             ->where('destinatario_id', auth()->id())
             ->where('estado', 'no_leido')
-            ->update([
+            ->first();
+
+        if ($destinatarioRel) {
+            $destinatarioRel->update([
                 'estado' => 'leido',
                 'leido_at' => now(),
             ]);
+        }
     }
 
     public function cerrarLeer(): void
