@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DocumentoRecibidoController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -18,13 +17,15 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    require __DIR__ . '/periodos.php';
-    //require __DIR__ . '/documentos.php';
-    require __DIR__ . '/avisos.php';
-    require __DIR__ . '/documentoRegistro.php';
-    require __DIR__ . '/documentoRevision.php';
-    require __DIR__ . '/asignacionEntes.php';
-    require __DIR__ . '/revisor.php';
-    require __DIR__ . '/reportes.php';
+    require __DIR__.'/periodos.php';
+    // require __DIR__ . '/documentos.php';
+    require __DIR__.'/avisos.php';
+    require __DIR__.'/documentoRegistro.php';
+    require __DIR__.'/documentoRevision.php';
+    require __DIR__.'/asignacionEntes.php';
+    require __DIR__.'/revisor.php';
+    require __DIR__.'/reportes.php';
+    require __DIR__.'/mensajeria.php';
+    require __DIR__.'/roles-permisos.php';
+    require __DIR__.'/manual_de_usuario.php';
 });
-

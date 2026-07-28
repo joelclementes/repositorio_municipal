@@ -43,27 +43,30 @@ class Revision extends Component
         return Periodo::orderBy('id', 'desc')->get();
     }
 
+
     #[Computed]
     public function entesAsignados()
     {
         $user = auth()->user();
 
-        // Si es administrador, mostrar todos los entes
-        if ($user->hasRole('Administrador')) {  // Ajusta el nombre del rol según tu configuración
-            return \App\Models\Ente::orderBy('nombre')->get();
-        }
-
-        // Si no es administrador, verificar si tiene ente asignado
-        if (!$user->ente) {
+        if (!$user) {
             return collect();
         }
 
-        // Retornar solo los entes asignados al usuario
-        return $user->entesAsignados()->orderBy('nombre')->get();
+        // El administrador puede consultar todos los entes
+        if ($user->hasRole('Administrador')) {
+            return \App\Models\Ente::orderBy('nombre')->get();
+        }
 
-        // Asegúrate de tener este método en el modelo User
-        //return auth()->user()->entesAsignados()->orderBy('nombre')->get();
+        // El revisor consulta los entes registrados en entes_revisor,
+        // donde entes_revisor.revisor_id corresponde al usuario autenticado.
+        if ($user->hasRole('Revisor')) {
+            return $user->entesAsignados()
+                ->orderBy('entes.nombre')
+                ->get();
+        }
 
+        return collect();
     }
 
     #[Computed]
@@ -215,7 +218,6 @@ class Revision extends Component
                 ]);
 
                 $this->dispatch('notificacion', 'Reenvío autorizado, el archivo puede reenviarse nuevamente', 'success');
-
             }
         } catch (\Exception $e) {
             $this->dispatch('notificacion', 'Error al autorizar el reenvío del archivo', 'error');
@@ -281,65 +283,65 @@ class Revision extends Component
     }
 
 
-public function mostrarElPanelAprobacion($archivoId)
-{
-    $archivo = ArchivoDocumentoRecibido::find($archivoId);
+    public function mostrarElPanelAprobacion($archivoId)
+    {
+        $archivo = ArchivoDocumentoRecibido::find($archivoId);
 
-    if (!$archivo) {
-        $this->dispatch('notificacion', 'Archivo no encontrado', 'error');
-        return;
-    }
-
-    $this->archivoSeleccionado = $archivo;
-    $this->mostrarPanelAprobacion = true;
-    $this->observacionesRevisor = $archivo->observaciones_revisor ?? '';
-}
-
-public function aprobarArchivo()
-{
-    $this->validate([
-        'observacionesRevisor' => 'nullable|string|max:500',
-    ]);
-
-    try {
-        $estadoAprobado = Estado::where('nombre', 'Aprobado')->value('id');
-
-        if ($this->archivoSeleccionado) {
-            $this->archivoSeleccionado->update([
-                'usuario_revisor' => auth()->id(),
-                'estado_id' => $estadoAprobado,
-                'observaciones_revisor' => $this->observacionesRevisor,
-                'causas_rechazo_id' => null,
-                'fecha_cambio_estatus' => now(),
-            ]);
-
-            $this->dispatch('notificacion', 'Archivo aprobado correctamente', 'success');
-
-            $this->archivoEnRevision = null;
-
-            $this->reset([
-                'mostrarPanelAprobacion',
-                'archivoSeleccionado',
-                'observacionesRevisor',
-            ]);
+        if (!$archivo) {
+            $this->dispatch('notificacion', 'Archivo no encontrado', 'error');
+            return;
         }
-    } catch (\Exception $e) {
-        $this->dispatch('notificacion', 'Error al aprobar el archivo', 'error');
-    }
-}
 
-public function cancelarAprobacion()
-{
-    $this->reset([
-        'mostrarPanelAprobacion',
-        'archivoSeleccionado',
-        'observacionesRevisor',
-    ]);
-}
+        $this->archivoSeleccionado = $archivo;
+        $this->mostrarPanelAprobacion = true;
+        $this->observacionesRevisor = $archivo->observaciones_revisor ?? '';
+    }
+
+    public function aprobarArchivo()
+    {
+        $this->validate([
+            'observacionesRevisor' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $estadoAprobado = Estado::where('nombre', 'Aprobado')->value('id');
+
+            if ($this->archivoSeleccionado) {
+                $this->archivoSeleccionado->update([
+                    'usuario_revisor' => auth()->id(),
+                    'estado_id' => $estadoAprobado,
+                    'observaciones_revisor' => $this->observacionesRevisor,
+                    'causas_rechazo_id' => null,
+                    'fecha_cambio_estatus' => now(),
+                ]);
+
+                $this->dispatch('notificacion', 'Archivo aprobado correctamente', 'success');
+
+                $this->archivoEnRevision = null;
+
+                $this->reset([
+                    'mostrarPanelAprobacion',
+                    'archivoSeleccionado',
+                    'observacionesRevisor',
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('notificacion', 'Error al aprobar el archivo', 'error');
+        }
+    }
+
+    public function cancelarAprobacion()
+    {
+        $this->reset([
+            'mostrarPanelAprobacion',
+            'archivoSeleccionado',
+            'observacionesRevisor',
+        ]);
+    }
 
     public function render()
     {
-    return view('livewire.documentos.revision');
+        return view('livewire.documentos.revision');
     }
 
     public function debug($archivoId)

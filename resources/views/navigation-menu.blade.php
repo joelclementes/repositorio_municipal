@@ -15,10 +15,19 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Inicio') }}
                     </x-nav-link>
+                    @can('configurar')
+                        <x-nav-link href="{{ url('/roles-permisos') }}" target="_blank" rel="noopener noreferrer">
+                            {{ __('Roles y permisos') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('usar-mensajeria')
+                        <x-nav-link href="{{ route('mensajeria.index') }}" :active="request()->routeIs('mensajeria.*')">
+                            {{ __('Mensajería') }}
+                        </x-nav-link>
+                    @endcan
 
                     @can('administrar')
-                        <x-nav-link href="{{ url('/admin') }}"
-                        target="_blank" rel="noopener noreferrer">
+                        <x-nav-link href="{{ url('/admin') }}" target="_blank" rel="noopener noreferrer">
                             {{ __('Administración') }}
                         </x-nav-link>
                     @endcan
@@ -87,13 +96,13 @@
 
                         <x-slot name="content">
                             <!-- Account Management -->
-                            <div class="block px-4 py-2 text-xs text-gray-400">
+                            {{-- <div class="block px-4 py-2 text-xs text-gray-400">
                                 {{ __('Manage Account') }}
                             </div>
 
                             <x-dropdown-link href="{{ route('profile.show') }}">
                                 {{ __('Profile') }}
-                            </x-dropdown-link>
+                            </x-dropdown-link> --}}
 
                             @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                                 <x-dropdown-link href="{{ route('api-tokens.index') }}">
@@ -138,7 +147,7 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-
+            <<<<<<< HEAD=======>>>>>>> johan
         </div>
 
         <!-- Responsive Settings Options (sin la campanita porque ya está arriba) -->
@@ -159,9 +168,9 @@
 
             <div class="mt-3 space-y-1">
                 <!-- Account Management -->
-                <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
+                {{-- <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
                     {{ __('Profile') }}
-                </x-responsive-nav-link>
+                </x-responsive-nav-link> --}}
 
                 @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                     <x-responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">

@@ -27,15 +27,15 @@ class EntesRevisorSeeder extends Seeder
                 'ente_id' => '3',
             ],
             [
-                'revisor_id' => '5',
+                'revisor_id' => '3',
                 'ente_id' => '4',
             ],
             [
-                'revisor_id' => '5',
+                'revisor_id' => '3',
                 'ente_id' => '5',
             ],
             [
-                'revisor_id' => '5',
+                'revisor_id' => '3',
                 'ente_id' => '6',
             ],
         ];
