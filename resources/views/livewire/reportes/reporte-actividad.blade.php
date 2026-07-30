@@ -20,6 +20,15 @@
                 </svg>
                 Exportar Excel
             </a>
+            <!-- Botón Limpiar/Respaldar (Solo Administrador) -->
+            @if(auth()->user()->hasAnyRole(['SuperUsuario', 'Administrador']))
+                <button wire:click="limpiarBitacora" onclick="confirm('¿Estás seguro de realizar la limpieza de la bitácora? Se guardará un respaldo automático en PDF de todos los registros actuales y luego se eliminarán permanentemente de la base de datos.') || event.stopImmediatePropagation()" class="inline-flex items-center px-4 py-2 bg-red-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-650 active:bg-red-800 focus:outline-none transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Limpiar y Respaldar
+                </button>
+            @endif
         </div>
     </div>
 
@@ -52,17 +61,19 @@
 
         <!-- Botones de Acción de Filtro -->
         <div class="md:col-span-4 flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
-            <button wire:click="$toggle('mostrarFiltros')" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-vino-500">
-                <svg class="w-4 h-4 mr-2 {{ $mostrarFiltros ? 'text-vino-800' : 'text-gray-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                </svg>
-                Filtros Avanzados
-                @if(!empty($this->tipoUsuario) || !empty($this->entesSeleccionados) || !empty($this->estatusUsuarios))
-                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-vino-100 text-vino-850">
-                        Activos
-                    </span>
-                @endif
-            </button>
+            <div class="flex flex-wrap items-center gap-2">
+                <button wire:click="$toggle('mostrarFiltros')" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-vino-500">
+                    <svg class="w-4 h-4 mr-2 {{ $mostrarFiltros ? 'text-vino-800' : 'text-gray-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                    </svg>
+                    Filtros Avanzados
+                    @if(!empty($this->tipoUsuario) || !empty($this->entesSeleccionados) || !empty($this->estatusUsuarios))
+                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-vino-100 text-vino-850">
+                            Activos
+                        </span>
+                    @endif
+                </button>
+            </div>
 
             @if($this->tieneFiltrosActivos)
                 <button wire:click="limpiarFiltros" type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
@@ -390,4 +401,62 @@
             </div>
         @endif
     </div>
+
+    <!-- Sección de Respaldos de Bitácora (Solo Administrador) -->
+    @if(auth()->user()->hasAnyRole(['SuperUsuario', 'Administrador']))
+        <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 p-6 space-y-4">
+            <div>
+                <h4 class="text-md font-bold text-vino-800">Historial de Respaldos de Bitácora</h4>
+                <p class="text-xs text-gray-500 mt-0.5">Listado de respaldos automáticos generados antes de realizar una limpieza de la base de datos.</p>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Fecha / Hora</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nombre del Archivo</th>
+                            <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Registros Respaldados</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Usuario que Limpió</th>
+                            <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($this->respaldos as $respaldo)
+                            <tr class="hover:bg-gray-50 transition-colors" wire:key="respaldo-row-{{ $respaldo->id }}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    {{ $respaldo->fecha_limpieza->format('d/m/Y H:i:s') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 font-mono">
+                                    {{ $respaldo->nombre_archivo }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {{ $respaldo->registros_afectados }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $respaldo->usuario?->name ?? 'Sistema' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button wire:click="descargarRespaldo({{ $respaldo->id }})" class="inline-flex items-center px-3 py-1.5 border border-vino-800 text-xs font-bold rounded text-vino-800 bg-white hover:bg-vino-50 transition">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Descargar PDF
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">
+                                    No se han generado respaldos de bitácora aún.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 </div>
