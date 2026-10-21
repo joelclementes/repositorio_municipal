@@ -1,0 +1,95 @@
+x-php: &php
+  image: repositorio-municipal-php:8.4
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+    args:
+      UID: ${HOST_UID:-1000}
+      GID: ${HOST_GID:-1000}
+  working_dir: /var/www/html
+  volumes:
+    - ../:/var/www/html
+
+name: repositorio_municipal
+services:
+  app:
+    <<: *php
+    ports:
+      - "127.0.0.1:${APP_PORT:-8082}:80"
+    container_name: repositorio_municipal_app
+    depends_on:
+      laravel_db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "php",
+          "-r",
+          "exit(@file_get_contents('http://127.0.0.1/up') === false ? 1 : 0);",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  laravel_db:
+    image: mysql:8.0
+    container_name: repositorio_municipal_db
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-repositorio_municipal}
+      MYSQL_USER: ${DB_USERNAME:-sifom}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-sifom}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    ports:
+      - "127.0.0.1:${FORWARD_DB_PORT:-3306}:3306"
+    volumes:
+      - laravel_db_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'MYSQL_PWD="$$MYSQL_PASSWORD" mysql --protocol=TCP -h 127.0.0.1 -u"$$MYSQL_USER" "$$MYSQL_DATABASE" -e "SELECT 1"',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  laravel_pma:
+    image: phpmyadmin:5-apache
+    container_name: repositorio_municipal_pma
+    environment:
+      PMA_HOST: laravel_db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "127.0.0.1:${PMA_PORT:-8083}:80"
+    depends_on:
+      laravel_db:
+        condition: service_healthy
+
+  composer:
+    <<: *php
+    profiles: [tools]
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    environment:
+      COMPOSER_HOME: /tmp/composer
+    entrypoint: [composer]
+    command: [--version]
+
+  node:
+    image: node:22-alpine
+    profiles: [tools]
+    working_dir: /var/www/html
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    environment:
+      npm_config_cache: /tmp/npm
+    volumes:
+      - ../:/var/www/html
+    command: [npm, run, dev, --, --host, 0.0.0.0]
+    ports:
+      - "127.0.0.1:${VITE_PORT:-5173}:5173"
+
+volumes:
+  laravel_db_data:
